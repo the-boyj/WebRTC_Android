@@ -21,14 +21,15 @@ public class MainAdapter extends BaseAdapter<User, MainAdapter.ViewHolder>{
 
     @Override
     protected void onBindView(ViewHolder holder, int position) {
-        holder.binding.setVariable(BR.item, itemList.get(position));
-        holder.binding.fabCall.setOnClickListener(v -> onFabClickListener.onFabClick(itemList.get(position)));
+        holder.binding.setVariable(BR.item, getItemList().get(position));
+        holder.binding.fabCall.setOnClickListener(v -> onFabClickListener.onFabClick(getItemList().get(position)));
     }
+
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, parent, false);
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, parent, false);
         return new ViewHolder(view);
     }
 

@@ -23,7 +23,7 @@ public class MainViewModel extends BaseViewModel {
     public void onCreate() {
         userRepository = UserRepository.getInstance();
 
-        addDisposable(userRepository.getItems()
+        addDisposable(userRepository.getUserList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(list -> users.setValue(list)));
     }

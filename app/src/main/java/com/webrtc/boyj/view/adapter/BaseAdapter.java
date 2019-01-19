@@ -7,11 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseAdapter<T, H extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<H> {
-    List<T> itemList;
+    private List<T> itemList = new ArrayList<>();
+
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
+    }
+
+    protected List<T> getItemList() {
+        return itemList;
     }
 
     @Override
@@ -26,12 +31,7 @@ public abstract class BaseAdapter<T, H extends RecyclerView.ViewHolder> extends 
     /**
      * itemList 전체 수정 */
     public void updateItems(List<T> items) {
-        if(itemList == null) {
-            itemList = new ArrayList<>();
-        }
-        this.itemList.clear();
-        this.itemList.addAll(items);
-
+        this.itemList = items;
         notifyDataSetChanged();
     }
 

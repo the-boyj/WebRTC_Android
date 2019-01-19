@@ -13,9 +13,16 @@ import com.webrtc.boyj.databinding.UserItemBinding;
 import com.webrtc.boyj.model.dto.User;
 
 public class MainAdapter extends BaseAdapter<User, MainAdapter.ViewHolder>{
+    private OnFabClickListener onFabClickListener;
+
+    public void setOnFabClickListener(OnFabClickListener onFabClickListener) {
+        this.onFabClickListener = onFabClickListener;
+    }
+
     @Override
     protected void onBindView(ViewHolder holder, int position) {
         holder.binding.setVariable(BR.item, itemList.get(position));
+        holder.binding.fabCall.setOnClickListener(v -> onFabClickListener.onFabClick(itemList.get(position)));
     }
 
     @NonNull

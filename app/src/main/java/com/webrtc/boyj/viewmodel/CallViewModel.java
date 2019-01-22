@@ -1,13 +1,16 @@
 package com.webrtc.boyj.viewmodel;
 
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
 
 public class CallViewModel extends BaseViewModel {
     private ObservableBoolean isCalling = new ObservableBoolean();
-    private MutableLiveData<Boolean> isActive = new MutableLiveData<>();
+    private MutableLiveData<Boolean> _isActive = new MutableLiveData<>();
+
+    private LiveData<Boolean> isActive = _isActive;
 
     public CallViewModel(@NonNull Application application) {
         super(application);
@@ -19,14 +22,14 @@ public class CallViewModel extends BaseViewModel {
     }
 
     public void onHangUp() {
-        isActive.setValue(false);
+        _isActive.setValue(false);
     }
 
     public ObservableBoolean getIsCalling() {
         return isCalling;
     }
 
-    public MutableLiveData<Boolean> getIsActive() {
+    public LiveData<Boolean> getIsActive() {
         return isActive;
     }
 }

@@ -30,7 +30,7 @@ public abstract class BaseAdapter<T, H extends RecyclerView.ViewHolder> extends 
 
     /**
      * itemList 전체 수정 */
-    public void updateItems(List<T> items) {
+    public void updateItems(@NonNull List<T> items) {
         this.itemList = items;
         notifyDataSetChanged();
     }

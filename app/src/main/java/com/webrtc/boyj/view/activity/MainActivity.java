@@ -8,7 +8,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.model.dto.User;
-import com.webrtc.boyj.utils.Util;
+import com.webrtc.boyj.utils.Constants;
 import com.webrtc.boyj.view.adapter.MainAdapter;
 import com.webrtc.boyj.viewmodel.MainViewModel;
 
@@ -32,7 +32,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
 
     private void moveToCallActivity(User user) {
         Intent intent = new Intent(this, CallActivity.class);
-        intent.putExtra(Util.STRING_USER, user);
+        intent.putExtra(Constants.EXTRA_USER, user);
         startActivity(intent);
     }
 

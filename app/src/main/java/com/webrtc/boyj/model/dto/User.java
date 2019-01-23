@@ -8,9 +8,10 @@ public class User implements Serializable {
     private String deviceToken;
 
     // TODO : Firebase 완성되면 삭제
-    public User(String name, String tel) {
+    public User(String name, String tel,String deviceToken) {
         this.name = name;
         this.tel = tel;
+        this.deviceToken=deviceToken;
     }
 
     public String getName() {

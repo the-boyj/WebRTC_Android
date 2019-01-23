@@ -1,6 +1,7 @@
 package com.webrtc.boyj.viewmodel;
 
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
 
@@ -13,7 +14,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MainViewModel extends BaseViewModel {
     private UserRepository userRepository;
-    private MutableLiveData<List<User>> users = new MutableLiveData<>();
+    private MutableLiveData<List<User>> _users = new MutableLiveData<>();
+
+    private LiveData<List<User>> users = _users;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -23,12 +26,12 @@ public class MainViewModel extends BaseViewModel {
     public void onCreate() {
         userRepository = UserRepository.getInstance();
 
-        addDisposable(userRepository.getItems()
+        addDisposable(userRepository.getUserList()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> users.setValue(list)));
+                .subscribe(list -> _users.setValue(list)));
     }
 
-    public MutableLiveData<List<User>> getUsers() {
+    public LiveData<List<User>> getUsers() {
         return users;
     }
 }

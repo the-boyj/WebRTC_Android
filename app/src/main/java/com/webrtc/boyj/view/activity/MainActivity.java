@@ -1,16 +1,20 @@
 package com.webrtc.boyj.view.activity;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
+import com.webrtc.boyj.model.dto.User;
+import com.webrtc.boyj.utils.Constants;
 import com.webrtc.boyj.view.adapter.MainAdapter;
 import com.webrtc.boyj.viewmodel.MainViewModel;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewModel> {
-    MainAdapter adapter;
+    private MainAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,10 +23,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding, MainViewMode
         binding.recycler.setAdapter(adapter);
         binding.recycler.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        // 아이템 클릭 리스너 필요한 경우
-        // adapter.setOnItemClickListener(System.out::println);
+        // Fab 클릭시 액티비티 이동
+        adapter.setOnFabClickListener(this::moveToCallActivity);
 
+        // User 추가시 데이터 반영
         model.getUsers().observe(this, adapter::updateItems);
+    }
+
+    private void moveToCallActivity(User user) {
+        Intent intent = new Intent(this, CallActivity.class);
+        intent.putExtra(Constants.EXTRA_USER, user);
+        startActivity(intent);
     }
 
     @Override

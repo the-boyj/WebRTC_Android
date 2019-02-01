@@ -45,4 +45,7 @@ dependencies {
     // RxJava
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    implementation ("io.socket:socket.io-client:$socket_version") {
+        exclude group: 'org.json', module: 'json'
+    }
 }

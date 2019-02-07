@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0-SNAPSHOT"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
         dataBinding {
             enabled true
         }

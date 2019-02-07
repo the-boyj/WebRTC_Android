@@ -8,16 +8,12 @@ import io.reactivex.Single;
 public class DeviceTokenManager {
     public static Single<String> getDeviceToken(){
 
-        return Single.create(emitter -> {
-            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(task -> {
-                String token=task.getResult().getToken();
-                emitter.onSuccess(token);
-            })
-            .addOnFailureListener(e -> {
-                emitter.onError(e);
-            });
-        });
-
-
+        return Single.create(emitter -> FirebaseInstanceId.getInstance()
+                .getInstanceId()
+                .addOnCompleteListener(task -> {
+                    final String token=task.getResult().getToken();
+                    emitter.onSuccess(token);
+                })
+                .addOnFailureListener(e -> emitter.onError(e)));
     }
 }

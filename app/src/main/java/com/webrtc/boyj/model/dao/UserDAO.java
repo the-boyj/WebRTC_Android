@@ -28,43 +28,16 @@ public class UserDAO {
     public static String KEY_TOKEN="deviceToken";
     public static String KEY_TEL="tel";
 
-    /*
-    private static UserDAO instance=null;
-
-    private UserDAO(){
-
-    }
-
-    public static UserDAO getInstance(){
-        if(instance==null){
-            synchronized (instance){
-                if(instance==null){
-                    instance=new UserDAO();
-                }
-            }
-        }
-
-        return instance;
-    }
-*/
-
-
     public static Single<String> create(String name){
 
-        return DeviceTokenManager.getDeviceToken().flatMap(new Function<String, Single<String>>() {
-            @Override
-            public Single<String> apply(String s) throws Exception {
-                Map<String, Object> data = new HashMap<>();
-                data.put(KEY_NAME, name);
-                data.put(KEY_TOKEN, s);
-                data.put(KEY_TEL, "010-0000-0000");
-                return FireStoreManager.createDocument(COLLECTION_NAME, FireStoreManager.AUTO_CREATE_DOCUMENT_ID, data);
-
-            }
+        return DeviceTokenManager.getDeviceToken().flatMap((Function<String, Single<String>>) s -> {
+            Map<String, Object> data = new HashMap<>();
+            data.put(KEY_NAME, name);
+            data.put(KEY_TOKEN, s);
+            data.put(KEY_TEL, "010-0000-0000");
+            return FireStoreManager.createDocument(COLLECTION_NAME, FireStoreManager.AUTO_CREATE_DOCUMENT_ID, data);
         });
-
     }
-
 
     public static Single<List<User>> readAll(){
         return Single.create(emitter -> {

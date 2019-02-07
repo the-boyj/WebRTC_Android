@@ -23,7 +23,9 @@ public class Logger {
         Log.e(tag(), msg);
     }
 
-    public static void signalingEvent(String eventString) {Log.i("SignalingEvent", eventString);}
+    public static void signalingEvent(String eventString) {
+        Log.i("SignalingEvent", eventString);
+    }
 
     private static String tag() {
         int level = Thread.currentThread().getStackTrace().length;

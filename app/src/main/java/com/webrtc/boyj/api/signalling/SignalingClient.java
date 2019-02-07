@@ -19,7 +19,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class SignalingClient {
-    private static final String URL = "http://13.124.41.104:";
+    private static final String IP = "http://13.124.41.104:";
     private static final int PORT = 3000;
     private static SignalingClient instance;
     private Socket socket;
@@ -66,8 +66,9 @@ public class SignalingClient {
             IO.setDefaultHostnameVerifier((hostname, session) -> true);
             IO.setDefaultSSLContext(sslcontext);
             */
-            socket = IO.socket(URL + PORT);
+            socket = IO.socket(IP + PORT);
         } catch (URISyntaxException e) {
+            //TODO 예외처리
             e.printStackTrace();
         }
         socket.on(SignalingInterface.EVENT_CREATED, args -> createdEventSubject.onNext("created"));
@@ -86,6 +87,7 @@ public class SignalingClient {
             socket.emit(SignalingInterface.EVENT_DIAL,object);
             Logger.signalingEvent(SignalingInterface.EVENT_DIAL);
         } catch (JSONException e) {
+            //TODO 예외처리
             e.printStackTrace();
         }
     }
@@ -96,6 +98,7 @@ public class SignalingClient {
             socket.emit(SignalingInterface.EVENT_AWAKEN,object);
             Logger.signalingEvent(SignalingInterface.EVENT_AWAKEN);
         } catch (JSONException e) {
+            //TODO 예외처리
             e.printStackTrace();
         }
     }
@@ -137,14 +140,14 @@ public class SignalingClient {
     public void connect(){
         if(!isConnected){
             socket.connect();
-            isConnected=true;
+            isConnected = true;
         }
     }
     public void close() {
         if(isConnected){
             socket.disconnect();
             socket.close();
-            isConnected=false;
+            isConnected = false;
         }
     }
 }

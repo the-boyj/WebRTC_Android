@@ -1,10 +1,6 @@
 package com.webrtc.boyj.model.dao;
 
-import android.util.Log;
-
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.webrtc.boyj.api.firebase.DeviceTokenManager;
 import com.webrtc.boyj.api.firebase.FireStoreManager;
 import com.webrtc.boyj.model.dto.User;
@@ -14,11 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
 public class UserDAO {
@@ -28,20 +20,19 @@ public class UserDAO {
     public static String KEY_TOKEN="deviceToken";
     public static String KEY_TEL="tel";
 
-    public static Single<String> create(String name){
-
-        return DeviceTokenManager.getDeviceToken().flatMap((Function<String, Single<String>>) s -> {
-            Map<String, Object> data = new HashMap<>();
-            data.put(KEY_NAME, name);
-            data.put(KEY_TOKEN, s);
-            data.put(KEY_TEL, "010-0000-0000");
-            return FireStoreManager.createDocument(COLLECTION_NAME, FireStoreManager.AUTO_CREATE_DOCUMENT_ID, data);
+    public Single<String> create(String name){
+        return DeviceTokenManager.getDeviceToken().flatMap((Function<String, Single<String>>) token -> {
+            final Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put(KEY_NAME, name);
+            userInfo.put(KEY_TOKEN, token);
+            userInfo.put(KEY_TEL, "010-0000-0000");
+            return FireStoreManager.createDocument(COLLECTION_NAME ,userInfo ,FireStoreManager.AUTO_CREATE_DOCUMENT_ID);
         });
     }
 
-    public static Single<List<User>> readAll(){
+    public Single<List<User>> readAll(){
         return Single.create(emitter -> {
-            List<User> userList=new ArrayList<>();
+            final List<User> userList=new ArrayList<>();
 
             FireStoreManager.getCollection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
@@ -55,9 +46,5 @@ public class UserDAO {
                 }
             });
         });
-
-
     }
-
-
 }

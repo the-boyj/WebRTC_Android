@@ -1,6 +1,5 @@
 package com.webrtc.boyj.api.firebase;
 
-
 import android.content.Intent;
 import android.util.Log;
 
@@ -36,6 +35,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void sendRegistrationToServer(String token) {
         // TODO: Implement this method to send token to your app server.
-        UserDAO.create("unknown").subscribe(s -> Log.d(TAG,"sendRegistrationToServer"));
+        UserDAO userDAO = new UserDAO();
+        userDAO.create("unknown")
+                .subscribe(s -> Log.d(TAG,"sendRegistrationToServer"));
     }
 }

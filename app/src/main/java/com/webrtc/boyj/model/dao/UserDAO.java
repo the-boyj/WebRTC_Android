@@ -42,6 +42,7 @@ public class UserDAO {
                     emitter.onSuccess(userList);
                 }
                 else {
+                    //TODO Issue#10 네트워크 확인 , 토스트메시지
                     emitter.onError(task.getException());
                 }
             });

@@ -8,6 +8,8 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.webrtc.boyj.model.dao.UserDAO;
 import com.webrtc.boyj.utils.Logger;
 import com.webrtc.boyj.view.activity.CallActivity;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 

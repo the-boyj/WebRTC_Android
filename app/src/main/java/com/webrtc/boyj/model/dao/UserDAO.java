@@ -27,7 +27,8 @@ public class UserDAO {
             FireStoreManager.getCollection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     for(QueryDocumentSnapshot document : task.getResult()){
-                        userList.add(new User(document.get("name").toString(),document.get("tel").toString(),document.get("deviceToken").toString()));
+                        User user = document.toObject(User.class);
+                        userList.add(user);
                     }
                     emitter.onSuccess(userList);
                 }

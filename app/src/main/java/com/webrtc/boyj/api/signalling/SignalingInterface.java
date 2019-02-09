@@ -15,5 +15,5 @@ public interface SignalingInterface {
     String EVENT_BYE = "bye";
     String EVENT_LOG = "log";
     String EVENT_SERVER_ERROR = "serverError";
-    String EVENT_PEER_ERROR = "peer_error";
+    String EVENT_PEER_ERROR = "peerError";
 }

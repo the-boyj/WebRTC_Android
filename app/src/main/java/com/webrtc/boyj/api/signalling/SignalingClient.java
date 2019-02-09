@@ -1,6 +1,11 @@
 package com.webrtc.boyj.api.signalling;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.NonNull;
+
+import com.google.gson.Gson;
+import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.utils.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +29,7 @@ public class SignalingClient {
     private static SignalingClient instance;
     private Socket socket;
 
-    private boolean isConnected=false;
+    private boolean isConnected = false;
     /*
     public boolean isStarted = false;
     public boolean isChannelReady = false;
@@ -80,28 +85,16 @@ public class SignalingClient {
         socket.on(SignalingInterface.EVENT_SERVER_ERROR, args -> byeEventSubject .onNext("error"));
     }
 
-    public void emitDial(String deviceToken) {
-        try {
-            JSONObject object = new JSONObject();
-            object.put("deviceToken", deviceToken);
-            socket.emit(SignalingInterface.EVENT_DIAL,object);
-            Logger.signalingEvent(SignalingInterface.EVENT_DIAL);
-        } catch (JSONException e) {
-            //TODO 예외처리
-            e.printStackTrace();
-        }
+    public void emitDial(@NonNull DialPayload payload) {
+        socket.emit(SignalingInterface.EVENT_DIAL, payload);
+        Logger.signalingEvent(SignalingInterface.EVENT_DIAL);
     }
-    public void emitAwaken(String room){
-        try {
-            JSONObject object = new JSONObject();
-            object.put("room", room);
-            socket.emit(SignalingInterface.EVENT_AWAKEN,object);
-            Logger.signalingEvent(SignalingInterface.EVENT_AWAKEN);
-        } catch (JSONException e) {
-            //TODO 예외처리
-            e.printStackTrace();
-        }
+
+    public void emitAwaken(@NonNull AwakenPayload awakenPayload){
+        socket.emit(SignalingInterface.EVENT_AWAKEN,awakenPayload);
+        Logger.signalingEvent(SignalingInterface.EVENT_AWAKEN);
     }
+
     //TODO 전화 수락 , 거절 기능 추가 후 수정
     public void emitAccept(){
         socket.emit(SignalingInterface.EVENT_ACCEPT);

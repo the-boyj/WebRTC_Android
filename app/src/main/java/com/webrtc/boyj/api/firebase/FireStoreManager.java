@@ -10,6 +10,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.webrtc.boyj.model.dto.User;
 
 import java.util.Map;
 
@@ -40,13 +41,14 @@ public class FireStoreManager {
         return db.collection(collection);
     }
 
-    public static Single<String> createDocument(@Nonnull String collection ,@Nonnull Map<String,Object> data ,@Nullable String documentId){
+    public static Single<String> createDocument(@Nonnull String collection , @Nonnull User user, @Nullable String documentId){
         final Task task;
+
         if(documentId == AUTO_CREATE_DOCUMENT_ID) {
-            task = db.collection(collection).add(data);
+            task = db.collection(collection).add(user);
         }
         else {
-            task = db.collection(collection).document(documentId).set(data);
+            task = db.collection(collection).document(documentId).set(user);
         }
 
         return Single.create(emitter -> task.addOnCompleteListener(task1 -> emitter.onSuccess(COMPLETE_STRING))

@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.webrtc.boyj.model.dao.UserDAO;
+import com.webrtc.boyj.model.dto.User;
 import com.webrtc.boyj.utils.Logger;
 import com.webrtc.boyj.view.activity.CallActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -36,9 +37,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendRegistrationToServer(String token) {
-        // TODO: Implement this method to send token to your app server.
+        User user = new User();
+        user.setDeviceToken(token);
+
         UserDAO userDAO = new UserDAO();
-        userDAO.create("unknown")
+        userDAO.create(user)
                 .subscribe(s -> Log.d(TAG,"sendRegistrationToServer"));
     }
 }

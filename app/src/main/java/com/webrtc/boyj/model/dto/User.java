@@ -7,7 +7,12 @@ public class User implements Serializable {
     private String tel;
     private String deviceToken;
 
-    // TODO : Firebase 완성되면 삭제
+    public User() {
+        this.name = "unknown";
+        this.tel = "000-0000-0000";
+        this.deviceToken = "";
+    }
+
     public User(String name, String tel,String deviceToken) {
         this.name = name;
         this.tel = tel;

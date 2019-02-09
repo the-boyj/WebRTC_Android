@@ -8,7 +8,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class SignalingClient {
-    private static final String PROTOCOL = "http://";
+    private static final String PROTOCOL = "http";
     private static final String IP = "13.124.41.104";
     private static final int PORT = 3000;
 
@@ -27,7 +27,7 @@ public class SignalingClient {
 
     private SignalingClient() {
         try {
-            final String url = String.format("%s%s:%d",PROTOCOL,IP, PORT);
+            final String url = String.format("%s://%s:%d",PROTOCOL,IP, PORT);
             socket = IO.socket(url);
         } catch (URISyntaxException e) {
             e.printStackTrace();

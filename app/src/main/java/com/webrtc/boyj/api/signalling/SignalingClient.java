@@ -1,11 +1,8 @@
 package com.webrtc.boyj.api.signalling;
 
 import com.webrtc.boyj.utils.Logger;
-
 import org.json.JSONObject;
-
 import java.net.URISyntaxException;
-
 import io.reactivex.subjects.PublishSubject;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -18,9 +15,6 @@ public class SignalingClient {
 
     private Socket socket;
     private boolean isConnected = false;
-
-
-
 
     public final PublishSubject<String> createdEventSubject = PublishSubject.create();
     public final PublishSubject<String> knockEventSubject = PublishSubject.create();

@@ -18,7 +18,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding, CallViewMode
 
         final User user = (User) getIntent().getSerializableExtra(Constants.EXTRA_USER);
 
-        if(user != null) {
+        if (user != null) {
             binding.setVariable(BR.item, user);
         }
 

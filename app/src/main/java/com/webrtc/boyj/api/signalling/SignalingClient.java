@@ -1,8 +1,11 @@
 package com.webrtc.boyj.api.signalling;
 
 import com.webrtc.boyj.utils.Logger;
+
 import org.json.JSONObject;
+
 import java.net.URISyntaxException;
+
 import io.reactivex.subjects.PublishSubject;
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -27,7 +30,7 @@ public class SignalingClient {
 
     private SignalingClient() {
         try {
-            final String url = String.format("%s://%s:%d",PROTOCOL,IP, PORT);
+            final String url = String.format("%s://%s:%d", PROTOCOL, IP, PORT);
             socket = IO.socket(url);
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -38,9 +41,9 @@ public class SignalingClient {
     }
 
     public static SignalingClient getInstance() {
-        if(instance == null)
+        if (instance == null)
             synchronized (SignalingClient.class) {
-                if(instance == null){
+                if (instance == null) {
                     instance = new SignalingClient();
                     instance.connect();
                 }
@@ -51,15 +54,15 @@ public class SignalingClient {
     private void attachEventListener() {
         socket.on(SignalingInterface.EVENT_CREATED, args -> createdEventSubject.onNext("created"));
         socket.on(SignalingInterface.EVENT_KNOCK, args -> knockEventSubject.onNext("knock"));
-        socket.on(SignalingInterface.EVENT_READY, args ->readyEventSubject.onNext("ready"));
-        socket.on(SignalingInterface.EVENT_RECEIVE_SDP, args ->rsdpEventSubject.onNext((JSONObject) args[0]));
-        socket.on(SignalingInterface.EVENT_RECEIVE_ICE, args -> riceEventSubject.onNext((JSONObject)args[0]));
-        socket.on(SignalingInterface.EVENT_BYE, args -> byeEventSubject .onNext("bye"));
-        socket.on(SignalingInterface.EVENT_SERVER_ERROR, args -> byeEventSubject .onNext("error"));
+        socket.on(SignalingInterface.EVENT_READY, args -> readyEventSubject.onNext("ready"));
+        socket.on(SignalingInterface.EVENT_RECEIVE_SDP, args -> rsdpEventSubject.onNext((JSONObject) args[0]));
+        socket.on(SignalingInterface.EVENT_RECEIVE_ICE, args -> riceEventSubject.onNext((JSONObject) args[0]));
+        socket.on(SignalingInterface.EVENT_BYE, args -> byeEventSubject.onNext("bye"));
+        socket.on(SignalingInterface.EVENT_SERVER_ERROR, args -> byeEventSubject.onNext("error"));
     }
 
-    private void connect(){
-        if(!isConnected){
+    private void connect() {
+        if (!isConnected) {
             socket.connect();
             isConnected = true;
         }

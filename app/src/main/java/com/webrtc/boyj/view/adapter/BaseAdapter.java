@@ -21,7 +21,7 @@ public abstract class BaseAdapter<T, H extends RecyclerView.ViewHolder> extends 
 
     @Override
     public int getItemCount() {
-        if(itemList == null) {
+        if (itemList == null) {
             return 0;
         }
 
@@ -29,7 +29,8 @@ public abstract class BaseAdapter<T, H extends RecyclerView.ViewHolder> extends 
     }
 
     /**
-     * itemList 전체 수정 */
+     * itemList 전체 수정
+     */
     public void updateItems(@NonNull List<T> items) {
         this.itemList = items;
         notifyDataSetChanged();
@@ -41,7 +42,7 @@ public abstract class BaseAdapter<T, H extends RecyclerView.ViewHolder> extends 
 
         holder.itemView.setOnClickListener(view -> {
             // Item click listener 등록
-            if(onItemClickListener != null) {
+            if (onItemClickListener != null) {
                 onItemClickListener.onItemClick(position);
             }
         });

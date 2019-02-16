@@ -12,7 +12,7 @@ import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.UserItemBinding;
 import com.webrtc.boyj.model.dto.User;
 
-public class MainAdapter extends BaseAdapter<User, MainAdapter.ViewHolder>{
+public class MainAdapter extends BaseAdapter<User, MainAdapter.ViewHolder> {
     private OnFabClickListener onFabClickListener;
 
     public void setOnFabClickListener(OnFabClickListener onFabClickListener) {

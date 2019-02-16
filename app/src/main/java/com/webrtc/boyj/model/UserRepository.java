@@ -13,12 +13,13 @@ public class UserRepository {
 
     // TODO : Firebase remote DataSource 변수 추가
 
-    private UserRepository() { }
+    private UserRepository() {
+    }
 
     public static UserRepository getInstance() {
-        if(userRepository == null) {
+        if (userRepository == null) {
             synchronized (UserRepository.class) {
-                if(userRepository == null) {
+                if (userRepository == null) {
                     userRepository = new UserRepository();
                 }
             }

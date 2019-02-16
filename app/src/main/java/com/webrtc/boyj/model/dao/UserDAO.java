@@ -10,29 +10,28 @@ import java.util.List;
 import io.reactivex.Single;
 
 public class UserDAO {
-    private static String TAG="BOYJ_UserInfoDAO";
-    public static String COLLECTION_NAME="User";
-    public static String KEY_NAME="name";
-    public static String KEY_TOKEN="deviceToken";
-    public static String KEY_TEL="tel";
+    private static String TAG = "BOYJ_UserInfoDAO";
+    public static String COLLECTION_NAME = "User";
+    public static String KEY_NAME = "name";
+    public static String KEY_TOKEN = "deviceToken";
+    public static String KEY_TEL = "tel";
 
-    public Single<String> create(User user){
-        return FireStoreManager.createDocument(COLLECTION_NAME ,user ,FireStoreManager.AUTO_CREATE_DOCUMENT_ID);
+    public Single<String> create(User user) {
+        return FireStoreManager.createDocument(COLLECTION_NAME, user, FireStoreManager.AUTO_CREATE_DOCUMENT_ID);
     }
 
-    public Single<List<User>> readAll(){
+    public Single<List<User>> readAll() {
         return Single.create(emitter -> {
-            final List<User> userList=new ArrayList<>();
+            final List<User> userList = new ArrayList<>();
 
             FireStoreManager.getCollection(COLLECTION_NAME).get().addOnCompleteListener(task -> {
-                if(task.isSuccessful()){
-                    for(QueryDocumentSnapshot document : task.getResult()){
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
                         User user = document.toObject(User.class);
                         userList.add(user);
                     }
                     emitter.onSuccess(userList);
-                }
-                else {
+                } else {
                     //TODO Issue#10 네트워크 확인 , 토스트메시지
                     emitter.onError(task.getException());
                 }

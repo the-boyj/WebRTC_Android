@@ -17,13 +17,14 @@ import com.webrtc.boyj.viewmodel.CallViewModel;
 public class CallActivity extends BaseActivity<ActivityCallBinding, CallViewModel> {
     private static final String KEY_IS_CALLER = "isCaller";
     private static final String KEY_ROOM = "room";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final User user = (User) getIntent().getSerializableExtra(Constants.EXTRA_USER);
 
-        if(user != null) {
+        if (user != null) {
             binding.setVariable(BR.item, user);
         }
 

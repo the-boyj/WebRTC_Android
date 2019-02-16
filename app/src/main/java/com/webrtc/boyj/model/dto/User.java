@@ -13,10 +13,10 @@ public class User implements Serializable {
         this.deviceToken = "";
     }
 
-    public User(String name, String tel,String deviceToken) {
+    public User(String name, String tel, String deviceToken) {
         this.name = name;
         this.tel = tel;
-        this.deviceToken=deviceToken;
+        this.deviceToken = deviceToken;
     }
 
     public String getName() {

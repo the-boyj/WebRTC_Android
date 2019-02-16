@@ -14,10 +14,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     private static final String TAG = "BOYJ_MyFCMService";
 
     @Override
-    public void onMessageReceived(RemoteMessage remoteMessage)
-    {
+    public void onMessageReceived(RemoteMessage remoteMessage) {
         Logger.d("FCM received");
-        String room=remoteMessage.getData().get("room");
+        String room = remoteMessage.getData().get("room");
         handleNow(room);
     }
 
@@ -36,6 +35,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         UserDAO userDAO = new UserDAO();
         userDAO.create(user)
-                .subscribe(s -> Log.d(TAG,"sendRegistrationToServer"));
+                .subscribe(s -> Log.d(TAG, "sendRegistrationToServer"));
     }
 }

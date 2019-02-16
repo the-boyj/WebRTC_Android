@@ -3,32 +3,23 @@ package com.webrtc.boyj.api.firebase;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.webrtc.boyj.model.dto.User;
-
-import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 
 public class FireStoreManager {
 
-    public static String AUTO_CREATE_DOCUMENT_ID="auto";
-    public static String COMPLETE_STRING="complete";
+    public static String AUTO_CREATE_DOCUMENT_ID = "auto";
+    public static String COMPLETE_STRING = "complete";
 
     private static FirebaseFirestore db;
 
-    static{
+    static {
 
         db = FirebaseFirestore.getInstance();
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
@@ -37,17 +28,16 @@ public class FireStoreManager {
         db.setFirestoreSettings(settings);
     }
 
-    public static CollectionReference getCollection(@Nonnull String collection){
+    public static CollectionReference getCollection(@Nonnull String collection) {
         return db.collection(collection);
     }
 
-    public static Single<String> createDocument(@Nonnull String collection , @Nonnull User user, @Nullable String documentId){
+    public static Single<String> createDocument(@Nonnull String collection, @Nonnull User user, @Nullable String documentId) {
         final Task task;
 
-        if(documentId == AUTO_CREATE_DOCUMENT_ID) {
+        if (documentId == AUTO_CREATE_DOCUMENT_ID) {
             task = db.collection(collection).add(user);
-        }
-        else {
+        } else {
             task = db.collection(collection).document(documentId).set(user);
         }
 

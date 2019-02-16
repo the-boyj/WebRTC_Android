@@ -7,7 +7,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0-SNAPSHOT"
+        versionName "dev-SNAPSHOT"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         dataBinding {
@@ -71,5 +71,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:17.1.5'
 
     implementation 'com.android.support:multidex:1.0.3'
+    implementation("io.socket:socket.io-client:$socket_version") {
+        exclude group: 'org.json', module: 'json'
+    }
 }
 apply plugin: 'com.google.gms.google-services'

@@ -21,7 +21,7 @@ public abstract class BaseViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        if(!compositeDisposable.isDisposed())
+        if (!compositeDisposable.isDisposed())
             compositeDisposable.dispose();
     }
 

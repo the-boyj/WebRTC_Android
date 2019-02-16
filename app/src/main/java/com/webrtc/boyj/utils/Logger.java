@@ -25,7 +25,7 @@ public class Logger {
 
     private static String tag() {
         int level = Thread.currentThread().getStackTrace().length;
-        level = level >= 5 ? 4 : level-1;
+        level = level >= 5 ? 4 : level - 1;
         final StackTraceElement trace = Thread.currentThread().getStackTrace()[level];
         final String fileName = trace.getFileName();
         final String classPath = trace.getClassName();

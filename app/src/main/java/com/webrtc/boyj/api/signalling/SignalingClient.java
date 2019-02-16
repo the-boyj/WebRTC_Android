@@ -52,6 +52,7 @@ public class SignalingClient {
     }
 
     private void attachEventListener() {
+
         socket.on(SignalingInterface.EVENT_CREATED, args -> createdEventSubject.onNext("created"));
         socket.on(SignalingInterface.EVENT_KNOCK, args -> knockEventSubject.onNext("knock"));
         socket.on(SignalingInterface.EVENT_READY, args -> readyEventSubject.onNext("ready"));
@@ -67,4 +68,5 @@ public class SignalingClient {
             isConnected = true;
         }
     }
+
 }

@@ -73,9 +73,9 @@ public class UserRepositoryImpl implements UserRepository {
                                     response.setMyUser(user);
                                 } else {
                                     userList.add(user);
-                                    response.setUserList(userList);
                                 }
                             }
+                            response.setUserList(userList);
                             if (response.getMyUser() == null) {
                                 emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                             } else {
@@ -113,7 +113,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Single<User> updateUserName(@NonNull String tel, @NonNull String name) {
+    public Single<User> updateUserName(@NonNull String name, @NonNull String tel) {
         final Map<String, Object> map = new HashMap<>();
         map.put(FIELD_USER_NAME, name);
 

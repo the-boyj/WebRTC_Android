@@ -24,11 +24,12 @@ public class UserRepositoryImpl implements UserRepository {
 
     private static final String FIELD_USER_NAME = "name";
     public static final String FIELD_USER_TOKEN = "deviceToken";
+    public static final String CHANGED = "CHANGED";
+
 
     private static final String NOT_EXIST_USER_NAME = "Unknown";
     private static final String ERROR_USER_NOT_EXIST = "User is not exists";
-
-    public static final String PREF_CHANGED = "CHANGED";
+    private static final String ERROR_TOKEN_NOT_EXIST = "Token is not exists";
 
     private static volatile UserRepositoryImpl INSTANCE;
 
@@ -87,11 +88,11 @@ public class UserRepositoryImpl implements UserRepository {
     public Completable updateToken(@NonNull final String tel) {
         final String token = pref.getString(FIELD_USER_TOKEN, null);
         if (token == null) {
-            return Completable.error(new IllegalArgumentException("Token is not exists"));
+            return Completable.error(new IllegalArgumentException(ERROR_TOKEN_NOT_EXIST));
         }
         final DocumentReference docRef = firestore.collection(COLLECTION_USER).document(tel);
 
-        if (pref.getBoolean(PREF_CHANGED, false)) {
+        if (pref.getBoolean(CHANGED, false)) {
             return Completable.create(emitter ->
                     firestore.runTransaction(transaction -> {
                         if (!transaction.get(docRef).exists()) {
@@ -101,7 +102,7 @@ public class UserRepositoryImpl implements UserRepository {
                         }
                         return null;
                     }).addOnSuccessListener(__ -> {
-                        pref.edit().putBoolean(PREF_CHANGED, true).apply();
+                        pref.edit().putBoolean(CHANGED, true).apply();
                         emitter.onComplete();
                     }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
         } else {

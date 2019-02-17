@@ -23,7 +23,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor edit = pref.edit();
         edit.putString(UserRepositoryImpl.FIELD_USER_TOKEN, token);
-        edit.putBoolean(UserRepositoryImpl.PREF_CHANGED, true);
+        edit.putBoolean(UserRepositoryImpl.CHANGED, true);
         edit.apply();
     }
 

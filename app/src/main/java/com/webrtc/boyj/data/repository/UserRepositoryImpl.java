@@ -26,7 +26,6 @@ public class UserRepositoryImpl implements UserRepository {
     public static final String FIELD_USER_TOKEN = "deviceToken";
     public static final String CHANGED = "CHANGED";
 
-
     private static final String NOT_EXIST_USER_NAME = "Unknown";
     private static final String ERROR_USER_NOT_EXIST = "User is not exists";
     private static final String ERROR_TOKEN_NOT_EXIST = "Token is not exists";
@@ -133,6 +132,7 @@ public class UserRepositoryImpl implements UserRepository {
                                     } else {
                                         emitter.onSuccess(user);
                                     }
-                                }).addOnFailureListener(emitter::onError))).subscribeOn(Schedulers.io());
+                                }).addOnFailureListener(emitter::onError)))
+                .subscribeOn(Schedulers.io());
     }
 }

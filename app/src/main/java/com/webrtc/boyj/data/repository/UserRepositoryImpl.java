@@ -1,5 +1,6 @@
 package com.webrtc.boyj.data.repository;
 
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentReference;
@@ -21,17 +22,21 @@ public class UserRepositoryImpl implements UserRepository {
     private static final String COLLECTION_USER = "user";
 
     private static final String FIELD_USER_NAME = "name";
-    private static final String FIELD_USER_TOKEN = "token";
+    public static final String FIELD_USER_TOKEN = "deviceToken";
 
     private static final String NOT_EXIST_USER_NAME = "Unknown";
+    private static final String ERROR_USER_NOT_EXIST = "User is not exists";
+
+    public static final String PREF_CHANGED = "CHANGED";
 
     private static volatile UserRepositoryImpl INSTANCE;
 
-    public static UserRepository getInstance(@NonNull final FirebaseFirestore firestore) {
+    public static UserRepository getInstance(@NonNull final FirebaseFirestore firestore,
+                                             @NonNull final SharedPreferences pref) {
         if (INSTANCE == null) {
             synchronized (UserRepositoryImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UserRepositoryImpl(firestore);
+                    INSTANCE = new UserRepositoryImpl(firestore, pref);
                 }
             }
         }
@@ -40,9 +45,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     private final FirebaseFirestore firestore;
+    @NonNull
+    private final SharedPreferences pref;
 
-    private UserRepositoryImpl(@NonNull FirebaseFirestore firestore) {
+    private UserRepositoryImpl(@NonNull FirebaseFirestore firestore,
+                               @NonNull SharedPreferences pref) {
         this.firestore = firestore;
+        this.pref = pref;
     }
 
     @NonNull
@@ -56,7 +65,7 @@ public class UserRepositoryImpl implements UserRepository {
                             for (final DocumentSnapshot snapshot : snapshots) {
                                 final User user = snapshot.toObject(User.class);
                                 if (user == null) {
-                                    emitter.onError(new IllegalArgumentException("User is null"));
+                                    emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                                     return;
                                 } else {
                                     if (user.getTel().equals(tel)) continue;
@@ -69,41 +78,46 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Completable updateToken(@NonNull final String tel,
-                                   @NonNull final String token) {
+    public Completable updateToken(@NonNull final String tel) {
+        final String token = pref.getString(FIELD_USER_TOKEN, null);
+        if (token == null) {
+            return Completable.error(new IllegalArgumentException("Token is not exists"));
+        }
         final DocumentReference docRef = firestore.collection(COLLECTION_USER).document(tel);
 
-        return Completable.create(emitter ->
-                firestore.runTransaction(transaction -> {
-                    if (!transaction.get(docRef).exists()) {
-                        transaction.set(docRef, new User(NOT_EXIST_USER_NAME, tel, token));
-                    } else {
-                        transaction.update(docRef, FIELD_USER_TOKEN, token);
-                    }
-                    return null;
-                })
-                        .addOnSuccessListener(__ -> emitter.onComplete())
-                        .addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
-
+        if (pref.getBoolean(PREF_CHANGED, false)) {
+            return Completable.create(emitter ->
+                    firestore.runTransaction(transaction -> {
+                        if (!transaction.get(docRef).exists()) {
+                            transaction.set(docRef, new User(NOT_EXIST_USER_NAME, tel, token));
+                        } else {
+                            transaction.update(docRef, FIELD_USER_TOKEN, token);
+                        }
+                        return null;
+                    }).addOnSuccessListener(__ -> {
+                        pref.edit().putBoolean(PREF_CHANGED, true).apply();
+                        emitter.onComplete();
+                    }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
+        } else {
+            return Completable.complete();
+        }
     }
-
 
     @NonNull
     @Override
     public Single<User> getProfile(@NonNull String tel) {
-        return Single.create((SingleOnSubscribe<User>) emitter -> {
-            firestore.collection(COLLECTION_USER)
-                    .document(tel)
-                    .get()
-                    .addOnSuccessListener(snapshot -> {
-                        final User user = snapshot.toObject(User.class);
-                        if (user != null) {
-                            emitter.onSuccess(user);
-                        } else {
-                            emitter.onError(new IllegalArgumentException("No user information"));
-                        }
-                    }).addOnFailureListener(emitter::onError);
-        }).subscribeOn(Schedulers.io());
+        return Single.create((SingleOnSubscribe<User>) emitter ->
+                firestore.collection(COLLECTION_USER)
+                        .document(tel)
+                        .get()
+                        .addOnSuccessListener(snapshot -> {
+                            final User user = snapshot.toObject(User.class);
+                            if (user != null) {
+                                emitter.onSuccess(user);
+                            } else {
+                                emitter.onError(new IllegalArgumentException("No user information"));
+                            }
+                        }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
     }
 
     @NonNull

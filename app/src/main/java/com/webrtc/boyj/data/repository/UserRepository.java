@@ -14,8 +14,7 @@ public interface UserRepository {
     Single<List<User>> getUserList(@NonNull final String tel);
 
     @NonNull
-    Completable updateToken(@NonNull String tel,
-                            @NonNull String token);
+    Completable updateToken(@NonNull String tel);
 
     @NonNull
     Single<User> getProfile(@NonNull final String tel);

@@ -1,5 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- margin/padding -->
+    <dimen name="space_xx_small">4dp</dimen>
+    <dimen name="space_x_small">8dp</dimen>
+    <dimen name="space_small">12dp</dimen>
+    <dimen name="space_median">16dp</dimen>
+    <dimen name="space_s_large">18dp</dimen>
+    <dimen name="space_large">20dp</dimen>
+    <dimen name="space_x_large">24dp</dimen>
+
+    <!-- button size -->
+    <dimen name="button_small">20dp</dimen>
+    <dimen name="button_median">24dp</dimen>
+    <dimen name="button_s_large">28dp</dimen>
+    <dimen name="button_large">32dp</dimen>
+
+    <!-- text size -->
+    <dimen name="text_x_small">10sp</dimen>
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_median">14sp</dimen>
+    <dimen name="text_s_large">16sp</dimen>
+    <dimen name="text_large">18sp</dimen>
+    <dimen name="text_x_large">20sp</dimen>
+
+    <!-- -->
 
     <!-- text size -->
     <dimen name="text_size_small">12sp</dimen>

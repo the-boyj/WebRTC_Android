@@ -111,7 +111,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Completable updateUserName(@NonNull String tel, @NonNull String name) {
+    public Single<User> updateUserName(@NonNull String tel, @NonNull String name) {
         final Map<String, Object> map = new HashMap<>();
         map.put(FIELD_USER_NAME, name);
 
@@ -120,7 +120,18 @@ public class UserRepositoryImpl implements UserRepository {
                         .document(tel)
                         .update(FIELD_USER_NAME, map)
                         .addOnSuccessListener(__ -> emitter.onComplete())
-                        .addOnFailureListener(emitter::onError))
-                .subscribeOn(Schedulers.io());
+                        .addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io())
+                .andThen(Single.create((SingleOnSubscribe<User>) emitter ->
+                        firestore.collection(COLLECTION_USER)
+                                .document(tel)
+                                .get()
+                                .addOnSuccessListener(snapshot -> {
+                                    final User user = snapshot.toObject(User.class);
+                                    if (user == null) {
+                                        emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
+                                    } else {
+                                        emitter.onSuccess(user);
+                                    }
+                                }).addOnFailureListener(emitter::onError))).subscribeOn(Schedulers.io());
     }
 }

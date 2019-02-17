@@ -2,6 +2,7 @@ package com.webrtc.boyj.data.repository;
 
 import android.support.annotation.NonNull;
 
+import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.firestore.response.UserResponse;
 
 import io.reactivex.Completable;
@@ -15,8 +16,6 @@ public interface UserRepository {
     Completable updateToken(@NonNull String tel);
 
     @NonNull
-    Completable updateUserName(@NonNull final String tel,
-                               @NonNull final String name);
-
-
+    Single<User> updateUserName(@NonNull final String tel,
+                                @NonNull final String name);
 }

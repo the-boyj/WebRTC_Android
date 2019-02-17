@@ -7,6 +7,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.webrtc.boyj.data.model.User;
+import com.webrtc.boyj.data.source.firestore.response.UserResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,23 +57,28 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Single<List<User>> getUserList(@NonNull String tel) {
-        return Single.create((SingleOnSubscribe<List<User>>) emitter ->
+    public Single<UserResponse> getUserList(@NonNull String tel) {
+        return Single.create((SingleOnSubscribe<UserResponse>) emitter ->
                 firestore.collection(COLLECTION_USER)
                         .get()
                         .addOnSuccessListener(snapshots -> {
                             final List<User> userList = new ArrayList<>();
+                            final UserResponse response = new UserResponse();
                             for (final DocumentSnapshot snapshot : snapshots) {
                                 final User user = snapshot.toObject(User.class);
                                 if (user == null) {
                                     emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                                     return;
                                 } else {
-                                    if (user.getTel().equals(tel)) continue;
+                                    if (user.getTel().equals(tel)) {
+                                        response.setMyUser(user);
+                                        continue;
+                                    }
                                     userList.add(user);
+                                    response.setUserList(userList);
                                 }
                             }
-                            emitter.onSuccess(userList);
+                            emitter.onSuccess(response);
                         })).subscribeOn(Schedulers.io());
     }
 
@@ -101,23 +107,6 @@ public class UserRepositoryImpl implements UserRepository {
         } else {
             return Completable.complete();
         }
-    }
-
-    @NonNull
-    @Override
-    public Single<User> getProfile(@NonNull String tel) {
-        return Single.create((SingleOnSubscribe<User>) emitter ->
-                firestore.collection(COLLECTION_USER)
-                        .document(tel)
-                        .get()
-                        .addOnSuccessListener(snapshot -> {
-                            final User user = snapshot.toObject(User.class);
-                            if (user != null) {
-                                emitter.onSuccess(user);
-                            } else {
-                                emitter.onError(new IllegalArgumentException("No user information"));
-                            }
-                        }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
     }
 
     @NonNull

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -17,19 +18,44 @@
             android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorAccent"
             app:contentInsetStart="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@{viewModel.myUser.name}"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/text_large"
+                    tools:text="BOYJ" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.myUser.tel}"
+                    android:textSize="@dimen/text_size_small"
+                    tools:text="010-0000-0000" />
+            </LinearLayout>
+        </android.support.v7.widget.Toolbar>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_user"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
     </android.support.constraint.ConstraintLayout>
 </layout>

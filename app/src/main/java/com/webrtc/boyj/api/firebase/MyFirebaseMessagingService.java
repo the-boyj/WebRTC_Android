@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
+import com.webrtc.boyj.utils.Logger;
+import com.webrtc.boyj.view.activity.CallActivity;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -13,22 +15,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        Logger.d("FCM received");
+        String room = remoteMessage.getData().get("room");
+        handleNow(room);
     }
 
     @Override
     public void onNewToken(String token) {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final SharedPreferences.Editor edit = pref.edit();
-        edit.putString(UserRepositoryImpl.FIELD_USER_TOKEN, token);
-        edit.putBoolean(UserRepositoryImpl.CHANGED, true);
-        edit.apply();
+        pref.edit()
+                .putString(UserRepositoryImpl.FIELD_USER_TOKEN, token)
+                .putBoolean(UserRepositoryImpl.CHANGED, true)
+                .apply();
     }
 
     private void handleNow(String room) {
-
-    }
-
-    private void sendRegistrationToServer(String token) {
-
+        CallActivity.goToCallActivity(this, false, room);
     }
 }

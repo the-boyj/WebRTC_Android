@@ -14,9 +14,15 @@ public interface UserRepository {
     Single<List<User>> getUserList(@NonNull final String tel);
 
     @NonNull
+    Completable updateToken(@NonNull String tel,
+                            @NonNull String token);
+
+    @NonNull
     Single<User> getProfile(@NonNull final String tel);
 
     @NonNull
     Completable updateUserName(@NonNull final String tel,
                                @NonNull final String name);
+
+
 }

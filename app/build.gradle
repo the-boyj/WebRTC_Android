@@ -74,5 +74,8 @@ dependencies {
     implementation("io.socket:socket.io-client:$socket_version") {
         exclude group: 'org.json', module: 'json'
     }
+
+    // TedPermission
+    implementation 'gun0912.ted:tedpermission-rx2:2.2.2'
 }
 apply plugin: 'com.google.gms.google-services'

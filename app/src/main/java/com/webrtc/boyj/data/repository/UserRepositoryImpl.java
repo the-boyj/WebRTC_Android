@@ -1,12 +1,10 @@
 package com.webrtc.boyj.data.repository;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.webrtc.boyj.data.model.User;
 
 import java.util.ArrayList;
@@ -26,12 +24,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     private static volatile UserRepositoryImpl INSTANCE;
 
-    public static UserRepository getInstance(@NonNull final FirebaseFirestore firestore,
-                                             @NonNull final FirebaseInstanceId instanceId) {
+    public static UserRepository getInstance(@NonNull final FirebaseFirestore firestore) {
         if (INSTANCE == null) {
             synchronized (UserRepositoryImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UserRepositoryImpl(firestore, instanceId);
+                    INSTANCE = new UserRepositoryImpl(firestore);
                 }
             }
         }
@@ -40,13 +37,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     private final FirebaseFirestore firestore;
-    @NonNull
-    private final FirebaseInstanceId instanceId;
 
-    private UserRepositoryImpl(@NonNull FirebaseFirestore firestore,
-                               @NonNull FirebaseInstanceId instanceId) {
+    private UserRepositoryImpl(@NonNull FirebaseFirestore firestore) {
         this.firestore = firestore;
-        this.instanceId = instanceId;
     }
 
     @NonNull
@@ -73,27 +66,41 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Single<User> getProfile(@NonNull String tel) {
+    public Completable updateToken(@NonNull final String tel,
+                                   @NonNull final String token) {
         final DocumentReference docRef = firestore.collection(COLLECTION_USER).document(tel);
 
-        return getMyToken().flatMap(token ->
-                Single.create((SingleOnSubscribe<User>) emitter ->
-                        firestore.runTransaction(transaction -> {
-                            final DocumentSnapshot snapshot = transaction.get(docRef);
-                            User user;
-                            if (!transaction.get(docRef).exists()) {
-                                Log.d("Melon", "AAAA");
-                                user = new User(NOT_EXIST_USER_NAME, tel, token);
-                                transaction.set(docRef, user);
-                            } else {
-                                user = snapshot.toObject(User.class);
-                                transaction.update(docRef, FIELD_USER_TOKEN, token);
-                            }
-                            return user;
-                        })
-                                .addOnSuccessListener(emitter::onSuccess)
-                                .addOnFailureListener(emitter::onError)))
-                .subscribeOn(Schedulers.io());
+        return Completable.create(emitter ->
+                firestore.runTransaction(transaction -> {
+                    if (!transaction.get(docRef).exists()) {
+                        transaction.set(docRef, new User(NOT_EXIST_USER_NAME, tel, token));
+                    } else {
+                        transaction.update(docRef, FIELD_USER_TOKEN, token);
+                    }
+                    return null;
+                })
+                        .addOnSuccessListener(__ -> emitter.onComplete())
+                        .addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
+
+    }
+
+
+    @NonNull
+    @Override
+    public Single<User> getProfile(@NonNull String tel) {
+        return Single.create((SingleOnSubscribe<User>) emitter -> {
+            firestore.collection(COLLECTION_USER)
+                    .document(tel)
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+                        final User user = snapshot.toObject(User.class);
+                        if (user != null) {
+                            emitter.onSuccess(user);
+                        } else {
+                            emitter.onError(new IllegalArgumentException("No user information"));
+                        }
+                    }).addOnFailureListener(emitter::onError);
+        }).subscribeOn(Schedulers.io());
     }
 
     @NonNull
@@ -102,13 +109,5 @@ public class UserRepositoryImpl implements UserRepository {
         return Completable.create(emitter -> {
             firestore.collection(COLLECTION_USER);
         });
-    }
-
-    @NonNull
-    private Single<String> getMyToken() {
-        return Single.create((SingleOnSubscribe<String>) emitter -> instanceId.getInstanceId()
-                .addOnSuccessListener(result -> emitter.onSuccess(result.getToken()))
-                .addOnFailureListener(emitter::onError)
-        ).subscribeOn(Schedulers.io());
     }
 }

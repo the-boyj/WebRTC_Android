@@ -14,14 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup, GoogleAppIndexingWarning">
-        <activity android:name=".view.activity.CallActivity" />
-        <activity android:name=".view.activity.MainActivity">
+        <activity android:name=".LegacyActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.activity.CallActivity" />
+        <activity android:name=".view.activity.MainActivity"></activity>
 
         <service
             android:name=".api.firebase.MyFirebaseMessagingService"

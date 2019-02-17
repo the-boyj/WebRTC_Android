@@ -88,12 +88,13 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Completable updateToken(@NonNull final String tel) {
         final String token = pref.getString(FIELD_USER_TOKEN, null);
+        final boolean isChanged = pref.getBoolean(CHANGED, false);
         if (token == null) {
             return Completable.error(new IllegalArgumentException(ERROR_TOKEN_NOT_EXIST));
         }
         final DocumentReference docRef = firestore.collection(COLLECTION_USER).document(tel);
 
-        if (pref.getBoolean(CHANGED, false)) {
+        if (isChanged) {
             return Completable.create(emitter ->
                     firestore.runTransaction(transaction -> {
                         if (!transaction.get(docRef).exists()) {

@@ -28,6 +28,7 @@
                 android:textSize="@dimen/text_x_large"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                android:text="@{user.name}"
                 tools:text="장OO" />
 
             <TextView
@@ -37,6 +38,7 @@
                 android:textSize="@dimen/text_s_large"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                android:text="@{user.tel}"
                 tools:text="010-9999-4444" />
 
             <android.support.design.widget.FloatingActionButton

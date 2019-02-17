@@ -76,6 +76,6 @@ dependencies {
     }
 
     // TedPermission
-    implementation 'gun0912.ted:tedpermission-rx2:2.2.2'
+    implementation 'gun0912.ted:tedpermission:2.2.2'
 }
 apply plugin: 'com.google.gms.google-services'

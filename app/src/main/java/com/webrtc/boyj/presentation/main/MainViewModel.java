@@ -1,6 +1,5 @@
 package com.webrtc.boyj.presentation.main;
 
-
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.support.annotation.NonNull;
@@ -13,7 +12,7 @@ import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
-class MainViewModel extends BaseViewModel {
+public class MainViewModel extends BaseViewModel {
     @NonNull
     private final UserRepository repository;
     @NonNull

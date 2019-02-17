@@ -2,6 +2,7 @@ package com.webrtc.boyj.data.repository;
 
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -58,6 +59,7 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     @Override
     public Single<UserResponse> getUserList(@NonNull String tel) {
+        Log.d("Melon", "getUserList");
         return Single.create((SingleOnSubscribe<UserResponse>) emitter ->
                 firestore.collection(COLLECTION_USER)
                         .get()
@@ -87,6 +89,7 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     @Override
     public Completable updateToken(@NonNull final String tel) {
+        Log.d("Melon", "updateToken()");
         final String token = pref.getString(FIELD_USER_TOKEN, null);
         final boolean isChanged = pref.getBoolean(CHANGED, false);
         if (token == null) {

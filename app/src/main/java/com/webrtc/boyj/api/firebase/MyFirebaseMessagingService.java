@@ -1,11 +1,11 @@
 package com.webrtc.boyj.api.firebase;
 
-import android.util.Log;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.webrtc.boyj.model.dao.UserDAO;
-import com.webrtc.boyj.model.dto.User;
+import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.utils.Logger;
 import com.webrtc.boyj.view.activity.CallActivity;
 
@@ -22,19 +22,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(String token) {
-        sendRegistrationToServer(token);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        pref.edit()
+                .putString(UserRepositoryImpl.FIELD_USER_TOKEN, token)
+                .putBoolean(UserRepositoryImpl.CHANGED, true)
+                .apply();
     }
 
     private void handleNow(String room) {
         CallActivity.goToCallActivity(this, false, room);
-    }
-
-    private void sendRegistrationToServer(String token) {
-        User user = new User();
-        user.setDeviceToken(token);
-
-        UserDAO userDAO = new UserDAO();
-        userDAO.create(user)
-                .subscribe(s -> Log.d(TAG, "sendRegistrationToServer"));
     }
 }

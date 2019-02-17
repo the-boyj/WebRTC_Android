@@ -37,7 +37,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @SuppressLint("MissingPermission, HardwareIds")
     @Override
     public void onNewToken(String token) {
-        Log.d("Melon", token);
         final UserRepository repository = UserRepositoryImpl.getInstance(FirebaseFirestore.getInstance());
 
         disposable.add(TedRx2Permission.with(this)
@@ -47,7 +46,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     if (result.isGranted()) {
                         TelephonyManager mgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
                         final String tel = mgr.getLine1Number().replace("+82", "0");
-                        Log.d("Melon", tel);
                         return repository.updateToken(tel, token);
                     } else {
                         return Completable.error(new IllegalStateException("Not Permission"));

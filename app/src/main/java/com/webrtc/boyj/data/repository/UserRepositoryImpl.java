@@ -8,7 +8,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.webrtc.boyj.data.model.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -17,9 +19,10 @@ import io.reactivex.schedulers.Schedulers;
 
 public class UserRepositoryImpl implements UserRepository {
     private static final String COLLECTION_USER = "user";
-    private static final String FIELD_USER_TEL = "tel";
+
     private static final String FIELD_USER_NAME = "name";
     private static final String FIELD_USER_TOKEN = "token";
+
     private static final String NOT_EXIST_USER_NAME = "Unknown";
 
     private static volatile UserRepositoryImpl INSTANCE;
@@ -106,8 +109,15 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     @Override
     public Completable updateUserName(@NonNull String tel, @NonNull String name) {
-        return Completable.create(emitter -> {
-            firestore.collection(COLLECTION_USER);
-        });
+        final Map<String, Object> map = new HashMap<>();
+        map.put(FIELD_USER_NAME, name);
+
+        return Completable.create(emitter ->
+                firestore.collection(COLLECTION_USER)
+                        .document(tel)
+                        .update(FIELD_USER_NAME, map)
+                        .addOnSuccessListener(__ -> emitter.onComplete())
+                        .addOnFailureListener(emitter::onError))
+                .subscribeOn(Schedulers.io());
     }
 }

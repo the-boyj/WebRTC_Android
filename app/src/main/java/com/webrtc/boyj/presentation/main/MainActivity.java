@@ -26,7 +26,9 @@ import com.webrtc.boyj.presentation.call.CallActivity;
 
 import java.util.List;
 
+import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_PHONE_STATE;
+import static android.Manifest.permission.RECORD_AUDIO;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Nullable
@@ -49,8 +51,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
     private void checkPermission() {
-        TedPermission.with(this)
-                .setPermissions(READ_PHONE_STATE)
+        TedPermission.with(getApplicationContext())
+                .setPermissions(READ_PHONE_STATE, RECORD_AUDIO, CAMERA)
                 .setPermissionListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
@@ -81,8 +83,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void initViewModel() {
-        assert tel != null;
-
         final MainViewModel vm = ViewModelProviders.of(this,
                 new MainViewModelFactory(UserRepositoryImpl.getInstance(
                         FirebaseFirestore.getInstance(),
@@ -107,10 +107,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         showToast(getString(R.string.ERROR_PHONE_NUMBER_NOT_EXIST));
     }
 
-    private void showToast(@NonNull final String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
     private void showDialog() {
         if (tel == null) {
             notExistPhoneNumber();
@@ -119,6 +115,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final NameDialog dialog = new NameDialog(this);
         dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
         dialog.show();
+    }
+
+    private void showToast(@NonNull final String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void startCallActivity(@NonNull final User user) {

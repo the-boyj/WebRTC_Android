@@ -2,5 +2,5 @@
 <resources>
     <string name="ERROR_DEFAULT">에러가 발생하였습니다.</string>
     <string name="ERROR_PHONE_NUMBER_NOT_EXIST">휴대폰 번호를 확인할 수 없습니다.</string>
-    <string name="ERROR_DENIED_PERMISSION">권한 없음</string>
+    <string name="ERROR_PERMISSION_DENIED">권한 없음</string>
 </resources>

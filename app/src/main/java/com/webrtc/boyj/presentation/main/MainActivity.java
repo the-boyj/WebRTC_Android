@@ -64,7 +64,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
                     @Override
                     public void onPermissionDenied(List<String> deniedPermissions) {
-                        showToast(getString(R.string.ERROR_DENIED_PERMISSION));
+                        showToast(getString(R.string.ERROR_PERMISSION_DENIED));
                     }
                 }).check();
     }

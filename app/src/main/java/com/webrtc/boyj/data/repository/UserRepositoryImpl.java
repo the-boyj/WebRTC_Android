@@ -11,9 +11,7 @@ import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.firestore.response.UserResponse;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
@@ -123,28 +121,26 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Single<User> updateUserName(@NonNull String name, @NonNull String tel) {
-        final Map<String, Object> map = new HashMap<>();
-        map.put(FIELD_USER_NAME, name);
-
+    public Single<User> updateUserName(@NonNull final String tel,
+                                       @NonNull final String name) {
         return Completable.create(emitter ->
                 firestore.collection(COLLECTION_USER)
                         .document(tel)
-                        .update(FIELD_USER_NAME, map)
+                        .update(FIELD_USER_NAME, name)
                         .addOnSuccessListener(__ -> emitter.onComplete())
                         .addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io())
-                .andThen(Single.create((SingleOnSubscribe<User>) emitter ->
-                        firestore.collection(COLLECTION_USER)
-                                .document(tel)
-                                .get()
-                                .addOnSuccessListener(snapshot -> {
-                                    final User user = snapshot.toObject(User.class);
-                                    if (user == null) {
-                                        emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
-                                    } else {
-                                        emitter.onSuccess(user);
-                                    }
-                                }).addOnFailureListener(emitter::onError)))
-                .subscribeOn(Schedulers.io());
+                .andThen(Single.create((SingleOnSubscribe<User>) emitter -> {
+                    firestore.collection(COLLECTION_USER)
+                            .document(tel)
+                            .get()
+                            .addOnSuccessListener(snapshot -> {
+                                final User user = snapshot.toObject(User.class);
+                                if (user == null) {
+                                    emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
+                                } else {
+                                    emitter.onSuccess(user);
+                                }
+                            }).addOnFailureListener(emitter::onError);
+                })).subscribeOn(Schedulers.io());
     }
 }

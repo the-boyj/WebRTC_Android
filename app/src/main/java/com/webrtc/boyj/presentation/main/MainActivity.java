@@ -17,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.common.NameDialog;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
@@ -42,7 +43,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         if (toolbar != null) {
             toolbar.setDisplayShowTitleEnabled(false);
         }
-
     }
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
@@ -108,6 +108,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    private void showDialog() {
+        if (tel == null) {
+            notExistPhoneNumber();
+            return;
+        }
+        final NameDialog dialog = new NameDialog(this);
+        dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
+        dialog.show();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -117,7 +127,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_update_profile) {
-            // Todo : 이름 변경
+            showDialog();
         }
         return super.onOptionsItemSelected(item);
     }

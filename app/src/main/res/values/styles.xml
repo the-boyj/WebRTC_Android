@@ -5,7 +5,9 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/colorWhiteBackground</item>
-        <item name="android:textColorSecondary">@color/colorWhite</item>
     </style>
 
+    <style name="AppToolbar" parent="AppTheme">
+        <item name="android:textColorSecondary">@color/colorWhite</item>
+    </style>
 </resources>

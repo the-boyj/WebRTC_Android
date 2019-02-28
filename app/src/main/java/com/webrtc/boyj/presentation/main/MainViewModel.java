@@ -38,8 +38,8 @@ public class MainViewModel extends BaseViewModel {
                 }, error::setValue));
     }
 
-    void updateUserName(@NonNull final String name,
-                        @NonNull final String tel) {
+    void updateUserName(@NonNull final String tel,
+                        @NonNull final String name) {
         addDisposable(repository.updateUserName(tel, name)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(user -> {

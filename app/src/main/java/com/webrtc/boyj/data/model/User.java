@@ -2,9 +2,10 @@ package com.webrtc.boyj.data.model;
 
 import android.support.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class User {
+public class User implements Serializable {
     private String tel;
     private String name;
     private String deviceToken;

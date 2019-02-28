@@ -18,9 +18,11 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.common.NameDialog;
+import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.call.CallActivity;
 
 import java.util.List;
 
@@ -92,6 +94,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void initRecyclerView() {
         final MainAdapter adapter = new MainAdapter();
+        adapter.setOnDialListener(this::startCallActivity);
         binding.rvUser.setAdapter(adapter);
     }
 
@@ -116,6 +119,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final NameDialog dialog = new NameDialog(this);
         dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
         dialog.show();
+    }
+
+    private void startCallActivity(@NonNull final User user) {
+        startActivity(CallActivity.getLaunchIntent(this, user, true));
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.webrtc.boyj.presentation.main;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
@@ -14,19 +15,22 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MainViewModel extends BaseViewModel {
     @NonNull
-    private final UserRepository repository;
+    private final MutableLiveData<List<User>> userList = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<User> myProfile = new MutableLiveData<>();
     @NonNull
-    private final MutableLiveData<List<User>> userList = new MutableLiveData<>();
-    @NonNull
     private final MutableLiveData<Throwable> error = new MutableLiveData<>();
+    @NonNull
+    private final ObservableBoolean loading = new ObservableBoolean(true);
+    @NonNull
+    private final UserRepository repository;
 
     MainViewModel(@NonNull UserRepository repository) {
         this.repository = repository;
     }
 
     void init(@NonNull final String tel) {
+        loading();
         addDisposable(repository.updateToken(tel)
                 .andThen(repository.getUserList(tel))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -35,11 +39,13 @@ public class MainViewModel extends BaseViewModel {
                     final User user = response.getMyProfile();
                     this.userList.setValue(userList);
                     this.myProfile.setValue(user);
+                    unLoading();
                 }, error::setValue));
     }
 
     void updateUserName(@NonNull final String tel,
                         @NonNull final String name) {
+        loading();
         addDisposable(repository.updateUserName(tel, name)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(user -> {
@@ -47,7 +53,22 @@ public class MainViewModel extends BaseViewModel {
                             user.getTel(),
                             user.getDeviceToken());
                     this.myProfile.setValue(newUser);
+                    unLoading();
                 }, error::setValue));
+    }
+
+    private void loading() {
+        loading.set(true);
+    }
+
+    private void unLoading() {
+        loading.set(false);
+    }
+
+
+    @NonNull
+    public ObservableBoolean getLoading() {
+        return loading;
     }
 
     @NonNull

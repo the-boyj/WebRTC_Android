@@ -40,7 +40,10 @@ public class MainViewModel extends BaseViewModel {
                     this.userList.setValue(userList);
                     this.myProfile.setValue(user);
                     unLoading();
-                }, error::setValue));
+                }, e -> {
+                    unLoading();
+                    error.setValue(e);
+                }));
     }
 
     void updateUserName(@NonNull final String tel,
@@ -54,7 +57,10 @@ public class MainViewModel extends BaseViewModel {
                             user.getDeviceToken());
                     this.myProfile.setValue(newUser);
                     unLoading();
-                }, error::setValue));
+                }, e -> {
+                    unLoading();
+                    error.setValue(e);
+                }));
     }
 
     private void loading() {
@@ -65,11 +71,6 @@ public class MainViewModel extends BaseViewModel {
         loading.set(false);
     }
 
-
-    @NonNull
-    public ObservableBoolean getLoading() {
-        return loading;
-    }
 
     @NonNull
     public LiveData<User> getMyProfile() {
@@ -84,5 +85,10 @@ public class MainViewModel extends BaseViewModel {
     @NonNull
     MutableLiveData<Throwable> getError() {
         return error;
+    }
+
+    @NonNull
+    public ObservableBoolean getLoading() {
+        return loading;
     }
 }

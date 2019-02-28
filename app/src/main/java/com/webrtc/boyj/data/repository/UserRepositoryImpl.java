@@ -103,7 +103,7 @@ public class UserRepositoryImpl implements UserRepository {
             return Completable.create(emitter ->
                     firestore.runTransaction(transaction -> {
                         if (!transaction.get(docRef).exists()) {
-                            transaction.set(docRef, new User(UNKNOWN, tel, token));
+                            transaction.set(docRef, new User(tel, UNKNOWN, token));
                         } else {
                             transaction.update(docRef, FIELD_USER_TOKEN, token);
                         }

@@ -49,8 +49,8 @@ public class MainViewModel extends BaseViewModel {
         addDisposable(repository.updateUserName(tel, name)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(user -> {
-                    final User newUser = new User(user.getName(),
-                            user.getTel(),
+                    final User newUser = new User(user.getTel(),
+                            user.getName(),
                             user.getDeviceToken());
                     this.myProfile.setValue(newUser);
                     unLoading();

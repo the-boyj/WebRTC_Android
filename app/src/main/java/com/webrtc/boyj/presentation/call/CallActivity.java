@@ -3,22 +3,17 @@ package com.webrtc.boyj.presentation.call;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
+import com.webrtc.boyj.databinding.ActivityCallBinding;
+import com.webrtc.boyj.presentation.BaseActivity;
 
-public class CallActivity extends AppCompatActivity {
+public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_USER = "EXTRA_USER";
     private static final String EXTRA_CALLER = "EXTRA_CALLER";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_call);
-    }
-
+    @NonNull
     public static Intent getLaunchIntent(@NonNull final Context context,
                                          @NonNull final User user,
                                          final boolean isCaller) {
@@ -26,5 +21,10 @@ public class CallActivity extends AppCompatActivity {
         intent.putExtra(EXTRA_USER, user);
         intent.putExtra(EXTRA_CALLER, isCaller);
         return intent;
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return R.layout.activity_call;
     }
 }

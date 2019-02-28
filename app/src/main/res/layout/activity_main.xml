@@ -1,17 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
-            name="model"
-            type="com.webrtc.boyj.viewmodel.MainViewModel" />
+            name="vm"
+            type="com.webrtc.boyj.presentation.main.MainViewModel" />
     </data>
 
-    <android.support.v7.widget.RecyclerView android:id="@+id/recycler"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="0dp"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorAccent"
+            android:theme="@style/AppToolbar"
+            app:contentInsetStart="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@{vm.myProfile.name}"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="@dimen/text_large"
+                    tools:text="BOYJ" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{vm.myProfile.tel}"
+                    android:textSize="@dimen/text_size_small"
+                    tools:text="010-0000-0000" />
+            </LinearLayout>
+        </android.support.v7.widget.Toolbar>
+
+        <ProgressBar
+            app:visible="@{vm.loading}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_user"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:items="@{vm.userList}"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+    </android.support.constraint.ConstraintLayout>
 </layout>

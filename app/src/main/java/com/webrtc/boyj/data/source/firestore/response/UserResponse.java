@@ -8,10 +8,9 @@ import java.util.List;
 
 public class UserResponse {
     private List<User> userList;
-    private User myUser;
+    private User myProfile;
 
     public UserResponse() {
-
     }
 
     public List<User> getUserList() {
@@ -22,11 +21,11 @@ public class UserResponse {
         this.userList = userList;
     }
 
-    public User getMyUser() {
-        return myUser;
+    public User getMyProfile() {
+        return myProfile;
     }
 
-    public void setMyUser(@NonNull User myUser) {
-        this.myUser = myUser;
+    public void setMyProfile(@NonNull User myProfile) {
+        this.myProfile = myProfile;
     }
 }

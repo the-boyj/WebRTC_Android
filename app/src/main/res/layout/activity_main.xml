@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="viewModel"
+            name="vm"
             type="com.webrtc.boyj.presentation.main.MainViewModel" />
     </data>
 
@@ -34,7 +34,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@{viewModel.myUser.name}"
+                    android:text="@{vm.myProfile.name}"
                     android:textColor="@color/colorWhite"
                     android:textSize="@dimen/text_large"
                     tools:text="BOYJ" />
@@ -42,7 +42,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.myUser.tel}"
+                    android:text="@{vm.myProfile.tel}"
                     android:textSize="@dimen/text_size_small"
                     tools:text="010-0000-0000" />
             </LinearLayout>
@@ -56,6 +56,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            app:items="@{vm.userList}" />
     </android.support.constraint.ConstraintLayout>
 </layout>

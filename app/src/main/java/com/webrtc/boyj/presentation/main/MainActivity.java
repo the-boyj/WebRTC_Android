@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.telephony.TelephonyManager;
-import android.util.Log;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -24,6 +26,9 @@ import java.util.List;
 import static android.Manifest.permission.READ_PHONE_STATE;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
+    @Nullable
+    private String tel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,10 +38,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void initToolbar() {
         setSupportActionBar(binding.toolbar);
-        ActionBar toolbar = getSupportActionBar();
+        final ActionBar toolbar = getSupportActionBar();
         if (toolbar != null) {
             toolbar.setDisplayShowTitleEnabled(false);
         }
+
     }
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
@@ -47,45 +53,73 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                     @Override
                     public void onPermissionGranted() {
                         final TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                        final String tel = tm.getLine1Number().replace("+82", "0");
-                        init(tel);
+                        final String number = tm.getLine1Number();
+                        if (TextUtils.isEmpty(number)) {
+                            notExistPhoneNumber();
+                        } else {
+                            tel = number.replace("+82", "0");
+                            init();
+                        }
                     }
 
                     @Override
                     public void onPermissionDenied(List<String> deniedPermissions) {
-                        Toast.makeText(getApplicationContext(), "권한 없음", Toast.LENGTH_SHORT).show();
+                        showToast(getString(R.string.ERROR_DENIED_PERMISSION));
                     }
                 }).check();
     }
 
-    private void init(@NonNull final String tel) {
-        initViewModel(tel);
+    private void init() {
+        assert tel != null;
+
+        initViewModel();
         initRecyclerView();
         subscribeViewModel();
-        binding.getViewModel().init();
+        binding.getVm().init(tel);
     }
 
-    private void initViewModel(@NonNull final String tel) {
+    private void initViewModel() {
+        assert tel != null;
+
         final MainViewModel vm = ViewModelProviders.of(this,
                 new MainViewModelFactory(UserRepositoryImpl.getInstance(
                         FirebaseFirestore.getInstance(),
-                        PreferenceManager.getDefaultSharedPreferences(this)), tel))
+                        PreferenceManager.getDefaultSharedPreferences(this))))
                 .get(MainViewModel.class);
-        binding.setViewModel(vm);
+
+        binding.setVm(vm);
     }
 
     private void initRecyclerView() {
         final MainAdapter adapter = new MainAdapter();
         binding.rvUser.setAdapter(adapter);
-        binding.getViewModel().getUserList().observe(this, adapter::submitList);
     }
 
     private void subscribeViewModel() {
-        binding.getViewModel().getMyUser().observe(this, user -> {
-            Log.d("Melon", user.getName());
-            Log.d("Melon", user.getTel());
-            Log.d("Melon", user.getDeviceToken());
-        });
+        binding.getVm().getError().observe(this,
+                e -> showToast(getString(R.string.ERROR_DEFAULT)));
+    }
+
+    private void notExistPhoneNumber() {
+        showToast(getString(R.string.ERROR_PHONE_NUMBER_NOT_EXIST));
+    }
+
+    private void showToast(@NonNull final String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_update_profile) {
+            // Todo : 이름 변경
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

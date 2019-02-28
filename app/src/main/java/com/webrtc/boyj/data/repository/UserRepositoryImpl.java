@@ -2,11 +2,11 @@ package com.webrtc.boyj.data.repository;
 
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.firestore.response.UserResponse;
 
@@ -20,6 +20,7 @@ import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class UserRepositoryImpl implements UserRepository {
     private static final String COLLECTION_USER = "user";
 
@@ -27,7 +28,7 @@ public class UserRepositoryImpl implements UserRepository {
     public static final String FIELD_USER_TOKEN = "deviceToken";
     public static final String CHANGED = "CHANGED";
 
-    private static final String NOT_EXIST_USER_NAME = "Unknown";
+    private static final String UNKNOWN = "Unknown";
     private static final String ERROR_USER_NOT_EXIST = "User is not exists";
     private static final String ERROR_TOKEN_NOT_EXIST = "Token is not exists";
 
@@ -54,12 +55,16 @@ public class UserRepositoryImpl implements UserRepository {
                                @NonNull SharedPreferences pref) {
         this.firestore = firestore;
         this.pref = pref;
+
+        final FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setTimestampsInSnapshotsEnabled(true)
+                .build();
+        this.firestore.setFirestoreSettings(settings);
     }
 
     @NonNull
     @Override
     public Single<UserResponse> getUserList(@NonNull String tel) {
-        Log.d("Melon", "getUserList");
         return Single.create((SingleOnSubscribe<UserResponse>) emitter ->
                 firestore.collection(COLLECTION_USER)
                         .get()
@@ -72,13 +77,13 @@ public class UserRepositoryImpl implements UserRepository {
                                     emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                                     return;
                                 } else if (user.getTel().equals(tel)) {
-                                    response.setMyUser(user);
+                                    response.setMyProfile(user);
                                 } else {
                                     userList.add(user);
                                 }
                             }
                             response.setUserList(userList);
-                            if (response.getMyUser() == null) {
+                            if (response.getMyProfile() == null) {
                                 emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                             } else {
                                 emitter.onSuccess(response);
@@ -89,7 +94,6 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     @Override
     public Completable updateToken(@NonNull final String tel) {
-        Log.d("Melon", "updateToken()");
         final String token = pref.getString(FIELD_USER_TOKEN, null);
         final boolean isChanged = pref.getBoolean(CHANGED, false);
         if (token == null) {
@@ -101,13 +105,15 @@ public class UserRepositoryImpl implements UserRepository {
             return Completable.create(emitter ->
                     firestore.runTransaction(transaction -> {
                         if (!transaction.get(docRef).exists()) {
-                            transaction.set(docRef, new User(NOT_EXIST_USER_NAME, tel, token));
+                            transaction.set(docRef, new User(UNKNOWN, tel, token));
                         } else {
                             transaction.update(docRef, FIELD_USER_TOKEN, token);
                         }
                         return null;
                     }).addOnSuccessListener(__ -> {
-                        pref.edit().putBoolean(CHANGED, true).apply();
+                        pref.edit()
+                                .putBoolean(CHANGED, true)
+                                .apply();
                         emitter.onComplete();
                     }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
         } else {

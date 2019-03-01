@@ -8,6 +8,7 @@
     <dimen name="space_s_large">18dp</dimen>
     <dimen name="space_large">20dp</dimen>
     <dimen name="space_x_large">24dp</dimen>
+    <dimen name="space_xx_large">28dp</dimen>
 
     <!-- button size -->
     <dimen name="button_small">20dp</dimen>
@@ -22,25 +23,7 @@
     <dimen name="text_s_large">16sp</dimen>
     <dimen name="text_large">18sp</dimen>
     <dimen name="text_x_large">20sp</dimen>
+    <dimen name="text_xx_large">24sp</dimen>
 
-    <!-- -->
-
-    <!-- text size -->
-    <dimen name="text_size_small">12sp</dimen>
-    <dimen name="text_size_main">16sp</dimen>
-    <dimen name="text_size_big">20sp</dimen>
-    <dimen name="text_size_ultra_big">24sp</dimen>
-
-    <dimen name="text_size_title_small">28sp</dimen>
-    <dimen name="text_size_title_main">32sp</dimen>
-
-    <!-- padding -->
-    <dimen name="padding_ultra_small">4dp</dimen>
-    <dimen name="padding_main">16dp</dimen>
-
-    <!-- margin -->
-    <dimen name="margin_ultra_small">4dp</dimen>
-    <dimen name="margin_small">8dp</dimen>
-    <dimen name="margin_ultra_big">20dp</dimen>
-
+    <dimen name="text_title_median">40sp</dimen>
 </resources>

@@ -1,11 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".presentation.call.CallActivity">
+        android:layout_height="match_parent">
+
+
+        <View
+            android:id="@+id/view_local"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="@dimen/space_x_large"
+            android:background="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@id/guideline"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_median"
+            android:textColor="@color/colorRed"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.6" />
+
+        <TextView
+            android:id="@+id/tv_callee_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_x_small"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_title_median"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            tools:text="홍길동" />
+
+        <TextView
+            android:id="@+id/tv_connect_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_x_large"
+            android:text="@string/text_connect_message"
+            android:textSize="@dimen/text_xx_large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_callee_name" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_hangup"
+            style="@style/CallFabDefault"
+            android:backgroundTint="@color/colorRed"
+            android:src="@drawable/ic_call_end"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_connect_message" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_first"
+            style="@style/CallFabDefault"
+            app:layout_constraintBottom_toBottomOf="@id/fab_hangup"
+            app:layout_constraintEnd_toStartOf="@id/fab_hangup"
+            app:layout_constraintTop_toTopOf="@id/fab_hangup" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_second"
+            style="@style/CallFabDefault"
+            app:layout_constraintBottom_toBottomOf="@id/fab_hangup"
+            app:layout_constraintStart_toEndOf="@id/fab_hangup"
+            app:layout_constraintTop_toTopOf="@id/fab_hangup" />
 
     </android.support.constraint.ConstraintLayout>
 

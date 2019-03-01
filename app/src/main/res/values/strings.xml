@@ -8,4 +8,7 @@
     <string name="dialog_negative_button">취소</string>
     <string name="dialog_edit_text_hint">이름</string>
     <string name="dialog_edit_text_helper_text">변경할 이름을 입력하세요.</string>
+
+    <!-- Call Activity -->
+    <string name="text_connect_message">연결 중입니다.</string>
 </resources>

@@ -30,24 +30,14 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     @NonNull
-    public static Intent getCallerLaunchIntent(@NonNull final Context context,
-                                               @NonNull final User user,
-                                               @NonNull final User otherUser) {
-        final Intent intent = new Intent(context, CallActivity.class);
-        intent.putExtra(EXTRA_USER, user);
-        intent.putExtra(EXTRA_OTHER_USER, otherUser);
-        intent.putExtra(EXTRA_IS_CALLER, true);
-        return intent;
-    }
-
-    @NonNull
-    public static Intent getCalleeLaunchIntent(@NonNull final Context context,
-                                               @NonNull final User otherUser) {
-
-        final Intent intent = new Intent(context, CallActivity.class);
-        intent.putExtra(EXTRA_OTHER_USER, otherUser);
-        intent.putExtra(EXTRA_IS_CALLER, false);
-        return intent;
+    public static Intent getLaunchIntent(@NonNull final Context context,
+                                         @NonNull final User otherUser,
+                                         @NonNull final User user,
+                                         final boolean isCaller) {
+        return getLaunchIntent(context, CallActivity.class)
+                .putExtra(EXTRA_OTHER_USER, otherUser)
+                .putExtra(EXTRA_USER, user)
+                .putExtra(EXTRA_IS_CALLER, isCaller);
     }
 
     @Override

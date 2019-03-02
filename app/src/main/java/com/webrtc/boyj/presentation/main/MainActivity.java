@@ -2,8 +2,6 @@ package com.webrtc.boyj.presentation.main;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -45,7 +43,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
         // Todo : Remove when callee func is implemented
         findViewById(R.id.btn_call_on).setOnClickListener(v ->
-                startActivity(RingingActivity.getLaunchIntent(this)));
+                startActivity(RingingActivity.getLaunchIntent(this, RingingActivity.class)));
     }
 
     private void initToolbar() {
@@ -132,7 +130,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final User user = binding.getVm().getUser().getValue();
         assert user != null;
 
-        startActivity(CallActivity.getCallerLaunchIntent(this, user, otherUser));
+        startActivity(CallActivity.getLaunchIntent(this, otherUser, user, true));
     }
 
     @Override
@@ -152,9 +150,5 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
-    }
-
-    public static Intent getLaunchIntent(@NonNull final Context context) {
-        return new Intent(context, MainActivity.class);
     }
 }

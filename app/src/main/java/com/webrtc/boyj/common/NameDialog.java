@@ -45,8 +45,9 @@ public class NameDialog extends Dialog {
             final Editable editable = editText.getText();
             assert editable != null;
 
+            final int maxLength = getContext().getResources().getInteger(R.integer.name_max_length);
             final String text = editable.toString();
-            if (!TextUtils.isEmpty(text) && text.length() < 12) {
+            if (!TextUtils.isEmpty(text) && text.length() < maxLength) {
                 if (positiveButton != null) {
                     positiveButton.onPositive(text);
                 }

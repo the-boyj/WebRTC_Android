@@ -35,16 +35,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@{vm.myProfile.name}"
+                    android:text="@{vm.myProfile.name, default=BOYJ}"
                     android:textColor="@color/colorWhite"
-                    android:textSize="@dimen/text_large"
-                    tools:text="BOYJ" />
+                    android:textSize="@dimen/text_large" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{vm.myProfile.tel}"
-                    android:textSize="@dimen/text_size_small"
+                    android:textSize="@dimen/text_median"
                     tools:text="010-0000-0000" />
             </LinearLayout>
         </android.support.v7.widget.Toolbar>

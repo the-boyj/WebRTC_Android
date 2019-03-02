@@ -25,7 +25,7 @@ import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
-import com.webrtc.boyj.presentation.callon.CallOnActivity;
+import com.webrtc.boyj.presentation.ringing.RingingActivity;
 
 import java.util.List;
 
@@ -45,7 +45,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
         // Todo : Remove when callee func is implemented
         findViewById(R.id.btn_call_on).setOnClickListener(v ->
-                startActivity(CallOnActivity.getLaunchIntent(this)));
+                startActivity(RingingActivity.getLaunchIntent(this)));
     }
 
     private void initToolbar() {

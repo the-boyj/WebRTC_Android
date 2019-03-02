@@ -15,9 +15,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class MainViewModel extends BaseViewModel {
     @NonNull
-    private final MutableLiveData<List<User>> userList = new MutableLiveData<>();
+    private final MutableLiveData<User> user = new MutableLiveData<>();
     @NonNull
-    private final MutableLiveData<User> myProfile = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> otherUserList = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<Throwable> error = new MutableLiveData<>();
     @NonNull
@@ -35,10 +35,10 @@ public class MainViewModel extends BaseViewModel {
                 .andThen(repository.getUserList(tel))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
-                    final List<User> userList = response.getUserList();
-                    final User user = response.getMyProfile();
-                    this.userList.setValue(userList);
-                    this.myProfile.setValue(user);
+                    final List<User> userList = response.getOtherUserList();
+                    final User user = response.getUser();
+                    this.otherUserList.setValue(userList);
+                    this.user.setValue(user);
                     unLoading();
                 }, e -> {
                     unLoading();
@@ -55,7 +55,7 @@ public class MainViewModel extends BaseViewModel {
                     final User newUser = new User(user.getTel(),
                             user.getName(),
                             user.getDeviceToken());
-                    this.myProfile.setValue(newUser);
+                    this.user.setValue(newUser);
                     unLoading();
                 }, e -> {
                     unLoading();
@@ -71,15 +71,14 @@ public class MainViewModel extends BaseViewModel {
         loading.set(false);
     }
 
-
     @NonNull
-    public LiveData<User> getMyProfile() {
-        return myProfile;
+    public LiveData<User> getUser() {
+        return user;
     }
 
     @NonNull
-    public LiveData<List<User>> getUserList() {
-        return userList;
+    public LiveData<List<User>> getOtherUserList() {
+        return otherUserList;
     }
 
     @NonNull

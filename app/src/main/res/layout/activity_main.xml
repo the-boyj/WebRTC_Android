@@ -35,14 +35,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@{vm.myProfile.name, default=BOYJ}"
+                    android:text="@{vm.user.name, default=BOYJ}"
                     android:textColor="@color/colorWhite"
                     android:textSize="@dimen/text_large" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{vm.myProfile.tel}"
+                    android:text="@{vm.user.tel}"
                     android:textSize="@dimen/text_median"
                     tools:text="010-0000-0000" />
             </LinearLayout>
@@ -61,7 +61,7 @@
             android:id="@+id/rv_user"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:items="@{vm.userList}"
+            app:items="@{vm.otherUserList}"
             app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

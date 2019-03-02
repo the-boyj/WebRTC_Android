@@ -121,8 +121,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void startCallActivity(@NonNull final User user) {
-        startActivity(CallActivity.getLaunchIntent(this, user, true));
+    private void startCallActivity(@NonNull final User otherUser) {
+        final User user = binding.getVm().getUser().getValue();
+        assert user != null;
+
+        startActivity(CallActivity.getCallerLaunchIntent(this, user, otherUser));
     }
 
     @Override

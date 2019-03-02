@@ -26,9 +26,11 @@ public class BindingAdapters {
 
     @BindingAdapter({"phoneNumber"})
     public static void setPhoneNumber(@NonNull final TextView textView,
-                                      @NonNull final String tel) {
-        final String replaceStr = tel.replaceFirst("(^02|[0-9]{3})([0-9]{3,4})([0-9]{4})$", "$1-$2-$3");
-        textView.setText(replaceStr);
+                                      @Nullable final String tel) {
+        if (tel != null) {
+            final String replaceStr = tel.replaceFirst("(^02|[0-9]{3})([0-9]{3,4})([0-9]{4})$", "$1-$2-$3");
+            textView.setText(replaceStr);
+        }
     }
 
     @BindingAdapter({"visible"})

@@ -2,6 +2,8 @@ package com.webrtc.boyj.presentation.main;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -145,5 +147,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
+    }
+
+    public static Intent getLaunchIntent(@NonNull final Context context) {
+        return new Intent(context, MainActivity.class);
     }
 }

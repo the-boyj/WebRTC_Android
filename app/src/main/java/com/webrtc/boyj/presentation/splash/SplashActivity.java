@@ -1,13 +1,18 @@
 package com.webrtc.boyj.presentation.splash;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.presentation.main.MainActivity;
 
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 
 public class SplashActivity extends AppCompatActivity {
+    private static final int SPLASH_TIME = 2;
     private Disposable disposable;
 
     @Override
@@ -15,6 +20,20 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        disposable = Single.timer(SPLASH_TIME, TimeUnit.SECONDS)
+                .subscribe(__ -> startMainActivity());
+    }
 
+    private void startMainActivity() {
+        startActivity(MainActivity.getLaunchIntent(this));
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!disposable.isDisposed()) {
+            disposable.dispose();
+        }
     }
 }

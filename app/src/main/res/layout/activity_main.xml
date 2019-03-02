@@ -48,14 +48,17 @@
             </LinearLayout>
         </android.support.v7.widget.Toolbar>
 
-        <ProgressBar
-            app:visible="@{vm.loading}"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="@dimen/loading_size_width"
+            android:layout_height="@dimen/loading_size_height"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="loading.json"
+            app:lottie_loop="true"
+            app:visible="@{vm.loading}" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_user"

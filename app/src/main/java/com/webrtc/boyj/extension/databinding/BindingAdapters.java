@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.airbnb.lottie.LottieAnimationView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +34,11 @@ public class BindingAdapters {
     }
 
     @BindingAdapter({"visible"})
-    public static void setVisible(@NonNull final ProgressBar pb, final boolean loading) {
+    public static void setVisible(@NonNull final LottieAnimationView view, final boolean loading) {
         if (loading) {
-            pb.setVisibility(View.VISIBLE);
+            view.setVisibility(View.VISIBLE);
         } else {
-            pb.setVisibility(View.GONE);
+            view.setVisibility(View.GONE);
         }
     }
 }

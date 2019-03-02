@@ -2,6 +2,8 @@
 <resources>
     <!-- App size -->
     <dimen name="splash_logo_size">200dp</dimen>
+    <dimen name="loading_size_width">120dp</dimen>
+    <dimen name="loading_size_height">80dp</dimen>
 
     <!-- margin/padding -->
     <dimen name="space_xx_small">4dp</dimen>

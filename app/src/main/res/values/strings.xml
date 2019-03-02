@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">BOYJ</string>
+    <string name="app_full_name">THE BOYJ</string>
+
+    <!-- Splash -->
+    <string name="app_description">광운대학교 산학연계 프로젝트</string>
 
     <!-- Menu -->
     <string name="menu_update_profile">이름 변경</string>

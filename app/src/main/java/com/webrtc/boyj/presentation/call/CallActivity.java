@@ -14,7 +14,7 @@ import com.webrtc.boyj.presentation.BaseActivity;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_USER = "EXTRA_USER";
-    private static final String EXTRA_THE_OTHER_USER = "THE_OTHER_USER";
+    private static final String EXTRA_OTHER_USER = "EXTRA_OTHER_USER";
     private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
     @Override
@@ -23,7 +23,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
         // Todo : Handle each "Caller" and "Callee"
         final TextView nameView = findViewById(R.id.tv_callee_name);
-        final User user = (User) getIntent().getSerializableExtra(EXTRA_THE_OTHER_USER);
+        final User user = (User) getIntent().getSerializableExtra(EXTRA_OTHER_USER);
         if (user != null) {
             nameView.setText(user.getName());
         }
@@ -35,7 +35,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
                                                @NonNull final User otherUser) {
         final Intent intent = new Intent(context, CallActivity.class);
         intent.putExtra(EXTRA_USER, user);
-        intent.putExtra(EXTRA_THE_OTHER_USER, otherUser);
+        intent.putExtra(EXTRA_OTHER_USER, otherUser);
         intent.putExtra(EXTRA_IS_CALLER, true);
         return intent;
     }
@@ -45,7 +45,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
                                                @NonNull final User otherUser) {
 
         final Intent intent = new Intent(context, CallActivity.class);
-        intent.putExtra(EXTRA_THE_OTHER_USER, otherUser);
+        intent.putExtra(EXTRA_OTHER_USER, otherUser);
         intent.putExtra(EXTRA_IS_CALLER, false);
         return intent;
     }

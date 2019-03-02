@@ -15,4 +15,9 @@
 
     <!-- Call Activity -->
     <string name="text_connect_message">연결 중입니다.</string>
+
+    <!-- CallOnActivity -->
+    <string name="text_call_on_message">수신전화</string>
+    <string name="text_call_accept">응답</string>
+    <string name="text_call_reject">거절</string>
 </resources>

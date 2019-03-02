@@ -10,7 +10,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_s_large"
-            android:text="수신전화"
+            android:text="@string/text_call_on_message"
             android:textSize="@dimen/text_large"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +29,7 @@
             android:layout_margin="@dimen/space_x_small"
             android:text="홍OO"
             android:textColor="@color/colorPrimary"
-            android:textSize="40sp"
+            android:textSize="@dimen/text_title_median"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guideline" />
@@ -49,7 +49,7 @@
             android:id="@+id/fab_dial"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_large"
+            android:layout_margin="@dimen/space_xx_large"
             android:backgroundTint="@android:color/holo_green_light"
             android:src="@drawable/ic_call"
             app:layout_constraintBottom_toBottomOf="@id/guideline2"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_x_small"
-            android:text="응답"
+            android:text="@string/text_call_accept"
             app:layout_constraintEnd_toEndOf="@id/fab_dial"
             app:layout_constraintStart_toStartOf="@id/fab_dial"
             app:layout_constraintTop_toBottomOf="@id/fab_dial" />
@@ -69,9 +69,7 @@
             android:id="@+id/fab_hang_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_large"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_margin="@dimen/space_xx_large"
             android:backgroundTint="@color/colorRed"
             android:src="@drawable/ic_call_end"
             app:layout_constraintBottom_toBottomOf="@id/guideline2"
@@ -82,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_x_small"
-            android:text="거절"
+            android:text="@string/text_call_reject"
             app:layout_constraintEnd_toEndOf="@id/fab_hang_up"
             app:layout_constraintStart_toStartOf="@id/fab_hang_up"
             app:layout_constraintTop_toBottomOf="@id/fab_hang_up" />
@@ -93,6 +91,17 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.8" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="dial.json"
+            app:lottie_loop="true" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>

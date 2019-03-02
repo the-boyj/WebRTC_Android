@@ -2,6 +2,8 @@ package com.webrtc.boyj.presentation.main;
 
 import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -18,13 +20,17 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.common.NameDialog;
+import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.call.CallActivity;
 
 import java.util.List;
 
+import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.READ_PHONE_STATE;
+import static android.Manifest.permission.RECORD_AUDIO;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Nullable
@@ -47,8 +53,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
     private void checkPermission() {
-        TedPermission.with(this)
-                .setPermissions(READ_PHONE_STATE)
+        TedPermission.with(getApplicationContext())
+                .setPermissions(READ_PHONE_STATE, RECORD_AUDIO, CAMERA)
                 .setPermissionListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
@@ -79,8 +85,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void initViewModel() {
-        assert tel != null;
-
         final MainViewModel vm = ViewModelProviders.of(this,
                 new MainViewModelFactory(UserRepositoryImpl.getInstance(
                         FirebaseFirestore.getInstance(),
@@ -92,6 +96,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void initRecyclerView() {
         final MainAdapter adapter = new MainAdapter();
+        adapter.setOnDialListener(this::startCallActivity);
         binding.rvUser.setAdapter(adapter);
     }
 
@@ -104,10 +109,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         showToast(getString(R.string.ERROR_PHONE_NUMBER_NOT_EXIST));
     }
 
-    private void showToast(@NonNull final String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
     private void showDialog() {
         if (tel == null) {
             notExistPhoneNumber();
@@ -116,6 +117,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final NameDialog dialog = new NameDialog(this);
         dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
         dialog.show();
+    }
+
+    private void showToast(@NonNull final String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void startCallActivity(@NonNull final User otherUser) {
+        final User user = binding.getVm().getUser().getValue();
+        assert user != null;
+
+        startActivity(CallActivity.getCallerLaunchIntent(this, user, otherUser));
     }
 
     @Override
@@ -135,5 +147,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected int getLayoutId() {
         return R.layout.activity_main;
+    }
+
+    public static Intent getLaunchIntent(@NonNull final Context context) {
+        return new Intent(context, MainActivity.class);
     }
 }

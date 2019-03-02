@@ -14,11 +14,11 @@ public class MainViewModelFactory implements ViewModelProvider.Factory {
         this.repository = repository;
     }
 
+    @SuppressWarnings("unchecked")
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
-            //noinspection unchecked
             return (T) new MainViewModel(repository);
         } else {
             throw new IllegalArgumentException("ViewModel Not Found");

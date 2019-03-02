@@ -7,7 +7,6 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.utils.Logger;
-import com.webrtc.boyj.view.activity.CallActivity;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
@@ -30,6 +29,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void handleNow(String room) {
-        CallActivity.goToCallActivity(this, false, room);
+
     }
 }

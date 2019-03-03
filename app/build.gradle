@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "dev-SNAPSHOT"
+        versionName "1.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         dataBinding {
@@ -38,7 +38,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //android support
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation "com.android.support:appcompat-v7:$appcompat_version"
     implementation 'com.android.support:customtabs:28.0.0'
     implementation 'com.android.support:support-vector-drawable:28.0.0'
     implementation 'com.android.support:support-media-compat:28.0.0'
@@ -56,9 +56,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
     // Floating Action Button
-    implementation 'com.android.support:design:28.0.0'
+    implementation "com.android.support:design:$design_version"
     // RecyclerView
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation "com.android.support:recyclerview-v7:$recyclerview_version"
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     // RxJava
@@ -76,9 +76,9 @@ dependencies {
     }
 
     // TedPermission
-    implementation 'gun0912.ted:tedpermission:2.2.2'
+    implementation "gun0912.ted:tedpermission:$tedpermission_version"
 
     // Lottie
-    implementation 'com.airbnb.android:lottie:2.7.0'
+    implementation "com.airbnb.android:lottie:$lottie_version"
 }
 apply plugin: 'com.google.gms.google-services'

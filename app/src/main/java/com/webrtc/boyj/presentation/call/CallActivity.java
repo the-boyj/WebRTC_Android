@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintSet;
+import android.transition.TransitionManager;
 import android.widget.Toast;
 
 import com.webrtc.boyj.R;
@@ -46,6 +48,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     private void initViews() {
         findViewById(R.id.fab_hang_up).setOnClickListener(__ -> hangUp());
+        findViewById(R.id.fab_left).setOnClickListener(__ -> callAnimation());
     }
 
     private void initViewModel(@NonNull final User otherUser) {
@@ -55,13 +58,21 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         binding.setVm(vm);
     }
 
-    private void showToast(@NonNull final String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    private void callAnimation() {
+        final ConstraintSet set = new ConstraintSet();
+        set.clone(this, R.layout.activity_call_calling);
+
+        TransitionManager.beginDelayedTransition(binding.root);
+        set.applyTo(binding.root);
     }
 
     // Todo : Hangup handling
     private void hangUp() {
         finish();
+    }
+
+    private void showToast(@NonNull final String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @NonNull

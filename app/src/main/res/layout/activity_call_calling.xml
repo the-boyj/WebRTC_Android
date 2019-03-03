@@ -36,7 +36,6 @@
             android:drawablePadding="@dimen/space_small"
             android:text="00:00"
             android:textColor="@android:color/holo_green_light"
-            android:textSize="@dimen/text_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -66,8 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
-            android:text="@{vm.getOtherUser.getName()}"
-            android:textSize="@dimen/text_xx_large"
+            android:textSize="@dimen/text_large"
             android:textColor="@color/colorWhite"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

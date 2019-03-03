@@ -68,7 +68,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_callee_name" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_hangup"
+            android:id="@+id/fab_hang_up"
             style="@style/CallFabDefault"
             android:backgroundTint="@color/colorRed"
             android:src="@drawable/ic_call_end"
@@ -80,16 +80,16 @@
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_first"
             style="@style/CallFabDefault"
-            app:layout_constraintBottom_toBottomOf="@id/fab_hangup"
-            app:layout_constraintEnd_toStartOf="@id/fab_hangup"
-            app:layout_constraintTop_toTopOf="@id/fab_hangup" />
+            app:layout_constraintBottom_toBottomOf="@id/fab_hang_up"
+            app:layout_constraintEnd_toStartOf="@id/fab_hang_up"
+            app:layout_constraintTop_toTopOf="@id/fab_hang_up" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_second"
             style="@style/CallFabDefault"
-            app:layout_constraintBottom_toBottomOf="@id/fab_hangup"
-            app:layout_constraintStart_toEndOf="@id/fab_hangup"
-            app:layout_constraintTop_toTopOf="@id/fab_hangup" />
+            app:layout_constraintBottom_toBottomOf="@id/fab_hang_up"
+            app:layout_constraintStart_toEndOf="@id/fab_hang_up"
+            app:layout_constraintTop_toTopOf="@id/fab_hang_up" />
 
     </android.support.constraint.ConstraintLayout>
 

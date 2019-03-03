@@ -3,7 +3,6 @@ package com.webrtc.boyj.presentation.call;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 
 import com.webrtc.boyj.data.model.User;
 

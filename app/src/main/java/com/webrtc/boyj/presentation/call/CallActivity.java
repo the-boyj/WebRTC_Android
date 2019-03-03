@@ -28,11 +28,24 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
             showToast(getString(R.string.ERROR_DEFAULT));
             finish();
         } else {
+            final User user = (User) intent.getSerializableExtra(EXTRA_USER);
             final User otherUser = (User) intent.getSerializableExtra(EXTRA_OTHER_USER);
-            if (otherUser != null) {
-                initViewModel(otherUser);
+            final boolean isCaller = intent.getBooleanExtra(EXTRA_IS_CALLER, true);
+
+            initViews();
+            initViewModel(otherUser);
+
+            // Todo : Handle "Caller" and "Callee" by next issue
+            if (isCaller) {
+
+            } else {
+
             }
         }
+    }
+
+    private void initViews() {
+        findViewById(R.id.fab_hang_up).setOnClickListener(__ -> hangUp());
     }
 
     private void initViewModel(@NonNull final User otherUser) {
@@ -44,6 +57,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     private void showToast(@NonNull final String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    // Todo : Hangup handling
+    private void hangUp() {
+        finish();
     }
 
     @NonNull

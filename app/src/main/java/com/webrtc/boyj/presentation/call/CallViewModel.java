@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
-class CallViewModel extends BaseViewModel {
+public class CallViewModel extends BaseViewModel {
     @NonNull
     private final User otherUser;
     @NonNull
@@ -24,16 +24,13 @@ class CallViewModel extends BaseViewModel {
         this.otherUser = otherUser;
     }
 
-    void dial() {
+    void call() {
+        isCalling.set(true);
+
         addDisposable(Observable.interval(1, TimeUnit.SECONDS)
                 .map(Long::intValue)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
-    }
-
-    void call() {
-        isCalling.set(true);
-        callTime.set(0);
     }
 
     @NonNull

@@ -96,7 +96,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_other_user_name" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_hang_up"
+            android:id="@+id/fab_reject"
             style="@style/CallFabDefault"
             android:backgroundTint="@color/colorRed"
             android:src="@drawable/ic_call_end"
@@ -109,14 +109,14 @@
             android:id="@+id/fab_left"
             style="@style/CallFabDefault"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/fab_hang_up"
+            app:layout_constraintEnd_toStartOf="@id/fab_reject"
             app:layout_constraintTop_toBottomOf="@id/guideline2" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_right"
             style="@style/CallFabDefault"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/fab_hang_up"
+            app:layout_constraintStart_toEndOf="@id/fab_reject"
             app:layout_constraintTop_toBottomOf="@id/guideline2" />
 
         <android.support.constraint.Guideline

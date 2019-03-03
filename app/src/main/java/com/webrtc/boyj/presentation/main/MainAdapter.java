@@ -10,10 +10,15 @@ import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
 
 public class MainAdapter extends ListAdapter<User, MainViewHolder> {
+    interface OnDialListener {
+        void onDial(@NonNull final User user);
+    }
 
     MainAdapter() {
         super(DIFF_CALLBACK);
     }
+
+    private OnDialListener onDialListener;
 
     @NonNull
     @Override
@@ -26,6 +31,16 @@ public class MainAdapter extends ListAdapter<User, MainViewHolder> {
     public void onBindViewHolder(@NonNull MainViewHolder holder, int i) {
         final User user = getItem(holder.getAdapterPosition());
         holder.bindTo(user);
+
+        holder.getBinding().fabCall.setOnClickListener(v -> {
+            if (onDialListener != null) {
+                onDialListener.onDial(user);
+            }
+        });
+    }
+
+    void setOnDialListener(OnDialListener onDialListener) {
+        this.onDialListener = onDialListener;
     }
 
     private static final DiffUtil.ItemCallback<User> DIFF_CALLBACK =

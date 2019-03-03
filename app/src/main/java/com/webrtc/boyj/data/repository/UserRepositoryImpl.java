@@ -75,13 +75,13 @@ public class UserRepositoryImpl implements UserRepository {
                                     emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                                     return;
                                 } else if (user.getTel().equals(tel)) {
-                                    response.setMyProfile(user);
+                                    response.setUser(user);
                                 } else {
                                     userList.add(user);
                                 }
                             }
-                            response.setUserList(userList);
-                            if (response.getMyProfile() == null) {
+                            response.setOtherUserList(userList);
+                            if (response.getUser() == null) {
                                 emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
                             } else {
                                 emitter.onSuccess(response);

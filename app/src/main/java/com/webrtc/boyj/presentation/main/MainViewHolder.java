@@ -19,4 +19,8 @@ class MainViewHolder extends RecyclerView.ViewHolder {
     void bindTo(@NonNull User user) {
         binding.setUser(user);
     }
+
+    ItemUserBinding getBinding() {
+        return binding;
+    }
 }

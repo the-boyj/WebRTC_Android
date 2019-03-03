@@ -7,25 +7,25 @@ import com.webrtc.boyj.data.model.User;
 import java.util.List;
 
 public class UserResponse {
-    private List<User> userList;
-    private User myProfile;
+    private List<User> otherUserList;
+    private User user;
 
     public UserResponse() {
     }
 
-    public List<User> getUserList() {
-        return userList;
+    public List<User> getOtherUserList() {
+        return otherUserList;
     }
 
-    public void setUserList(@NonNull List<User> userList) {
-        this.userList = userList;
+    public void setOtherUserList(@NonNull List<User> otherUserList) {
+        this.otherUserList = otherUserList;
     }
 
-    public User getMyProfile() {
-        return myProfile;
+    public User getUser() {
+        return user;
     }
 
-    public void setMyProfile(@NonNull User myProfile) {
-        this.myProfile = myProfile;
+    public void setUser(@NonNull User user) {
+        this.user = user;
     }
 }

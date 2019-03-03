@@ -23,6 +23,7 @@ import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.presentation.ringing.RingingActivity;
 
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         super.onCreate(savedInstanceState);
         initToolbar();
         checkPermission();
+
+        // Todo : Remove when callee func is implemented
+        findViewById(R.id.btn_call_on).setOnClickListener(v ->
+                startActivity(RingingActivity.getLaunchIntent(this, RingingActivity.class)));
     }
 
     private void initToolbar() {
@@ -125,7 +130,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final User user = binding.getVm().getUser().getValue();
         assert user != null;
 
-        startActivity(CallActivity.getCallerLaunchIntent(this, user, otherUser));
+        startActivity(CallActivity.getLaunchIntent(this, otherUser, user, true));
     }
 
     @Override

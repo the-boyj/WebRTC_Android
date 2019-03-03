@@ -42,4 +42,9 @@ public class CallViewModel extends BaseViewModel {
     public ObservableBoolean getIsCalling() {
         return isCalling;
     }
+
+    @NonNull
+    public ObservableInt getCallTime() {
+        return callTime;
+    }
 }

@@ -46,7 +46,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_caller_name" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_dial"
+            android:id="@+id/fab_accept"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_ringing_fab"
@@ -61,12 +61,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_x_small"
             android:text="@string/text_call_accept"
-            app:layout_constraintEnd_toEndOf="@id/fab_dial"
-            app:layout_constraintStart_toStartOf="@id/fab_dial"
-            app:layout_constraintTop_toBottomOf="@id/fab_dial" />
+            app:layout_constraintEnd_toEndOf="@id/fab_accept"
+            app:layout_constraintStart_toStartOf="@id/fab_accept"
+            app:layout_constraintTop_toBottomOf="@id/fab_accept" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_hang_up"
+            android:id="@+id/fab_reject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_ringing_fab"
@@ -81,9 +81,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_x_small"
             android:text="@string/text_call_reject"
-            app:layout_constraintEnd_toEndOf="@id/fab_hang_up"
-            app:layout_constraintStart_toStartOf="@id/fab_hang_up"
-            app:layout_constraintTop_toBottomOf="@id/fab_hang_up" />
+            app:layout_constraintEnd_toEndOf="@id/fab_reject"
+            app:layout_constraintStart_toStartOf="@id/fab_reject"
+            app:layout_constraintTop_toBottomOf="@id/fab_reject" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline2"

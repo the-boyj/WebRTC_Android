@@ -131,6 +131,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         assert user != null;
 
         startActivity(CallActivity.getLaunchIntent(this, otherUser, user, true));
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     @Override

@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="vm"
-            type="com.webrtc.boyj.presentation.call.CallViewModel" />
-    </data>
-
     <android.support.constraint.ConstraintLayout
         android:id="@+id/root"
         android:layout_width="match_parent"
@@ -19,8 +12,6 @@
             android:id="@+id/view_remote"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/colorBlack"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,12 +19,10 @@
 
         <View
             android:id="@+id/view_local"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="@dimen/space_x_large"
+            android:layout_width="80dp"
+            android:layout_height="120dp"
+            android:layout_margin="@dimen/space_large"
             android:background="@drawable/connecting_local_view_bg"
-            app:layout_constraintBottom_toBottomOf="@id/guideline"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -45,9 +34,6 @@
             android:drawableStart="@drawable/ic_call_green"
             android:drawablePadding="@dimen/space_small"
             android:textColor="@android:color/holo_green_light"
-            android:textSize="@dimen/text_large"
-            android:visibility="gone"
-            app:callTime="@{vm.callTime}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -63,6 +49,7 @@
             android:id="@+id/lottie_calling"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,9 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
-            android:text="@{vm.getOtherUser.getName()}"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_title_median"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guideline"
@@ -88,9 +73,8 @@
             android:id="@+id/tv_connect_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_margin="@dimen/space_x_large"
-            android:text="@string/text_connect_message"
-            android:textSize="@dimen/text_xx_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_other_user_name" />

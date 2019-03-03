@@ -34,13 +34,4 @@ public class BindingAdapters {
             textView.setText(replaceStr);
         }
     }
-
-    @BindingAdapter({"visible"})
-    public static void setVisible(@NonNull final LottieAnimationView view, final boolean loading) {
-        if (loading) {
-            view.setVisibility(View.VISIBLE);
-        } else {
-            view.setVisibility(View.GONE);
-        }
-    }
 }

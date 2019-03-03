@@ -14,7 +14,7 @@
     <string name="dialog_edit_text_helper_text">변경할 이름을 입력하세요.</string>
 
     <!-- Call Activity -->
-    <string name="text_connect_message">연결 중입니다.</string>
+    <string name="text_connect_message">전화를 거는중…</string>
 
     <!-- CallOnActivity -->
     <string name="text_call_on_message">수신전화</string>

@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="vm"
             type="com.webrtc.boyj.presentation.call.CallViewModel" />
@@ -43,14 +45,27 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.6" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_calling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="calling.json"
+            app:lottie_loop="true" />
+
         <TextView
             android:id="@+id/tv_callee_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
+            android:text="@{vm.getOtherUser.getName()}"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_title_median"
-            android:text="@{vm.getOtherUser.getName()}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guideline"

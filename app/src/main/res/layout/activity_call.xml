@@ -3,10 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="com.webrtc.boyj.presentation.call.CallViewModel" />
+    </data>
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <View
             android:id="@+id/view_local"
@@ -37,11 +45,25 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.6" />
 
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_calling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="calling.json"
+            app:lottie_loop="true" />
+
         <TextView
             android:id="@+id/tv_callee_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
+            android:text="@{vm.getOtherUser.getName()}"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_title_median"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +83,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_callee_name" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_hangup"
+            android:id="@+id/fab_hang_up"
             style="@style/CallFabDefault"
             android:backgroundTint="@color/colorRed"
             android:src="@drawable/ic_call_end"
@@ -73,16 +95,16 @@
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_first"
             style="@style/CallFabDefault"
-            app:layout_constraintBottom_toBottomOf="@id/fab_hangup"
-            app:layout_constraintEnd_toStartOf="@id/fab_hangup"
-            app:layout_constraintTop_toTopOf="@id/fab_hangup" />
+            app:layout_constraintBottom_toBottomOf="@id/fab_hang_up"
+            app:layout_constraintEnd_toStartOf="@id/fab_hang_up"
+            app:layout_constraintTop_toTopOf="@id/fab_hang_up" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_second"
             style="@style/CallFabDefault"
-            app:layout_constraintBottom_toBottomOf="@id/fab_hangup"
-            app:layout_constraintStart_toEndOf="@id/fab_hangup"
-            app:layout_constraintTop_toTopOf="@id/fab_hangup" />
+            app:layout_constraintBottom_toBottomOf="@id/fab_hang_up"
+            app:layout_constraintStart_toEndOf="@id/fab_hang_up"
+            app:layout_constraintTop_toTopOf="@id/fab_hang_up" />
 
     </android.support.constraint.ConstraintLayout>
 

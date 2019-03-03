@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="vm"
             type="com.webrtc.boyj.presentation.main.MainViewModel" />
@@ -42,8 +44,8 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:phoneNumber="@{vm.user.tel}"
                     android:textSize="@dimen/text_median"
+                    app:phoneNumber="@{vm.user.tel}"
                     tools:text="010-0000-0000" />
             </LinearLayout>
         </android.support.v7.widget.Toolbar>
@@ -51,14 +53,14 @@
         <com.airbnb.lottie.LottieAnimationView
             android:layout_width="@dimen/loading_size_width"
             android:layout_height="@dimen/loading_size_height"
+            android:visibility="@{vm.loading ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
             app:lottie_fileName="loading.json"
-            app:lottie_loop="true"
-            app:visible="@{vm.loading}" />
+            app:lottie_loop="true" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_user"
@@ -77,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_small"
             android:text="RINGING"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </android.support.constraint.ConstraintLayout>
 </layout>

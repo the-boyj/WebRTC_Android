@@ -25,7 +25,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     }
 
     private void startMainActivity() {
-        startActivity(MainActivity.getLaunchIntent(this));
+        startActivity(MainActivity.getLaunchIntent(this, MainActivity.class));
         finish();
     }
 

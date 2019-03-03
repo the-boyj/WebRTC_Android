@@ -18,4 +18,12 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_margin">@dimen/space_xx_large</item>
     </style>
+
+    <!-- Name Dialog Style -->
+    <style name="NameDialogTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/space_x_small</item>
+        <item name="android:textSize">@dimen/text_large</item>
+    </style>
 </resources>

@@ -3,11 +3,13 @@ package com.webrtc.boyj.presentation.call;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintSet;
 import android.transition.TransitionManager;
+import android.util.TypedValue;
 import android.widget.Toast;
 
 import com.webrtc.boyj.R;
@@ -48,7 +50,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     private void initViews() {
         findViewById(R.id.fab_hang_up).setOnClickListener(__ -> hangUp());
-        findViewById(R.id.fab_left).setOnClickListener(__ -> callAnimation());
+        findViewById(R.id.fab_left).setOnClickListener(__ -> call());
     }
 
     private void initViewModel(@NonNull final User otherUser) {
@@ -56,6 +58,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
                 new CallViewModelFactory(otherUser)).get(CallViewModel.class);
 
         binding.setVm(vm);
+    }
+
+    private void call() {
+        binding.getVm().call();
+        callAnimation();
     }
 
     private void callAnimation() {

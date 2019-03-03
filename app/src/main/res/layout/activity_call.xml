@@ -19,7 +19,7 @@
             android:id="@+id/view_remote"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/colorGray"
+            android:background="@color/colorBlack"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -47,6 +47,7 @@
             android:textColor="@android:color/holo_green_light"
             android:textSize="@dimen/text_large"
             android:visibility="gone"
+            app:callTime="@{vm.callTime}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -71,7 +72,7 @@
             app:lottie_loop="true" />
 
         <TextView
-            android:id="@+id/tv_callee_name"
+            android:id="@+id/tv_other_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
@@ -92,7 +93,7 @@
             android:textSize="@dimen/text_xx_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_callee_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_other_user_name" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_hang_up"

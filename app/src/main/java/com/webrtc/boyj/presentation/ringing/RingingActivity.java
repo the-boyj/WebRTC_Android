@@ -30,7 +30,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
         startActivity(CallActivity.getLaunchIntent(this,
                 otherUser, null, false));
-
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
     }
 

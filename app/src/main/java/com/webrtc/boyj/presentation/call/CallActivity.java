@@ -1,11 +1,12 @@
 package com.webrtc.boyj.presentation.call;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
@@ -21,12 +22,28 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Todo : Handle each "Caller" and "Callee"
-        final TextView nameView = findViewById(R.id.tv_callee_name);
-        final User user = (User) getIntent().getSerializableExtra(EXTRA_OTHER_USER);
-        if (user != null) {
-            nameView.setText(user.getName());
+        final Intent intent = getIntent();
+
+        if (intent == null) {
+            showToast(getString(R.string.ERROR_DEFAULT));
+            finish();
+        } else {
+            final User otherUser = (User) intent.getSerializableExtra(EXTRA_OTHER_USER);
+            if (otherUser != null) {
+                initViewModel(otherUser);
+            }
         }
+    }
+
+    private void initViewModel(@NonNull final User otherUser) {
+        final CallViewModel vm = ViewModelProviders.of(this,
+                new CallViewModelFactory(otherUser)).get(CallViewModel.class);
+
+        binding.setVm(vm);
+    }
+
+    private void showToast(@NonNull final String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @NonNull

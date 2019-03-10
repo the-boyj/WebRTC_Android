@@ -1,72 +1,43 @@
 package com.webrtc.boyj.api.signalling;
 
-import com.webrtc.boyj.utils.Logger;
 
-import org.json.JSONObject;
+import android.support.annotation.NonNull;
 
-import java.net.URISyntaxException;
+import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.DialPayload;
 
-import io.reactivex.subjects.PublishSubject;
-import io.socket.client.IO;
-import io.socket.client.Socket;
+import javax.annotation.Nonnull;
 
 public class SignalingClient {
-    private static final String PROTOCOL = "http";
-    private static final String IP = "13.124.41.104";
-    private static final int PORT = 3000;
 
-    private static SignalingClient instance;
+    private final SocketIOClient socketIOClient;
 
-    private Socket socket;
-    private boolean isConnected = false;
+    private static volatile SignalingClient instance;
 
-    public final PublishSubject<String> createdEventSubject = PublishSubject.create();
-    public final PublishSubject<String> knockEventSubject = PublishSubject.create();
-    public final PublishSubject<String> readyEventSubject = PublishSubject.create();
-    public final PublishSubject<JSONObject> rsdpEventSubject = PublishSubject.create();
-    public final PublishSubject<JSONObject> riceEventSubject = PublishSubject.create();
-    public final PublishSubject<String> byeEventSubject = PublishSubject.create();
-    public final PublishSubject<JSONObject> errorEventSubject = PublishSubject.create();
+    @Nonnull
+    public static SignalingClient getInstance(@NonNull SocketIOClient socketIOClient) {
 
-    private SignalingClient() {
-        try {
-            final String url = String.format("%s://%s:%d", PROTOCOL, IP, PORT);
-            socket = IO.socket(url);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            Logger.e("check server URL");
-        }
-        attachEventListener();
-        connect();
-    }
+        socketIOClient.connect();
 
-    public static SignalingClient getInstance() {
-        if (instance == null)
+        if (instance == null) {
             synchronized (SignalingClient.class) {
                 if (instance == null) {
-                    instance = new SignalingClient();
-                    instance.connect();
+                    instance = new SignalingClient(socketIOClient);
                 }
             }
+        }
         return instance;
     }
 
-    private void attachEventListener() {
-
-        socket.on(SignalingInterface.EVENT_CREATED, args -> createdEventSubject.onNext("created"));
-        socket.on(SignalingInterface.EVENT_KNOCK, args -> knockEventSubject.onNext("knock"));
-        socket.on(SignalingInterface.EVENT_READY, args -> readyEventSubject.onNext("ready"));
-        socket.on(SignalingInterface.EVENT_RECEIVE_SDP, args -> rsdpEventSubject.onNext((JSONObject) args[0]));
-        socket.on(SignalingInterface.EVENT_RECEIVE_ICE, args -> riceEventSubject.onNext((JSONObject) args[0]));
-        socket.on(SignalingInterface.EVENT_BYE, args -> byeEventSubject.onNext("bye"));
-        socket.on(SignalingInterface.EVENT_SERVER_ERROR, args -> byeEventSubject.onNext("error"));
+    private SignalingClient(@NonNull SocketIOClient socketIOClient) {
+        this.socketIOClient = socketIOClient;
     }
 
-    private void connect() {
-        if (!isConnected) {
-            socket.connect();
-            isConnected = true;
-        }
+    public void emitDial(@NonNull DialPayload dialPayload) {
+        socketIOClient.getSocket().emit(SignalingEventString.EVENT_DIAL, dialPayload);
     }
 
+    public void emitAwaken(@NonNull AwakenPayload awakenPayload) {
+        socketIOClient.getSocket().emit(SignalingEventString.EVENT_AWAKEN, awakenPayload);
+    }
 }

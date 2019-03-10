@@ -2,13 +2,12 @@ package com.webrtc.boyj.api.signalling.payload;
 
 import android.support.annotation.NonNull;
 
-import javax.annotation.Nonnull;
 
 public class AwakenPayload {
 
     private String room;
 
-    public void setRoom(@Nonnull String room) {
+    public void setRoom(@NonNull String room) {
         this.room = room;
     }
 
@@ -20,7 +19,7 @@ public class AwakenPayload {
             this.room = room;
         }
 
-        @Nonnull
+        @NonNull
         public AwakenPayload build() {
             final AwakenPayload payload = new AwakenPayload();
             payload.setRoom(this.room);

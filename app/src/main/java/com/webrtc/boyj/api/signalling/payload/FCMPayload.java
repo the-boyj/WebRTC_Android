@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.messaging.RemoteMessage;
 
-import javax.annotation.Nonnull;
 
 public class FCMPayload {
 
@@ -19,11 +18,11 @@ public class FCMPayload {
         this.tel = remoteMessage.getData().get(KEY_TEL);
     }
 
-    @Nonnull
+    @NonNull
     public String getRoom() {
         return room;
     }
-    @Nonnull
+    @NonNull
     public String getTel() {
         return tel;
     }

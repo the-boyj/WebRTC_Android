@@ -5,6 +5,10 @@ import android.preference.PreferenceManager;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.webrtc.boyj.api.signalling.SignalingClient;
+import com.webrtc.boyj.api.signalling.SignalingClientFactory;
+import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.utils.Logger;
 
@@ -15,8 +19,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Logger.d("FCM received");
-        String room = remoteMessage.getData().get("room");
-        handleNow(room);
+        FCMPayload payload = new FCMPayload(remoteMessage);
+        handleNow(payload);
     }
 
     @Override
@@ -28,7 +32,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .apply();
     }
 
-    private void handleNow(String room) {
+    public void handleNow(FCMPayload payload) {
+        String room = payload.getRoom();
 
+        final SignalingClient signalingClient = SignalingClientFactory.getSignalingClient();
+        final AwakenPayload awakenPayload = new AwakenPayload.Builder(room).build();
+
+        signalingClient.emitAwaken(awakenPayload);
     }
 }

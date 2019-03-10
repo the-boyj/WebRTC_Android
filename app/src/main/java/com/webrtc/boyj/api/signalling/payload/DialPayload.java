@@ -2,13 +2,12 @@ package com.webrtc.boyj.api.signalling.payload;
 
 import android.support.annotation.NonNull;
 
-import javax.annotation.Nonnull;
 
 public class DialPayload {
 
     private String deviceToken;
 
-    public void setDeviceToken(@Nonnull String deviceToken) {
+    public void setDeviceToken(@NonNull String deviceToken) {
         this.deviceToken = deviceToken;
     }
 
@@ -20,7 +19,7 @@ public class DialPayload {
             this.deviceToken = deviceToken;
         }
 
-        @Nonnull
+        @NonNull
         public DialPayload build() {
             final DialPayload payload = new DialPayload();
             payload.setDeviceToken(this.deviceToken);

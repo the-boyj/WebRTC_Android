@@ -16,12 +16,6 @@ public class SignalingClientFactory {
 
     //for test
     @NonNull
-    public static SignalingClient getSignalingClient(@NonNull final Socket socket) {
-        SocketIOClient socketIOClient = new SocketIOClient(socket);
-        return getSignalingClient(socketIOClient);
-    }
-    //for test
-    @NonNull
     public static SignalingClient getSignalingClient(@NonNull final SocketIOClient socketIOClient) {
         return SignalingClient.getInstance(socketIOClient);
     }
@@ -36,7 +30,8 @@ public class SignalingClientFactory {
             }
         }
 
-        final SignalingClient signalingClient = getSignalingClient(socket);
+        final SocketIOClient socketIOClient = new SocketIOClient(socket);
+        final SignalingClient signalingClient = getSignalingClient(socketIOClient);
 
         return signalingClient;
     }

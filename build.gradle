@@ -11,6 +11,7 @@ buildscript {
         socket_version = "0.8.3"
         tedpermission_version = "2.2.2"
         lottie_version = "2.7.0"
+        webrtc_version = "1.0.25821"
     }
     repositories {
         google()

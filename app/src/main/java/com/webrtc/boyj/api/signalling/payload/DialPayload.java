@@ -5,15 +5,17 @@ import android.support.annotation.NonNull;
 
 public class DialPayload {
 
+    @NonNull
     private String deviceToken;
 
-    public void setDeviceToken(@NonNull String deviceToken) {
+    public void setDeviceToken(@NonNull final String deviceToken) {
         this.deviceToken = deviceToken;
     }
 
     public static class Builder {
 
-        private String deviceToken;
+        @NonNull
+        private final String deviceToken;
 
         public Builder(@NonNull final String deviceToken) {
             this.deviceToken = deviceToken;

@@ -2,20 +2,22 @@ package com.webrtc.boyj.api.signalling;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 
-import javax.annotation.Nonnull;
-
 public class SignalingClient {
 
+    @NonNull
     private final SocketIOClient socketIOClient;
 
+
+    @Nullable
     private static volatile SignalingClient instance;
 
-    @Nonnull
-    public static SignalingClient getInstance(@NonNull SocketIOClient socketIOClient) {
+    @NonNull
+    public static SignalingClient getInstance(@NonNull final SocketIOClient socketIOClient) {
 
         socketIOClient.connect();
 
@@ -29,15 +31,15 @@ public class SignalingClient {
         return instance;
     }
 
-    private SignalingClient(@NonNull SocketIOClient socketIOClient) {
+    private SignalingClient(@NonNull final SocketIOClient socketIOClient) {
         this.socketIOClient = socketIOClient;
     }
 
-    public void emitDial(@NonNull DialPayload dialPayload) {
+    public void emitDial(@NonNull final DialPayload dialPayload) {
         socketIOClient.getSocket().emit(SignalingEventString.EVENT_DIAL, dialPayload);
     }
 
-    public void emitAwaken(@NonNull AwakenPayload awakenPayload) {
+    public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {
         socketIOClient.getSocket().emit(SignalingEventString.EVENT_AWAKEN, awakenPayload);
     }
 }

@@ -1,5 +1,7 @@
 package com.webrtc.boyj.api.signalling;
 
+import android.support.annotation.NonNull;
+
 import com.webrtc.boyj.api.firebase.MyFirebaseMessagingService;
 import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.data.model.User;
@@ -29,15 +31,17 @@ public class SignalingClientTest {
     public void shouldEmitDial() {
         //given
 
-        Socket mockSocket = mock(Socket.class);
-        SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
-        SocketIOClient spySocketIOClient = spy(socketIOClient);
+
+        final Socket mockSocket = mock(Socket.class);
+
+        final SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
+        final SocketIOClient spySocketIOClient = spy(socketIOClient);
 
         //assume socket connected. escape connection error.
         doNothing().when(spySocketIOClient).connect();
 
-        SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
-        SignalingClient spySignalingClient = spy(signalingClient);
+        final SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
+        final SignalingClient spySignalingClient = spy(signalingClient);
 
 
         mockStatic(SignalingClientFactory.class);
@@ -46,7 +50,7 @@ public class SignalingClientTest {
 
         //when
         //call button click
-        CallViewModel callViewModel = new CallViewModel(mock(User.class));
+        final CallViewModel callViewModel = new CallViewModel(mock(User.class));
         callViewModel.call();
 
         //then
@@ -57,14 +61,14 @@ public class SignalingClientTest {
     @Test
     public void shouldEmitAwaken() {
         //given
-        Socket mockSocket = mock(Socket.class);
-        SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
-        SocketIOClient spySocketIOClient = spy(socketIOClient);
+        final Socket mockSocket = mock(Socket.class);
+        final SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
+        final SocketIOClient spySocketIOClient = spy(socketIOClient);
 
         //assume socket connected. escape connection error.
         doNothing().when(spySocketIOClient).connect();
 
-        SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
+        final SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
         SignalingClient spySignalingClient = spy(signalingClient);
 
 
@@ -74,8 +78,8 @@ public class SignalingClientTest {
 
         //when
         //fcm received
-        MyFirebaseMessagingService service = new MyFirebaseMessagingService();
-        FCMPayload payload = mock(FCMPayload.class);
+        final MyFirebaseMessagingService service = new MyFirebaseMessagingService();
+        final FCMPayload payload = mock(FCMPayload.class);
 
         service.handleNow(payload);
 

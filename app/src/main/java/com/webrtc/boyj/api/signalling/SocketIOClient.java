@@ -7,9 +7,10 @@ import io.socket.client.Socket;
 
 public class SocketIOClient {
 
+    @NonNull
     final private Socket socket;
 
-    public SocketIOClient(@NonNull Socket socket) {
+    public SocketIOClient(@NonNull final Socket socket) {
         this.socket = socket;
     }
 

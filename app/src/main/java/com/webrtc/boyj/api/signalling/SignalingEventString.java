@@ -2,7 +2,7 @@ package com.webrtc.boyj.api.signalling;
 
 //TODO modify Enum or @StrDef
 public class SignalingEventString {
-    public static final String EVENT_DIAL ="dial";
+    public static final String EVENT_DIAL = "dial";
     public static final String EVENT_CREATED = "created";
     public static final String EVENT_AWAKEN = "awaken";
     public static final String EVENT_KNOCK = "knock";

@@ -1,15 +1,18 @@
 package com.webrtc.boyj.api.signalling;
 
 
+import android.support.annotation.NonNull;
+
 public class SocketConnectionFailedException extends RuntimeException {
 
-    private static final String message = "socket connect failed";
+    @NonNull
+    private static final String DEFAULT_MESSAGE = "socket connect failed";
 
     public SocketConnectionFailedException() {
-        super(message);
+        this(DEFAULT_MESSAGE);
     }
 
-    public SocketConnectionFailedException(String message) {
+    public SocketConnectionFailedException(@NonNull final String message) {
         super(message);
     }
 

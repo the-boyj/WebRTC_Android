@@ -4,16 +4,18 @@ import android.support.annotation.NonNull;
 
 
 public class AwakenPayload {
-
+    @NonNull
     private String room;
 
-    public void setRoom(@NonNull String room) {
+    public void setRoom(@NonNull final String room) {
         this.room = room;
     }
 
     public static class Builder {
 
-        private String room;
+
+        @NonNull
+        private final String room;
 
         public Builder(@NonNull final String room) {
             this.room = room;

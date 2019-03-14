@@ -11,6 +11,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class SignalingClientFactory {
+
     @Nullable
     private static Socket socket;
 

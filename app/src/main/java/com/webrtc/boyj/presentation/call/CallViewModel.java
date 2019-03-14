@@ -3,6 +3,7 @@ package com.webrtc.boyj.presentation.call;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.SignalingClientFactory;
@@ -48,6 +49,7 @@ public class CallViewModel extends BaseViewModel {
             e.printStackTrace();
             throw new RuntimeException();
         }
+
         signalingClient.emitDial(dialPayload);
     }
 

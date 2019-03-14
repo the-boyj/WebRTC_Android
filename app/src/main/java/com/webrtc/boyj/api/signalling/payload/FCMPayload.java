@@ -10,10 +10,12 @@ public class FCMPayload {
     private static final String KEY_ROOM = "room";
     private static final String KEY_TEL = "tel";
 
-    @NonNull private final String room;
-    @NonNull private final String tel;
+    @NonNull
+    private final String room;
+    @NonNull
+    private final String tel;
 
-    public FCMPayload(@NonNull RemoteMessage remoteMessage) {
+    public FCMPayload(@NonNull final RemoteMessage remoteMessage) {
         this.room = remoteMessage.getData().get(KEY_ROOM);
         this.tel = remoteMessage.getData().get(KEY_TEL);
     }
@@ -22,6 +24,7 @@ public class FCMPayload {
     public String getRoom() {
         return room;
     }
+
     @NonNull
     public String getTel() {
         return tel;

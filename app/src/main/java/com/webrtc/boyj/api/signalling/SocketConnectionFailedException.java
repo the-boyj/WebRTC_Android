@@ -8,4 +8,9 @@ public class SocketConnectionFailedException extends RuntimeException {
     public SocketConnectionFailedException() {
         super(message);
     }
+
+    public SocketConnectionFailedException(String message) {
+        super(message);
+    }
+
 }

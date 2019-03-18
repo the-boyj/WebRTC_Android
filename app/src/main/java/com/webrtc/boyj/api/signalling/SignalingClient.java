@@ -6,6 +6,9 @@ import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
+import com.webrtc.boyj.api.signalling.payload.SdpPayload;
+
+import org.webrtc.IceCandidate;
 
 public class SignalingClient {
 
@@ -41,5 +44,17 @@ public class SignalingClient {
 
     public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {
         socketIOClient.getSocket().emit(SignalingEventString.EVENT_AWAKEN, awakenPayload);
+    }
+
+    public void emitAccept() {
+        socketIOClient.getSocket().emit(SignalingEventString.EVENT_ACCEPT);
+    }
+
+    public void emitReject() {
+        socketIOClient.getSocket().emit(SignalingEventString.EVENT_REJECT);
+    }
+
+    public void emitBye() {
+        socketIOClient.getSocket().emit(SignalingEventString.EVENT_BYE);
     }
 }

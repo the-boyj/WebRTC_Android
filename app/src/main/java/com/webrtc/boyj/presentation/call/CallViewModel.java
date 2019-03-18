@@ -25,9 +25,20 @@ public class CallViewModel extends BaseViewModel {
     private final ObservableBoolean isCalling = new ObservableBoolean(false);
     @NonNull
     private final ObservableInt callTime = new ObservableInt(0);
+    @Nullable
+    private SignalingClient signalingClient;
 
     public CallViewModel(@NonNull User otherUser) {
+
         this.otherUser = otherUser;
+        this.signalingClient = null;
+        try {
+            signalingClient = SignalingClientFactory.getSignalingClient();
+        } catch (SocketConnectionFailedException e) {
+            //TODO 시그널링 서버 접속 에러를 사용자에게 알린후 재시도 유도
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
     }
 
     public void call() {
@@ -39,18 +50,10 @@ public class CallViewModel extends BaseViewModel {
                 .subscribe(callTime::set));
 
         final DialPayload dialPayload = new DialPayload.Builder(otherUser.getDeviceToken()).build();
-
-
-        SignalingClient signalingClient = null;
-        try {
-            signalingClient = SignalingClientFactory.getSignalingClient();
-        } catch (SocketConnectionFailedException e) {
-            //TODO 시그널링 서버 접속 에러를 사용자에게 알린후 재시도 유도
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
-
         signalingClient.emitDial(dialPayload);
+    }
+    public void hangUp(){
+        signalingClient.emitBye();
     }
 
     @NonNull

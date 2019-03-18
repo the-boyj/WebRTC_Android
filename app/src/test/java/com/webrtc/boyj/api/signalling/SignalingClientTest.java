@@ -1,11 +1,10 @@
 package com.webrtc.boyj.api.signalling;
 
-import android.support.annotation.NonNull;
-
 import com.webrtc.boyj.api.firebase.MyFirebaseMessagingService;
 import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.presentation.call.CallViewModel;
+import com.webrtc.boyj.presentation.ringing.RingingViewModel;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,4 +86,90 @@ public class SignalingClientTest {
         //emit awaken
         verify(spySignalingClient, times(1)).emitAwaken(any());
     }
+
+
+    @Test
+    public void shouldEmitAccpet() {
+        //given
+        final Socket mockSocket = mock(Socket.class);
+        final SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
+        final SocketIOClient spySocketIOClient = spy(socketIOClient);
+
+        //assume socket connected. escape connection error.
+        doNothing().when(spySocketIOClient).connect();
+
+        final SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
+        SignalingClient spySignalingClient = spy(signalingClient);
+
+
+        mockStatic(SignalingClientFactory.class);
+        when(SignalingClientFactory.getSignalingClient())
+                .thenReturn(spySignalingClient);
+
+        //when
+        //user accpet action
+        final RingingViewModel ringingViewModel = new RingingViewModel();
+        ringingViewModel.acceptAction();
+
+        //then
+        //emit accept
+        verify(spySignalingClient, times(1)).emitAccept();
+    }
+
+    @Test
+    public void shouldEmitReject() {
+        //given
+        final Socket mockSocket = mock(Socket.class);
+        final SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
+        final SocketIOClient spySocketIOClient = spy(socketIOClient);
+
+        //assume socket connected. escape connection error.
+        doNothing().when(spySocketIOClient).connect();
+
+        final SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
+        SignalingClient spySignalingClient = spy(signalingClient);
+
+
+        mockStatic(SignalingClientFactory.class);
+        when(SignalingClientFactory.getSignalingClient())
+                .thenReturn(spySignalingClient);
+
+        //when
+        //user reject action
+        final RingingViewModel ringingViewModel = new RingingViewModel();
+        ringingViewModel.rejectAction();
+
+        //then
+        //emit reject
+        verify(spySignalingClient, times(1)).emitReject();
+    }
+
+    @Test
+    public void shouldEmitBye() {
+        //given
+        final Socket mockSocket = mock(Socket.class);
+        final SocketIOClient socketIOClient = new SocketIOClient(mockSocket);
+        final SocketIOClient spySocketIOClient = spy(socketIOClient);
+
+        //assume socket connected. escape connection error.
+        doNothing().when(spySocketIOClient).connect();
+
+        final SignalingClient signalingClient = SignalingClientFactory.getSignalingClient(spySocketIOClient);
+        SignalingClient spySignalingClient = spy(signalingClient);
+
+
+        mockStatic(SignalingClientFactory.class);
+        when(SignalingClientFactory.getSignalingClient())
+                .thenReturn(spySignalingClient);
+
+        //when
+        //user bye action
+        final CallViewModel callViewModel = new CallViewModel(mock(User.class));
+        callViewModel.hangUp();
+
+        //then
+        //emit bye
+        verify(spySignalingClient, times(1)).emitBye();
+    }
 }
+

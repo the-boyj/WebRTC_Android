@@ -2,6 +2,7 @@ package com.webrtc.boyj.api.signalling;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import io.socket.client.Socket;
 
@@ -21,6 +22,10 @@ public class SocketIOClient {
         }
     }
 
+    @NonNull
+    public void emit(@NonNull final String event , @Nullable final Object object){
+        socket.emit(event , object);
+    }
     @NonNull
     public Socket getSocket() {
         return socket;

@@ -31,7 +31,6 @@ public class CallViewModel extends BaseViewModel {
     public CallViewModel(@NonNull User otherUser) {
 
         this.otherUser = otherUser;
-        this.signalingClient = null;
         try {
             signalingClient = SignalingClientFactory.getSignalingClient();
         } catch (SocketConnectionFailedException e) {

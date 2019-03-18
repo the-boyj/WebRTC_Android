@@ -39,22 +39,22 @@ public class SignalingClient {
     }
 
     public void emitDial(@NonNull final DialPayload dialPayload) {
-        socketIOClient.getSocket().emit(SignalingEventString.EVENT_DIAL, dialPayload);
+        socketIOClient.emit(SignalingEventString.EVENT_DIAL, dialPayload);
     }
 
     public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {
-        socketIOClient.getSocket().emit(SignalingEventString.EVENT_AWAKEN, awakenPayload);
+        socketIOClient.emit(SignalingEventString.EVENT_AWAKEN, awakenPayload);
     }
 
     public void emitAccept() {
-        socketIOClient.getSocket().emit(SignalingEventString.EVENT_ACCEPT);
+        socketIOClient.emit(SignalingEventString.EVENT_ACCEPT,null);
     }
 
     public void emitReject() {
-        socketIOClient.getSocket().emit(SignalingEventString.EVENT_REJECT);
+        socketIOClient.emit(SignalingEventString.EVENT_REJECT,null);
     }
 
     public void emitBye() {
-        socketIOClient.getSocket().emit(SignalingEventString.EVENT_BYE);
+        socketIOClient.emit(SignalingEventString.EVENT_BYE,null);
     }
 }

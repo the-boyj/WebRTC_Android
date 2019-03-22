@@ -1,15 +1,21 @@
 package com.webrtc.boyj.presentation.ringing;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
 
 public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
+
+    private static final String EXTRA_FCM_PAYLOAD = "EXTRA_FCM_PAYLOAD";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -33,6 +39,14 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
     }
+
+
+    public static Intent getLaunchIntent(@NonNull final Context context,
+                                         @NonNull final FCMPayload payload) {
+        return getLaunchIntent(context, RingingActivity.class)
+                .putExtra(EXTRA_FCM_PAYLOAD, payload);
+    }
+
 
     @Override
     protected int getLayoutId() {

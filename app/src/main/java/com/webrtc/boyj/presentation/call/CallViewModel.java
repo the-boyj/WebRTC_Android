@@ -5,13 +5,12 @@ import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.api.signalling.SignalingClient;
-import com.webrtc.boyj.api.signalling.SignalingClientFactory;
 import com.webrtc.boyj.api.signalling.SocketConnectionFailedException;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.presentation.BaseViewModel;
-import com.webrtc.boyj.presentation.main.MainActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,19 +24,15 @@ public class CallViewModel extends BaseViewModel {
     private final ObservableBoolean isCalling = new ObservableBoolean(false);
     @NonNull
     private final ObservableInt callTime = new ObservableInt(0);
-    @Nullable
-    private SignalingClient signalingClient;
+
+    @NonNull
+    private final BoyjRTC boyjRTC;
 
     public CallViewModel(@NonNull User otherUser) {
 
         this.otherUser = otherUser;
-        try {
-            signalingClient = SignalingClientFactory.getSignalingClient();
-        } catch (SocketConnectionFailedException e) {
-            //TODO 시그널링 서버 접속 에러를 사용자에게 알린후 재시도 유도
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
+
+        boyjRTC = new BoyjRTC();
     }
 
     public void call() {
@@ -48,11 +43,11 @@ public class CallViewModel extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
 
-        final DialPayload dialPayload = new DialPayload.Builder(otherUser.getDeviceToken()).build();
-        signalingClient.emitDial(dialPayload);
+        boyjRTC.callActionTo(otherUser);
+
     }
     public void hangUp(){
-        signalingClient.emitBye();
+        boyjRTC.hangupAction();
     }
 
     @NonNull

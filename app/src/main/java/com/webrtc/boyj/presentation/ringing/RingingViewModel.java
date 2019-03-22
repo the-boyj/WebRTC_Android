@@ -1,15 +1,24 @@
 package com.webrtc.boyj.presentation.ringing;
 
+import android.support.annotation.NonNull;
+
+import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.api.signalling.SignalingClient;
-import com.webrtc.boyj.api.signalling.SignalingClientFactory;
 
 public class RingingViewModel {
-    public void acceptAction(){
-        SignalingClient signalingClient = SignalingClientFactory.getSignalingClient();
-        signalingClient.emitAccept();
+
+    @NonNull
+    private final BoyjRTC boyjRTC;
+
+    public RingingViewModel() {
+        boyjRTC = new BoyjRTC();
     }
-    public void rejectAction(){
-        SignalingClient signalingClient = SignalingClientFactory.getSignalingClient();
-        signalingClient.emitReject();
+
+    public void acceptAction() {
+        boyjRTC.acceptAction();
+    }
+
+    public void rejectAction() {
+        boyjRTC.rejectAction();
     }
 }

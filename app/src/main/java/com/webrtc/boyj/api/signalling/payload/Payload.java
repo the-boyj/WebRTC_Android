@@ -4,7 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-public abstract class Payload {
+import java.io.Serializable;
+
+public abstract class Payload implements Serializable {
 
     @NonNull
     public String toJson() {

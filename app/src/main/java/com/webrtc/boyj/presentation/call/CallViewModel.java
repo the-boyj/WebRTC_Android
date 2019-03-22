@@ -3,11 +3,8 @@ package com.webrtc.boyj.presentation.call;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.SignalingClient;
-import com.webrtc.boyj.api.signalling.SocketConnectionFailedException;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.presentation.BaseViewModel;
@@ -43,10 +40,11 @@ public class CallViewModel extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
 
-        boyjRTC.callActionTo(otherUser);
-
+        final DialPayload dialPayload = new DialPayload.Builder(otherUser.getDeviceToken()).build();
+        boyjRTC.callAction(dialPayload);
     }
-    public void hangUp(){
+
+    public void hangUp() {
         boyjRTC.hangupAction();
     }
 

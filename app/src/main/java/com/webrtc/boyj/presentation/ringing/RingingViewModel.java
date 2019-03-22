@@ -14,11 +14,11 @@ public class RingingViewModel {
         boyjRTC = new BoyjRTC();
     }
 
-    public void acceptAction() {
-        boyjRTC.acceptAction();
+    public void accept() {
+        boyjRTC.accept();
     }
 
-    public void rejectAction() {
-        boyjRTC.rejectAction();
+    public void reject() {
+        boyjRTC.reject();
     }
 }

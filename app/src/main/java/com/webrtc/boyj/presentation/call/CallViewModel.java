@@ -32,6 +32,13 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC = new BoyjRTC();
     }
 
+    //전화 거는 요청
+    public void dial() {
+        DialPayload dialPayload = new DialPayload.Builder(otherUser.getDeviceToken()).build();
+        boyjRTC.dial(dialPayload);
+    }
+
+    //전화 연결 되었을때 작업
     public void call() {
         isCalling.set(true);
 
@@ -39,13 +46,10 @@ public class CallViewModel extends BaseViewModel {
                 .map(Long::intValue)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
-
-        final DialPayload dialPayload = new DialPayload.Builder(otherUser.getDeviceToken()).build();
-        boyjRTC.callAction(dialPayload);
     }
 
     public void hangUp() {
-        boyjRTC.hangupAction();
+        boyjRTC.hangUp();
     }
 
     @NonNull

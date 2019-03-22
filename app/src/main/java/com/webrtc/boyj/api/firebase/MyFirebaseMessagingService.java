@@ -1,5 +1,6 @@
 package com.webrtc.boyj.api.firebase;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -7,8 +8,11 @@ import android.support.annotation.NonNull;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.webrtc.boyj.api.BoyjRTC;
+import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
+import com.webrtc.boyj.presentation.ringing.RingingActivity;
+import com.webrtc.boyj.utils.App;
 import com.webrtc.boyj.utils.Logger;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
@@ -24,8 +28,16 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         final FCMPayload payload = new FCMPayload(remoteMessage);
 
         final BoyjRTC boyjRTC = new BoyjRTC();
-        boyjRTC.onPushReceived(payload);
+        boyjRTC.knock().subscribe(() -> {
+            final Intent intent = RingingActivity.getLaunchIntent(getApplicationContext(), payload);
+            startActivity(intent);
+        });
+
+        final String room = payload.getRoom();
+        final AwakenPayload awakenPayload = new AwakenPayload.Builder(room).build();
+        boyjRTC.awaken(awakenPayload);
     }
+
 
     @Override
     public void onNewToken(@NonNull final String token) {

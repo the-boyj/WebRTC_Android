@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import org.webrtc.IceCandidate;
 
-public class IceCandidatePayload {
+public class IceCandidatePayload extends Payload {
 
     @NonNull
     private IceCandidate iceCandidate;

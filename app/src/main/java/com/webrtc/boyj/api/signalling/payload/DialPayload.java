@@ -3,7 +3,7 @@ package com.webrtc.boyj.api.signalling.payload;
 import android.support.annotation.NonNull;
 
 
-public class DialPayload {
+public class DialPayload extends Payload {
 
     @NonNull
     private String deviceToken;

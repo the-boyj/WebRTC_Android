@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.google.firebase.messaging.RemoteMessage;
 
 
-public class FCMPayload {
+public class FCMPayload extends Payload {
 
     private static final String KEY_ROOM = "room";
     private static final String KEY_TEL = "tel";

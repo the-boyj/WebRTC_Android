@@ -3,7 +3,7 @@ package com.webrtc.boyj.api.signalling.payload;
 import android.support.annotation.NonNull;
 
 
-public class AwakenPayload {
+public class AwakenPayload extends Payload {
     @NonNull
     private String room;
 

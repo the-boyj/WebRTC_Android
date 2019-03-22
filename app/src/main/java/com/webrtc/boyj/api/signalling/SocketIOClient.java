@@ -4,30 +4,45 @@ package com.webrtc.boyj.api.signalling;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.webrtc.boyj.BuildConfig;
+
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
 import io.socket.client.Socket;
 
 public class SocketIOClient {
 
     @NonNull
-    final private Socket socket;
+    private static final Socket socket;
 
-    public SocketIOClient(@NonNull final Socket socket) {
-        this.socket = socket;
-    }
-
-    public void connect() {
-        socket.connect();
-        if (!socket.connected()) {
-            throw new SocketConnectionFailedException();
+    static {
+        try {
+            socket = IO.socket(BuildConfig.SERVER_URL);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            throw new RuntimeException("serverURL invalid." +
+                    " check build.gradle variable : SERVER_URL ");
         }
     }
 
-    @NonNull
-    public void emit(@NonNull final String event , @Nullable final Object object){
-        socket.emit(event , object);
+    public void connect() {
+        // 연결시도
+        if (!socket.connected()) {
+            socket.connect();
+
+            //연결 실패시
+            if (!socket.connected()) {
+                throw new SocketConnectionFailedException();
+            }
+        }
     }
-    @NonNull
-    public Socket getSocket() {
-        return socket;
+
+    public void disconnect() {
+        socket.disconnect();
+    }
+
+    public void emit(@NonNull final String event, @Nullable final Object... args) {
+        socket.emit(event, args);
     }
 }

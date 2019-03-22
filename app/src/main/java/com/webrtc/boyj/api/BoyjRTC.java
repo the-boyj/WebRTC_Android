@@ -21,7 +21,7 @@ public class BoyjRTC {
     public BoyjRTC() {
     }
 
-    public void pushReceived(@NonNull final FCMPayload fcmPayload) {
+    public void onPushReceived(@NonNull final FCMPayload fcmPayload) {
 
         //노크 이벤트를 수신하면 , 링액티비티를 실행시킨다. 이 서브스크립션은 1번만 실행된후 해제되므로 따로 리소스 해제를 시킬 필요가 없다.
         signalingClient.getKnockSubject().take(1).subscribe(o -> {

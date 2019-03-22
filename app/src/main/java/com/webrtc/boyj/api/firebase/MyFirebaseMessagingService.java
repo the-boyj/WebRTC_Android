@@ -24,7 +24,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         final FCMPayload payload = new FCMPayload(remoteMessage);
 
         final BoyjRTC boyjRTC = new BoyjRTC();
-        boyjRTC.pushReceived(payload);
+        boyjRTC.onPushReceived(payload);
     }
 
     @Override

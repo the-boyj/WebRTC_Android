@@ -96,5 +96,8 @@ dependencies {
 
     //WebRtc
     implementation "org.webrtc:google-webrtc:$webrtc_version"
+
+    //gson
+    implementation "com.google.code.gson:gson:$gson_version"
 }
 apply plugin: 'com.google.gms.google-services'

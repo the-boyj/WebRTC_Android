@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import org.webrtc.SessionDescription;
 
-public class SdpPayload {
+public class SdpPayload extends Payload {
     @NonNull
     private SessionDescription sdp;
 

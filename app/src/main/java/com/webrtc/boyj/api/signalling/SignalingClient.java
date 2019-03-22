@@ -8,13 +8,20 @@ import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 
+import io.reactivex.subjects.PublishSubject;
+
 public class SignalingClient {
 
     @NonNull
-    private static final SocketIOClient socketIOClient;
+    private static final SocketIOClient socketIOClient = new SocketIOClient();
+    private static final PublishSubject knockSubject = PublishSubject.create();
 
     static {
-        socketIOClient = new SocketIOClient();
+        socketIOClient.on(SignalingEventString.EVENT_KNOCK, args -> knockSubject.onNext("knock"));
+    }
+
+    public PublishSubject getKnockSubject() {
+        return knockSubject;
     }
 
     public SignalingClient() {
@@ -49,7 +56,7 @@ public class SignalingClient {
         socketIOClient.emit(SignalingEventString.EVENT_BYE);
     }
 
-    public void disconnect(){
+    public void disconnect() {
         socketIOClient.disconnect();
     }
 }

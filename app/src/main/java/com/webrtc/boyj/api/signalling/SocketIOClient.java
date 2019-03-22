@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class SocketIOClient {
 
@@ -44,5 +45,9 @@ public class SocketIOClient {
 
     public void emit(@NonNull final String event, @Nullable final Object... args) {
         socket.emit(event, args);
+    }
+
+    public Emitter on(String event, Emitter.Listener fn) {
+        return socket.on(event, fn);
     }
 }

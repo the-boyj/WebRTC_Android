@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.webrtc.boyj.presentation.ringing.RingingViewModel" />
+    </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -23,27 +31,17 @@
             app:layout_constraintGuide_percent="0.15" />
 
         <TextView
-            android:id="@+id/tv_caller_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_small"
-            android:text="홍OO"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_title_median"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline" />
-
-        <TextView
             android:id="@+id/tv_caller_tel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
-            android:text="010-9999-2222"
-            android:textSize="@dimen/text_x_large"
+            android:textColor="@color/colorPrimary"
+            tools:text="010-9952-4321"
+            app:phoneNumber="@{vm.tel}"
+            android:textSize="@dimen/text_title_median"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_caller_name" />
+            app:layout_constraintTop_toBottomOf="@id/guideline" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_accept"

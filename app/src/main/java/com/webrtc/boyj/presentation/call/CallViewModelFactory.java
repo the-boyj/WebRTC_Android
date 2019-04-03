@@ -4,14 +4,12 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.data.model.User;
-
 public class CallViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
-    private final User otherUser;
+    private final String tel;
 
-    CallViewModelFactory(@NonNull User otherUser) {
-        this.otherUser = otherUser;
+    CallViewModelFactory(@NonNull final String tel) {
+        this.tel = tel;
     }
 
     @SuppressWarnings("unchecked")
@@ -19,7 +17,7 @@ public class CallViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(CallViewModel.class)) {
-            return (T) new CallViewModel(otherUser);
+            return (T) new CallViewModel(tel);
         } else {
             throw new IllegalArgumentException("ViewModel Not Found");
         }

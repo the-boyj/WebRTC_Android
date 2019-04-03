@@ -5,6 +5,8 @@
 
     <data>
 
+        <import type="android.view.View" />
+
         <variable
             name="vm"
             type="com.webrtc.boyj.presentation.call.CallViewModel" />
@@ -15,27 +17,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <View
+        <com.webrtc.boyj.extension.custom.BoyjSurfaceView
             android:id="@+id/view_remote"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@color/colorBlack"
-            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:mediaStream="@{vm.remoteMediaStream}" />
 
-        <View
+        <com.webrtc.boyj.extension.custom.BoyjSurfaceView
             android:id="@+id/view_local"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/space_x_large"
-            android:background="@drawable/connecting_local_view_bg"
-            app:layout_constraintBottom_toBottomOf="@id/guideline"
+            app:callAnimation="@{vm.isCalling}"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:mediaStream="@{vm.localMediaStream}" />
 
         <TextView
             android:id="@+id/tv_timer"
@@ -63,6 +64,7 @@
             android:id="@+id/lottie_calling"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -72,17 +74,18 @@
             app:lottie_loop="true" />
 
         <TextView
-            android:id="@+id/tv_other_user_name"
+            android:id="@+id/tv_tel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
-            android:text="@{vm.getOtherUser.getName()}"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_title_median"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guideline"
-            tools:text="홍길동" />
+            app:phoneNumber="@{vm.tel}"
+            tools:text="010-9959-9999" />
 
         <TextView
             android:id="@+id/tv_connect_message"
@@ -91,9 +94,10 @@
             android:layout_margin="@dimen/space_x_large"
             android:text="@string/text_connect_message"
             android:textSize="@dimen/text_xx_large"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_other_user_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_tel" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_reject"

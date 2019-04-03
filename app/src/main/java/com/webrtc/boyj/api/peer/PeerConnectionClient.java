@@ -3,6 +3,7 @@ package com.webrtc.boyj.api.peer;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.peer.manager.PeerConnectionFactoryManager;
+import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
@@ -21,22 +22,50 @@ import io.reactivex.subjects.PublishSubject;
 
 public class PeerConnectionClient {
 
+    public PeerConnectionClient() {
+
+    }
+
+    private static final List<String> stunServerUrls = new ArrayList<>();
+    private static final List<String> turnServerUrls = new ArrayList<>();
     @NonNull
     private static final List<PeerConnection.IceServer> iceServers = new ArrayList<>();
-
     @NonNull
     private static PeerConnection.RTCConfiguration rtcConfiguration;
     @NonNull
-    private static final PeerConnection.RTCConfiguration defaultRtcConfiguration = new PeerConnection.RTCConfiguration(iceServers);
-
+    private static PeerConnection.RTCConfiguration defaultRtcConfiguration;
     @NonNull
     private static final MediaConstraints constraints = new MediaConstraints();
-
     @NonNull
     private static final PeerConnectionFactory peerConnectionFactory;
 
-
     static {
+        stunServerUrls.add("stun:tk-turn1.xirsys.com");
+        turnServerUrls.add("turn:tk-turn1.xirsys.com:80?transport=udp");
+        turnServerUrls.add("turn:tk-turn1.xirsys.com:3478?transport=udp");
+        turnServerUrls.add("turn:tk-turn1.xirsys.com:80?transport=tcp");
+        turnServerUrls.add("turn:tk-turn1.xirsys.com:3478?transport=tcp");
+        turnServerUrls.add("turns:tk-turn1.xirsys.com:443?transport=tcp");
+        turnServerUrls.add("turns:tk-turn1.xirsys.com:5349?transport=tcp");
+
+        for (String stunServerUrl : stunServerUrls) {
+            iceServers.add(
+                    PeerConnection.IceServer.builder(stunServerUrl).createIceServer()
+            );
+        }
+
+        for (String turnServerUrl : turnServerUrls) {
+            iceServers.add(
+                    PeerConnection.IceServer.builder(turnServerUrl)
+                            .setUsername("aa1f1c54-39c4-11e9-9ab4-8a1138a37ce0")
+                            .setPassword("aa1f1ccc-39c4-11e9-9fd9-42348e526b10")
+                            .createIceServer()
+
+            );
+        }
+
+        defaultRtcConfiguration = new PeerConnection.RTCConfiguration(iceServers);
+
         /*
         RTC Configuration:
             https://developer.mozilla.org/en-US/docs/Web/API/RTCConfiguration
@@ -54,6 +83,7 @@ public class PeerConnectionClient {
         peerConnectionFactory = PeerConnectionFactoryManager.getPeerConnectionFactory();
     }
 
+    @SuppressWarnings("NullableProblems")
     @NonNull
     private PeerConnection peerConnection;
     @NonNull
@@ -63,35 +93,57 @@ public class PeerConnectionClient {
     @NonNull
     private PublishSubject<MediaStream> remoteMediaStreamSubject = PublishSubject.create();
 
-    public void createPeerConnection(boolean isCaller) {
+    public void createPeerConnection() {
         final PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, new BoyjPeerConnectionObserver());
-
-        if (isCaller) {
-            peerConnection.createOffer(new BoyjSdpObserver(), constraints);
-        }
+        assert peerConnection != null;
+        this.peerConnection = peerConnection;
     }
 
+    public void createOffer() {
+        peerConnection.createOffer(new BoyjSdpObserver(), constraints);
+    }
+
+    public void createAnswer() {
+        peerConnection.createAnswer(new BoyjSdpObserver(), constraints);
+    }
+
+    public void setRemoteSdp(SessionDescription sdp) {
+        Logger.d(sdp.type.canonicalForm());
+        peerConnection.setRemoteDescription(new CustomSdpObserver("SDP"), sdp);
+    }
+
+    public void addIceCandidate(IceCandidate iceCandidate) {
+        peerConnection.addIceCandidate(iceCandidate);
+    }
+
+    // Todo : 이후 Configuration 변경 대비
     public void setRtcConfiguration(PeerConnection.RTCConfiguration rtcConfiguration) {
-        this.rtcConfiguration = rtcConfiguration;
+        PeerConnectionClient.rtcConfiguration = rtcConfiguration;
+    }
+
+    public void addStreamToLocalPeer(@NonNull final MediaStream userMedia) {
+        peerConnection.addStream(userMedia);
+    }
+
+    @NonNull
+    public PublishSubject<SessionDescription> getSdpSubject() {
+        return sdpSubject;
+    }
+
+    @NonNull
+    public PublishSubject<IceCandidate> getIceCandidateSubject() {
+        return iceCandidateSubject;
+    }
+
+    @NonNull
+    public PublishSubject<MediaStream> getRemoteMediaStreamSubject() {
+        return remoteMediaStreamSubject;
     }
 
     public void release() {
         peerConnection.dispose();
         peerConnectionFactory.dispose();
     }
-
-    public PublishSubject<SessionDescription> getSdpSubject() {
-        return sdpSubject;
-    }
-
-    public PublishSubject<IceCandidate> getIceCandidateSubject() {
-        return iceCandidateSubject;
-    }
-
-    public PublishSubject<MediaStream> getRemoteMediaStreamSubject() {
-        return remoteMediaStreamSubject;
-    }
-
 
     private class BoyjPeerConnectionObserver implements PeerConnection.Observer {
 
@@ -117,6 +169,7 @@ public class PeerConnectionClient {
 
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
+            Logger.d("onIceCandidate : " + iceCandidate.toString());
             iceCandidateSubject.onNext(iceCandidate);
         }
 
@@ -127,6 +180,7 @@ public class PeerConnectionClient {
 
         @Override
         public void onAddStream(MediaStream mediaStream) {
+            Logger.d("onAddStream()");
             remoteMediaStreamSubject.onNext(mediaStream);
         }
 
@@ -155,7 +209,7 @@ public class PeerConnectionClient {
 
         @Override
         public void onCreateSuccess(SessionDescription sessionDescription) {
-            peerConnection.setRemoteDescription(null, sessionDescription);
+            peerConnection.setLocalDescription(new CustomSdpObserver("AAA"), sessionDescription);
             sdpSubject.onNext(sessionDescription);
         }
 
@@ -166,7 +220,6 @@ public class PeerConnectionClient {
 
         @Override
         public void onCreateFailure(String s) {
-
         }
 
         @Override
@@ -174,6 +227,4 @@ public class PeerConnectionClient {
 
         }
     }
-
-
 }

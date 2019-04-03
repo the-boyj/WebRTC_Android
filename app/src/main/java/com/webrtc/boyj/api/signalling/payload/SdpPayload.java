@@ -16,8 +16,8 @@ public class SdpPayload extends Payload {
     }
 
     @NonNull
-    public static SdpPayload fromJson(@NonNull final String jsonString) {
-        return new Gson().fromJson(jsonString, SdpPayload.class);
+    public static SdpPayload fromJsonObject(@NonNull final JSONObject jsonObject) {
+        return new Gson().fromJson(jsonObject.toString(), SdpPayload.class);
     }
 
 

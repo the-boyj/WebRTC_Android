@@ -55,6 +55,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     // Todo : Hangup handling
     private void hangUp() {
+        binding.getVm().hangUp();
         finish();
     }
 

@@ -3,7 +3,9 @@ package com.webrtc.boyj.api.signalling.payload;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
+import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 
 public class IceCandidatePayload extends Payload {
@@ -16,8 +18,8 @@ public class IceCandidatePayload extends Payload {
     }
 
     @NonNull
-    public static IceCandidatePayload fromJson(@NonNull final String jsonString) {
-        return new Gson().fromJson(jsonString, IceCandidatePayload.class);
+    public static IceCandidatePayload fromJsonObject(@NonNull final JSONObject jsonObject) {
+        return new Gson().fromJson(jsonObject.toString(), IceCandidatePayload.class);
     }
 
     @NonNull

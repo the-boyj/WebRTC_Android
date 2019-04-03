@@ -31,12 +31,8 @@ public class SocketIOClient {
         // 연결시도
         if (!socket.connected()) {
             socket.connect();
-
-            //연결 실패시
-            if (!socket.connected()) {
-                throw new SocketConnectionFailedException();
-            }
         }
+
     }
 
     public void disconnect() {

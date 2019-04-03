@@ -47,13 +47,13 @@ public class CallViewModel extends BaseViewModel {
 
     //전화 거는 요청
     void dial(@NonNull final String room) {
-        boyjRTC.attachCallerListener();
+        boyjRTC.readyToCall(true);
         final DialPayload dialPayload = new DialPayload.Builder(room).build();
         boyjRTC.dial(dialPayload);
     }
 
     void join() {
-        boyjRTC.attachCalleeListener();
+        boyjRTC.readyToCall(false);
         boyjRTC.accept();
     }
 
@@ -65,6 +65,10 @@ public class CallViewModel extends BaseViewModel {
                 .map(Long::intValue)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
+
+        addDisposable(
+                boyjRTC.bye().subscribe(() -> hangUp())
+        );
     }
 
     public void hangUp() {

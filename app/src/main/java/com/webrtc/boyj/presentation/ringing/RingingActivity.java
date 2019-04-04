@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
@@ -15,16 +16,19 @@ import com.webrtc.boyj.presentation.call.CallActivity;
 
 public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private static final String EXTRA_FCM_PAYLOAD = "EXTRA_FCM_PAYLOAD";
-    private FCMPayload payload;
+    private FCMPayload fcmPayload;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        payload = (FCMPayload) getIntent().getSerializableExtra(EXTRA_FCM_PAYLOAD);
+        fcmPayload = (FCMPayload) getIntent().getSerializableExtra(EXTRA_FCM_PAYLOAD);
 
         initViews();
         initViewModel();
+
+        final AwakenPayload awakenPayload = new AwakenPayload.Builder(fcmPayload.getRoom()).build();
+        binding.getVm().awaken(awakenPayload);
     }
 
     private void initViews() {
@@ -37,12 +41,12 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
     private void initViewModel() {
         final RingingViewModel vm = ViewModelProviders.of(this,
-                new RingingViewModelFactory(payload.getTel())).get(RingingViewModel.class);
+                new RingingViewModelFactory(fcmPayload.getTel())).get(RingingViewModel.class);
         binding.setVm(vm);
     }
 
     private void startCallActivity() {
-        startActivity(CallActivity.getLaunchIntent(this, payload.getTel(), payload.getRoom(), false));
+        startActivity(CallActivity.getLaunchIntent(this, fcmPayload.getTel(), fcmPayload.getRoom(), false));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
     }

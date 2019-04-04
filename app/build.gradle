@@ -4,18 +4,30 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.webrtc.boyj"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0-SNAPSHOT"
+        versionName "1.x"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        dataBinding {
+            enabled true
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            buildConfigField "String", "SERVER_URL", "\"http://13.124.244.130:3000\""
+
+        }
     }
+
 
     dataBinding {
         enabled true
@@ -30,19 +42,63 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:28.0.0'
+    //android support
+    implementation "com.android.support:appcompat-v7:$appcompat_version"
+    implementation 'com.android.support:customtabs:28.0.0'
+    implementation 'com.android.support:support-vector-drawable:28.0.0'
+    implementation 'com.android.support:support-media-compat:28.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+
+    //android test
     testImplementation 'junit:junit:4.12'
+    testImplementation 'com.android.support.test:runner:1.0.2'
+    testImplementation 'com.android.support.test:rules:1.0.2'
+    //mockito
+    testImplementation 'org.mockito:mockito-core:2.8.0'
+
+    //power mockito
+    testImplementation 'org.powermock:powermock-api-mockito2:1.7.0RC2'
+    testImplementation 'org.powermock:powermock-module-junit4:1.7.0'
+    testImplementation 'org.powermock:powermock-core:1.7.0'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.7.0'
+
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
     // Floating Action Button
-    implementation 'com.android.support:design:28.0.0'
+    implementation "com.android.support:design:$design_version"
     // RecyclerView
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation "com.android.support:recyclerview-v7:$recyclerview_version"
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     // RxJava
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+
+    //Firebase
+    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
+    implementation 'com.google.firebase:firebase-firestore:17.1.5'
+
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation("io.socket:socket.io-client:$socket_version") {
+        exclude group: 'org.json', module: 'json'
+    }
+
+    // TedPermission
+    implementation "gun0912.ted:tedpermission:$tedpermission_version"
+
+    // Lottie
+    implementation "com.airbnb.android:lottie:$lottie_version"
+
+    //WebRtc
+    implementation "org.webrtc:google-webrtc:$webrtc_version"
+
+    //gson
+    implementation "com.google.code.gson:gson:$gson_version"
 }
+apply plugin: 'com.google.gms.google-services'

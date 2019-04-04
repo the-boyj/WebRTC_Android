@@ -23,9 +23,13 @@ public class Logger {
         Log.e(tag(), msg);
     }
 
+    public static void signalingEvent(String eventString) {
+        Log.i("SignalingEvent", eventString);
+    }
+
     private static String tag() {
         int level = Thread.currentThread().getStackTrace().length;
-        level = level >= 5 ? 4 : level-1;
+        level = level >= 5 ? 4 : level - 1;
         final StackTraceElement trace = Thread.currentThread().getStackTrace()[level];
         final String fileName = trace.getFileName();
         final String classPath = trace.getClassName();

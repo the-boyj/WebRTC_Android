@@ -1,77 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
+        <import type="android.view.View" />
+
         <variable
-            name="model"
-            type="com.webrtc.boyj.viewmodel.CallViewModel"/>
-        <variable
-            name="item"
-            type="com.webrtc.boyj.model.dto.User"/>
+            name="vm"
+            type="com.webrtc.boyj.presentation.call.CallViewModel" />
     </data>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.webrtc.boyj.extension.custom.BoyjSurfaceView
+            android:id="@+id/view_remote"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mediaStream="@{vm.remoteMediaStream}" />
+
+        <com.webrtc.boyj.extension.custom.BoyjSurfaceView
+            android:id="@+id/view_local"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:callAnimation="@{vm.isCalling}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mediaStream="@{vm.localMediaStream}" />
+
+        <TextView
+            android:id="@+id/tv_timer"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="vertical"
-            android:visibility="@{!model.isCalling}">
+            android:layout_margin="@dimen/space_median"
+            android:drawableStart="@drawable/ic_call_green"
+            android:drawablePadding="@dimen/space_small"
+            android:textColor="@android:color/holo_green_light"
+            android:textSize="@dimen/text_large"
+            android:visibility="gone"
+            app:callTime="@{vm.callTime}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:text="@{item.name}"
-                android:textColor="@android:color/holo_blue_dark"
-                android:textSize="@dimen/text_size_title_main"
-                android:gravity="center"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{item.tel}"
-                android:gravity="center"
-                android:textSize="@dimen/text_size_title_small"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_gravity="bottom"
-            android:gravity="center"
-            android:layout_marginBottom="@dimen/margin_ultra_big">
+            app:layout_constraintGuide_percent="0.6" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_ultra_big"
-                android:src="@android:drawable/ic_dialog_dialer"
-                app:backgroundTint="@android:color/background_light"
-                android:tint="@color/fabForeground"
-                app:rippleColor="@android:color/darker_gray" />
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_calling"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="calling.json"
+            app:lottie_loop="true" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/margin_ultra_big"
-                android:src="@drawable/ic_call_end"
-                android:onClick="@{() -> model.onHangUp()}"
-                app:backgroundTint="@android:color/holo_red_dark"
-                app:rippleColor="@android:color/white" />
+        <TextView
+            android:id="@+id/tv_tel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_x_small"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_title_median"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:phoneNumber="@{vm.tel}"
+            tools:text="010-9959-9999" />
 
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@android:drawable/ic_dialog_info"
-                android:tint="@color/fabForeground"
-                app:backgroundTint="@android:color/background_light"
-                app:rippleColor="@android:color/darker_gray" />
-        </LinearLayout>
-    </FrameLayout>
+        <TextView
+            android:id="@+id/tv_connect_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_x_large"
+            android:text="@string/text_connect_message"
+            android:textSize="@dimen/text_xx_large"
+            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_tel" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_reject"
+            style="@style/CallFabDefault"
+            android:backgroundTint="@color/colorRed"
+            android:src="@drawable/ic_call_end"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline2" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_left"
+            style="@style/CallFabDefault"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/fab_reject"
+            app:layout_constraintTop_toBottomOf="@id/guideline2" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_right"
+            style="@style/CallFabDefault"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/fab_reject"
+            app:layout_constraintTop_toBottomOf="@id/guideline2" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
+    </android.support.constraint.ConstraintLayout>
+
 </layout>
+

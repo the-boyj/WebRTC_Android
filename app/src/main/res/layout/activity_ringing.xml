@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.webrtc.boyj.presentation.ringing.RingingViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_s_large"
+            android:text="@string/text_call_on_message"
+            android:textSize="@dimen/text_large"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <TextView
+            android:id="@+id/tv_caller_tel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_x_small"
+            android:clickable="@{vm.isKnockReceived ? true : false, default=false}"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/text_title_median"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            app:phoneNumber="@{vm.tel}"
+            tools:text="010-9952-4321" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_ringing_fab"
+            android:backgroundTint="@android:color/holo_green_light"
+            android:src="@drawable/ic_call"
+            app:layout_constraintBottom_toBottomOf="@id/guideline2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:rippleColor="@color/colorWhite" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_x_small"
+            android:text="@string/text_call_accept"
+            app:layout_constraintEnd_toEndOf="@id/fab_accept"
+            app:layout_constraintStart_toStartOf="@id/fab_accept"
+            app:layout_constraintTop_toBottomOf="@id/fab_accept" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_reject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_ringing_fab"
+            android:backgroundTint="@color/colorRed"
+            android:src="@drawable/ic_call_end"
+            app:layout_constraintBottom_toBottomOf="@id/guideline2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:rippleColor="@color/colorWhite" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_x_small"
+            android:text="@string/text_call_reject"
+            app:layout_constraintEnd_toEndOf="@id/fab_reject"
+            app:layout_constraintStart_toStartOf="@id/fab_reject"
+            app:layout_constraintTop_toBottomOf="@id/fab_reject" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="dial.json"
+            app:lottie_loop="true" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

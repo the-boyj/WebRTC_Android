@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">BOYJ</string>
+    <string name="app_full_name">THE BOYJ</string>
+
+    <!-- Splash -->
+    <string name="app_description">광운대학교 산학연계 프로젝트</string>
+
+    <!-- Menu -->
+    <string name="menu_update_profile">이름 변경</string>
+    <!-- Name change dialog -->
+    <string name="dialog_positive_button">확인</string>
+    <string name="dialog_negative_button">취소</string>
+    <string name="dialog_edit_text_hint">이름</string>
+    <string name="dialog_edit_text_helper_text">변경할 이름을 입력하세요.</string>
+
+    <!-- Call Activity -->
+    <string name="text_connect_message">전화를 거는중…</string>
+
+    <!-- CallOnActivity -->
+    <string name="text_call_on_message">수신전화</string>
+    <string name="text_call_accept">응답</string>
+    <string name="text_call_reject">거절</string>
 </resources>

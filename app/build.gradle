@@ -23,7 +23,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField "String", "SERVER_URL", "\"http://13.124.244.130:3000\""
+            //buildConfigField "String", "SERVER_URL", "\"http://13.124.244.130:3000\""
+            buildConfigField "String", "SERVER_URL", "\"http://10.20.10.194:3000\""
+
         }
     }
 

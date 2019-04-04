@@ -2,8 +2,6 @@ package com.webrtc.boyj.api.peer;
 
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.peer.manager.PeerConnectionFactoryManager;
-
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -14,46 +12,19 @@ import org.webrtc.RtpReceiver;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.subjects.PublishSubject;
 
 public class PeerConnectionClient {
-
     @NonNull
-    private static final List<PeerConnection.IceServer> iceServers = new ArrayList<>();
-
+    private final List<PeerConnection.IceServer> iceServerList;
     @NonNull
-    private static PeerConnection.RTCConfiguration rtcConfiguration;
+    private final PeerConnection.RTCConfiguration rtcConfiguration;
     @NonNull
-    private static final PeerConnection.RTCConfiguration defaultRtcConfiguration = new PeerConnection.RTCConfiguration(iceServers);
-
+    private final MediaConstraints constraints = new MediaConstraints();
     @NonNull
-    private static final MediaConstraints constraints = new MediaConstraints();
-
-    @NonNull
-    private static final PeerConnectionFactory peerConnectionFactory;
-
-
-    static {
-        /*
-        RTC Configuration:
-            https://developer.mozilla.org/en-US/docs/Web/API/RTCConfiguration
-            http://cocoadocs.org/docsets/GoogleWebRTC/1.1.20266/Classes/RTCConfiguration.html#//api/name/keyType
-         */
-        defaultRtcConfiguration.tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED;
-        defaultRtcConfiguration.bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE;
-        defaultRtcConfiguration.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE;
-        defaultRtcConfiguration.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY;
-        defaultRtcConfiguration.keyType = PeerConnection.KeyType.ECDSA;
-        rtcConfiguration = defaultRtcConfiguration;
-
-        constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
-        constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
-        peerConnectionFactory = PeerConnectionFactoryManager.getPeerConnectionFactory();
-    }
-
+    private final PeerConnectionFactory peerConnectionFactory;
     @NonNull
     private PeerConnection peerConnection;
     @NonNull
@@ -63,35 +34,74 @@ public class PeerConnectionClient {
     @NonNull
     private PublishSubject<MediaStream> remoteMediaStreamSubject = PublishSubject.create();
 
-    public void createPeerConnection(boolean isCaller) {
+    public PeerConnectionClient(@NonNull final PeerConnectionFactory peerConnectionFactory) {
+        this.peerConnectionFactory = peerConnectionFactory;
+        this.iceServerList = IceServers.getIceServerList();
+        this.rtcConfiguration = createRtcConfiguration();
+
+
+        this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
+        this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
+    }
+
+    private PeerConnection.RTCConfiguration createRtcConfiguration() {
+        final PeerConnection.RTCConfiguration rtcConfiguration = new PeerConnection.RTCConfiguration(iceServerList);
+
+        rtcConfiguration.tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.DISABLED;
+        rtcConfiguration.bundlePolicy = PeerConnection.BundlePolicy.MAXBUNDLE;
+        rtcConfiguration.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.REQUIRE;
+        rtcConfiguration.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.GATHER_CONTINUALLY;
+        rtcConfiguration.keyType = PeerConnection.KeyType.ECDSA;
+
+        return rtcConfiguration;
+    }
+
+    public void createPeerConnection() {
         final PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(rtcConfiguration, new BoyjPeerConnectionObserver());
-
-        if (isCaller) {
-            peerConnection.createOffer(new BoyjSdpObserver(), constraints);
+        if (peerConnection == null) {
+            throw new IllegalStateException("Peer connection has invalid status");
         }
+        this.peerConnection = peerConnection;
     }
 
-    public void setRtcConfiguration(PeerConnection.RTCConfiguration rtcConfiguration) {
-        this.rtcConfiguration = rtcConfiguration;
+    public void createOffer() {
+        peerConnection.createOffer(new BoyjSdpObserver(), constraints);
     }
 
-    public void release() {
-        peerConnection.dispose();
-        peerConnectionFactory.dispose();
+    public void createAnswer() {
+        peerConnection.createAnswer(new BoyjSdpObserver(), constraints);
     }
 
+    public void setRemoteSdp(@NonNull final SessionDescription sdp) {
+        peerConnection.setRemoteDescription(new CustomSdpObserver("SDP"), sdp);
+    }
+
+    public void addIceCandidate(@NonNull final IceCandidate iceCandidate) {
+        peerConnection.addIceCandidate(iceCandidate);
+    }
+
+    public void addStreamToLocalPeer(@NonNull final MediaStream userMedia) {
+        peerConnection.addStream(userMedia);
+    }
+
+    @NonNull
     public PublishSubject<SessionDescription> getSdpSubject() {
         return sdpSubject;
     }
 
+    @NonNull
     public PublishSubject<IceCandidate> getIceCandidateSubject() {
         return iceCandidateSubject;
     }
 
+    @NonNull
     public PublishSubject<MediaStream> getRemoteMediaStreamSubject() {
         return remoteMediaStreamSubject;
     }
 
+    public void dispose() {
+        peerConnection.dispose();
+    }
 
     private class BoyjPeerConnectionObserver implements PeerConnection.Observer {
 
@@ -155,7 +165,7 @@ public class PeerConnectionClient {
 
         @Override
         public void onCreateSuccess(SessionDescription sessionDescription) {
-            peerConnection.setRemoteDescription(null, sessionDescription);
+            peerConnection.setLocalDescription(new CustomSdpObserver("AAA"), sessionDescription);
             sdpSubject.onNext(sessionDescription);
         }
 
@@ -166,7 +176,6 @@ public class PeerConnectionClient {
 
         @Override
         public void onCreateFailure(String s) {
-
         }
 
         @Override
@@ -174,6 +183,4 @@ public class PeerConnectionClient {
 
         }
     }
-
-
 }

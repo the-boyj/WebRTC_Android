@@ -8,7 +8,7 @@ buildscript {
         lifecycle_version = "1.1.1"
         rxandroid_version = "2.1.0"
         rxjava_version = "2.2.5"
-        socket_version = "0.8.3"
+        socket_version = "1.0.0"
         tedpermission_version = "2.2.2"
         lottie_version = "2.7.0"
         webrtc_version = "1.0.25821"

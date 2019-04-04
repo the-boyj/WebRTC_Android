@@ -110,7 +110,7 @@ public class UserRepositoryImpl implements UserRepository {
                         return null;
                     }).addOnSuccessListener(__ -> {
                         pref.edit()
-                                .putBoolean(CHANGED, true)
+                                .putBoolean(CHANGED, false)
                                 .apply();
                         emitter.onComplete();
                     }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());

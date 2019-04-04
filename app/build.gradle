@@ -7,7 +7,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.1.0-SNAPSHOT"
+        versionName "1.x"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         dataBinding {
@@ -24,6 +24,7 @@ android {
         }
         debug {
             buildConfigField "String", "SERVER_URL", "\"http://13.124.244.130:3000\""
+
         }
     }
 

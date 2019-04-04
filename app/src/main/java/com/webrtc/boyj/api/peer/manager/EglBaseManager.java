@@ -4,20 +4,16 @@ import android.support.annotation.NonNull;
 
 import org.webrtc.EglBase;
 
-public class EglBaseManager {
+public final class EglBaseManager {
     @NonNull
-    private static EglBase eglBase;
+    private static EglBase eglBase = EglBase.create();
 
-    static {
-        eglBase = EglBase.create();
+    private EglBaseManager() {
+
     }
 
     @NonNull
-    public static EglBase.Context getEglBaseContext() {
-        return eglBase.getEglBaseContext();
-    }
-
-    public static void release() {
-        eglBase.release();
+    public static EglBase getEglBase() {
+        return eglBase;
     }
 }

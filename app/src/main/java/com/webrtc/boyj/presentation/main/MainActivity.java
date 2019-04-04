@@ -23,7 +23,6 @@ import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
-import com.webrtc.boyj.presentation.ringing.RingingActivity;
 
 import java.util.List;
 
@@ -38,12 +37,9 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         initToolbar();
         checkPermission();
-
-        // Todo : Remove when callee func is implemented
-        findViewById(R.id.btn_call_on).setOnClickListener(v ->
-                startActivity(RingingActivity.getLaunchIntent(this, RingingActivity.class)));
     }
 
     private void initToolbar() {
@@ -126,11 +122,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void startCallActivity(@NonNull final User otherUser) {
-        final User user = binding.getVm().getUser().getValue();
-        assert user != null;
-
-        startActivity(CallActivity.getLaunchIntent(this, otherUser, user, true));
+    private void startCallActivity(@NonNull final User user) {
+        startActivity(CallActivity.getLaunchIntent(this, user.getTel(), user.getDeviceToken(), true));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 

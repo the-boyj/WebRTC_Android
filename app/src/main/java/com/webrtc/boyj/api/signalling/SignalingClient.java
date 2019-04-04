@@ -3,12 +3,10 @@ package com.webrtc.boyj.api.signalling;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
-import com.webrtc.boyj.utils.Logger;
 
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
@@ -18,50 +16,41 @@ import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public class SignalingClient {
-
     @NonNull
-    private static final SocketIOClient socketIOClient;
-
-    static {
-        socketIOClient = new SocketIOClient();
-    }
-
+    private static final SocketIOClient socketIOClient = new SocketIOClient();
     @NonNull
     private CompletableSubject knockSubject = CompletableSubject.create();
     @NonNull
     private CompletableSubject readySubject = CompletableSubject.create();
     @NonNull
     private CompletableSubject byeSubject = CompletableSubject.create();
-    
     @NonNull
     private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<SessionDescription> sdpSubject = PublishSubject.create();
 
-
     public SignalingClient() {
-
         socketIOClient.on(SignalingEventString.EVENT_KNOCK, args -> knockSubject.onComplete());
         socketIOClient.on(SignalingEventString.EVENT_READY, args -> readySubject.onComplete());
 
         socketIOClient.on(SignalingEventString.EVENT_RECEIVE_SDP, args -> {
-            SdpPayload payload = SdpPayload.fromJsonObject((JSONObject) args[0]);
+            final SdpPayload payload = SdpPayload.fromJsonObject((JSONObject) args[0]);
             sdpSubject.onNext(payload.getSdp());
         });
         socketIOClient.on(SignalingEventString.EVENT_RECEIVE_ICE, args -> {
-            IceCandidatePayload payload = IceCandidatePayload.fromJsonObject((JSONObject) args[0]);
+            final IceCandidatePayload payload = IceCandidatePayload.fromJsonObject((JSONObject) args[0]);
             iceCandidateSubject.onNext(payload.getIceCandidate());
         });
+        socketIOClient.on(SignalingEventString.EVENT_BYE, args -> byeSubject.onComplete());
+
         socketIOClient.connect();
     }
 
     public void emitDial(@NonNull final DialPayload dialPayload) {
-        Logger.d("emitDial()");
         socketIOClient.emit(SignalingEventString.EVENT_DIAL, dialPayload.toJsonObject());
     }
 
     public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {
-        Logger.d("emitAwaken()");
         socketIOClient.emit(SignalingEventString.EVENT_AWAKEN, awakenPayload.toJsonObject());
     }
 

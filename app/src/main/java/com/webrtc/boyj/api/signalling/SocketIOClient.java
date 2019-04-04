@@ -12,8 +12,7 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class SocketIOClient {
-
+class SocketIOClient {
     @NonNull
     private static final Socket socket;
 
@@ -27,23 +26,31 @@ public class SocketIOClient {
         }
     }
 
-    public void connect() {
-        // 연결시도
+    SocketIOClient() {
+
+    }
+
+    void connect() {
         if (!socket.connected()) {
             socket.connect();
         }
 
     }
 
-    public void disconnect() {
+    void disconnect() {
+        socket.off();
         socket.disconnect();
     }
 
-    public void emit(@NonNull final String event, @Nullable final Object... args) {
+    void emit(@NonNull final String event, @Nullable final Object... args) {
         socket.emit(event, args);
     }
 
-    public Emitter on(String event, Emitter.Listener fn) {
-        return socket.on(event, fn);
+    void on(@NonNull final String event, @NonNull final Emitter.Listener fn) {
+        socket.on(event, fn);
+    }
+
+    void off() {
+        socket.off();
     }
 }

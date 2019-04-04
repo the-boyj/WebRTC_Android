@@ -20,7 +20,7 @@ public class BoyjSurfaceView extends SurfaceViewRenderer {
     }
 
     private void initView() {
-        init(EglBaseManager.getEglBaseContext(), null);
+        init(EglBaseManager.getEglBase().getEglBaseContext(), null);
         setMirror(true);
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
         setEnableHardwareScaler(true);

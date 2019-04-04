@@ -34,8 +34,9 @@ public class CallViewModel extends BaseViewModel {
         this.tel = tel;
 
         boyjRTC = new BoyjRTC();
-        localMediaStream.setValue(boyjRTC.getUserMedia());
+        boyjRTC.initRTC();
         boyjRTC.startCapture();
+        localMediaStream.setValue(boyjRTC.getUserMedia());
 
         addDisposable(boyjRTC.remoteMediaStream()
                 .observeOn(AndroidSchedulers.mainThread())
@@ -66,12 +67,11 @@ public class CallViewModel extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
 
-        addDisposable(
-                boyjRTC.bye().subscribe(() -> hangUp())
+        addDisposable(boyjRTC.bye().subscribe(this::hangUp)
         );
     }
 
-    public void hangUp() {
+    void hangUp() {
         boyjRTC.hangUp();
     }
 

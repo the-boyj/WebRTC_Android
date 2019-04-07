@@ -22,16 +22,15 @@ import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public class BoyjRTC {
+    @NonNull
     private SignalingClient signalingClient = new SignalingClient();
     private PeerConnectionClient peerConnectionClient;
     private UserMediaManager userMediaManager;
-
-    @NonNull
-    private final PeerConnectionFactory factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
     @NonNull
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void initRTC() {
+        final PeerConnectionFactory factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
         userMediaManager = new UserMediaManager(factory);
         peerConnectionClient = new PeerConnectionClient(factory);
 

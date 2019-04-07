@@ -73,32 +73,6 @@
             app:lottie_fileName="calling.json"
             app:lottie_loop="true" />
 
-        <TextView
-            android:id="@+id/tv_tel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_small"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_title_median"
-            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline"
-            app:phoneNumber="@{vm.tel}"
-            tools:text="010-9959-9999" />
-
-        <TextView
-            android:id="@+id/tv_connect_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_large"
-            android:text="@string/text_connect_message"
-            android:textSize="@dimen/text_xx_large"
-            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_tel" />
-
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_reject"
             style="@style/CallFabDefault"

@@ -6,6 +6,7 @@ import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.BoyjRTC;
+import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
@@ -18,22 +19,21 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class CallViewModel extends BaseViewModel {
     @NonNull
-    private final String tel;
-    @NonNull
     private final ObservableInt callTime = new ObservableInt(0);
     @NonNull
     private final ObservableBoolean isCalling = new ObservableBoolean();
     @NonNull
-    private final BoyjRTC boyjRTC;
-    @NonNull
     private final MutableLiveData<MediaStream> localMediaStream = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<MediaStream> remoteMediaStream = new MutableLiveData<>();
+    @NonNull
+    private final BoyjRTC boyjRTC;
 
-    CallViewModel(@NonNull final String tel) {
-        this.tel = tel;
+    public CallViewModel(@NonNull final BoyjRTC boyjRTC) {
+        this.boyjRTC = boyjRTC;
+    }
 
-        boyjRTC = new BoyjRTC();
+    void init() {
         boyjRTC.initRTC();
         boyjRTC.startCapture();
         localMediaStream.setValue(boyjRTC.getUserMedia());
@@ -44,6 +44,10 @@ public class CallViewModel extends BaseViewModel {
                     call();
                     this.remoteMediaStream.setValue(mediaStream);
                 }));
+    }
+
+    public void createRoom(@NonNull final CreateRoomPayload payload) {
+        boyjRTC.createRoom(payload);
     }
 
     //전화 거는 요청
@@ -73,11 +77,6 @@ public class CallViewModel extends BaseViewModel {
 
     void hangUp() {
         boyjRTC.hangUp();
-    }
-
-    @NonNull
-    public String getTel() {
-        return tel;
     }
 
     @NonNull

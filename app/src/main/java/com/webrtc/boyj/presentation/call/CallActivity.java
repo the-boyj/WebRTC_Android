@@ -9,11 +9,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.api.BoyjRTC;
+import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.utils.TelManager;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
-    private static final String EXTRA_TEL = "EXTRA_TEL";
+    private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
     private static final String EXTRA_ROOM = "EXTRA_ROOM";
     private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
@@ -21,15 +24,19 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String tel = getIntent().getStringExtra(EXTRA_TEL);
-        final String room = getIntent().getStringExtra(EXTRA_ROOM);
+        final String callerId = TelManager.getTelNumber(getApplicationContext());
+        final String calleeId = getIntent().getStringExtra(EXTRA_CALLEE_ID);
         final boolean isCaller = getIntent().getBooleanExtra(EXTRA_IS_CALLER, true);
 
         initViews();
-        initViewModel(tel);
+        initViewModel();
+
+        assert callerId != null;
 
         if (isCaller) {
-            binding.getVm().dial(room);
+            final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
+            binding.getVm().init();
+            binding.getVm().createRoom(payload);
         } else {
             binding.getVm().join();
         }
@@ -39,18 +46,18 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         findViewById(R.id.fab_reject).setOnClickListener(__ -> hangUp());
     }
 
+    private void initViewModel() {
+        final CallViewModel vm = ViewModelProviders.of(this,
+                new CallViewModelFactory(new BoyjRTC())).get(CallViewModel.class);
+
+        binding.setVm(vm);
+    }
+
     private void turnOnSpeaker() {
         AudioManager manager = (AudioManager) getSystemService(AUDIO_SERVICE);
         if (!manager.isSpeakerphoneOn()) {
             manager.setSpeakerphoneOn(true);
         }
-    }
-
-    private void initViewModel(@NonNull final String tel) {
-        final CallViewModel vm = ViewModelProviders.of(this,
-                new CallViewModelFactory(tel)).get(CallViewModel.class);
-
-        binding.setVm(vm);
     }
 
     // Todo : Hangup handling
@@ -61,11 +68,20 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     @NonNull
     public static Intent getLaunchIntent(@NonNull final Context context,
-                                         @NonNull final String tel,
+                                         @NonNull final String calleeId,
+                                         final boolean isCaller) {
+        return getLaunchIntent(context, CallActivity.class)
+                .putExtra(EXTRA_CALLEE_ID, calleeId)
+                .putExtra(EXTRA_IS_CALLER, isCaller);
+    }
+
+    @NonNull
+    public static Intent getLaunchIntent(@NonNull final Context context,
+                                         @NonNull final String calleeId,
                                          @NonNull final String room,
                                          final boolean isCaller) {
         return getLaunchIntent(context, CallActivity.class)
-                .putExtra(EXTRA_TEL, tel)
+                .putExtra(EXTRA_CALLEE_ID, calleeId)
                 .putExtra(EXTRA_ROOM, room)
                 .putExtra(EXTRA_IS_CALLER, isCaller);
     }

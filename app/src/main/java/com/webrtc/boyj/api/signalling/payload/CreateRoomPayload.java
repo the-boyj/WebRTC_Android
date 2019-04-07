@@ -39,7 +39,7 @@ public class CreateRoomPayload {
         private final String callerId;
 
         public Builder(@NonNull final String callerId) {
-            this.room = createRoom(callerId);
+            this.room = createRoom();
             this.callerId = callerId;
         }
 
@@ -47,8 +47,8 @@ public class CreateRoomPayload {
             return new CreateRoomPayload(room, callerId);
         }
 
-        private static String createRoom(@NonNull final String callerId) {
-            return UUID.fromString(callerId).toString();
+        private static String createRoom() {
+            return UUID.randomUUID().toString();
         }
     }
 }

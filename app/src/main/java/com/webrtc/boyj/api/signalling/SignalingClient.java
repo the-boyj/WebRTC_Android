@@ -2,20 +2,35 @@ package com.webrtc.boyj.api.signalling;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringDef;
 
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
+import com.webrtc.boyj.utils.JSONUtil;
+import com.webrtc.boyj.utils.Logger;
 
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
 import org.webrtc.SessionDescription;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public class SignalingClient {
+    private static final String CREATE_ROOM = "createRoom";
+
+    // Todo : 모든 이벤트 추가 후 SocketIOClient의 emit 메소드에 어노테이션 추가
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef(CREATE_ROOM)
+    private @interface Event {
+    }
+
     @NonNull
     private static final SocketIOClient socketIOClient = new SocketIOClient();
     @NonNull
@@ -44,6 +59,11 @@ public class SignalingClient {
         socketIOClient.on(SignalingEventString.EVENT_BYE, args -> byeSubject.onComplete());
 
         socketIOClient.connect();
+    }
+
+    public void emitCreateRoom(@NonNull final CreateRoomPayload payload) {
+        Logger.i("emitCreateRoom : " + payload.toString());
+        socketIOClient.emit(CREATE_ROOM, JSONUtil.toJSONObject(payload));
     }
 
     public void emitDial(@NonNull final DialPayload dialPayload) {
@@ -102,6 +122,4 @@ public class SignalingClient {
     public PublishSubject<SessionDescription> getSdpSubject() {
         return sdpSubject;
     }
-
-
 }

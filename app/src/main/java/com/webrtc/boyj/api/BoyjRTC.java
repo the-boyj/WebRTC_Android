@@ -7,6 +7,7 @@ import com.webrtc.boyj.api.peer.manager.PeerConnectionFactoryManager;
 import com.webrtc.boyj.api.peer.manager.UserMediaManager;
 import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
@@ -21,16 +22,15 @@ import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public class BoyjRTC {
+    @NonNull
     private SignalingClient signalingClient = new SignalingClient();
     private PeerConnectionClient peerConnectionClient;
     private UserMediaManager userMediaManager;
-
-    @NonNull
-    private final PeerConnectionFactory factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
     @NonNull
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     public void initRTC() {
+        final PeerConnectionFactory factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
         userMediaManager = new UserMediaManager(factory);
         peerConnectionClient = new PeerConnectionClient(factory);
 
@@ -82,6 +82,15 @@ public class BoyjRTC {
     @NonNull
     public PublishSubject<MediaStream> remoteMediaStream() {
         return peerConnectionClient.getRemoteMediaStreamSubject();
+    }
+
+    /**
+     * 처음으로 통화를 요청할 경우 room을 생성한다.
+     *
+     * @param payload room, callerId 가 담긴 페이로드
+     */
+    public void createRoom(@NonNull final CreateRoomPayload payload) {
+        signalingClient.emitCreateRoom(payload);
     }
 
     //앱 유저로 부터 온 이벤트 처리

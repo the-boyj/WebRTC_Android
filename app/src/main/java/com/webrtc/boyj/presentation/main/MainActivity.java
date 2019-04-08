@@ -1,14 +1,11 @@
 package com.webrtc.boyj.presentation.main;
 
-import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -23,6 +20,7 @@ import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.utils.TelManager;
 
 import java.util.List;
 
@@ -50,19 +48,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         }
     }
 
-    @SuppressLint({"MissingPermission", "HardwareIds"})
     private void checkPermission() {
         TedPermission.with(getApplicationContext())
                 .setPermissions(READ_PHONE_STATE, RECORD_AUDIO, CAMERA)
                 .setPermissionListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        final TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                        final String number = tm.getLine1Number();
-                        if (TextUtils.isEmpty(number)) {
+                        tel = TelManager.getTelNumber(getApplicationContext());
+                        if (tel == null) {
                             notExistPhoneNumber();
                         } else {
-                            tel = number.replace("+82", "0");
                             init();
                         }
                     }
@@ -123,7 +118,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void startCallActivity(@NonNull final User user) {
-        startActivity(CallActivity.getLaunchIntent(this, user.getTel(), user.getDeviceToken(), true));
+        startActivity(CallActivity.getCallerLaunchIntent(this, user.getTel()));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 

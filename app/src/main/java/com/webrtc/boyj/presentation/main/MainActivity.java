@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void startCallActivity(@NonNull final User user) {
-        startActivity(CallActivity.getLaunchIntent(this, user.getTel(), true));
+        startActivity(CallActivity.getCallerLaunchIntent(this, user.getTel()));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 

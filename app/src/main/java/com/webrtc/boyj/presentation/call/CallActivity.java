@@ -10,33 +10,31 @@ import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.utils.TelManager;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
-    private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
-    private static final String EXTRA_ROOM = "EXTRA_ROOM";
+    private static final String CALLEE_ID = "CALLEE_ID";
     private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String callerId = TelManager.getTelNumber(getApplicationContext());
-        final String calleeId = getIntent().getStringExtra(EXTRA_CALLEE_ID);
         final boolean isCaller = getIntent().getBooleanExtra(EXTRA_IS_CALLER, true);
 
         initViews();
         initViewModel();
 
-        assert callerId != null;
-
         if (isCaller) {
-            final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
+            final String callerId = TelManager.getTelNumber(getApplicationContext());
+            final String calleeId = getIntent().getStringExtra(CALLEE_ID);
+
+            assert callerId != null;
+
             binding.getVm().init();
-            binding.getVm().createRoom(payload);
+            binding.getVm().createRoom(callerId);
         } else {
             binding.getVm().join();
         }
@@ -66,24 +64,21 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         finish();
     }
 
+    /**
+     * @param calleeId 상대방의 전화번호
+     */
     @NonNull
-    public static Intent getLaunchIntent(@NonNull final Context context,
-                                         @NonNull final String calleeId,
-                                         final boolean isCaller) {
+    public static Intent getCallerLaunchIntent(@NonNull final Context context,
+                                               @NonNull final String calleeId) {
         return getLaunchIntent(context, CallActivity.class)
-                .putExtra(EXTRA_CALLEE_ID, calleeId)
-                .putExtra(EXTRA_IS_CALLER, isCaller);
+                .putExtra(CALLEE_ID, calleeId)
+                .putExtra(EXTRA_IS_CALLER, true);
     }
 
     @NonNull
-    public static Intent getLaunchIntent(@NonNull final Context context,
-                                         @NonNull final String calleeId,
-                                         @NonNull final String room,
-                                         final boolean isCaller) {
+    public static Intent getCalleeLaunchIntent(@NonNull final Context context) {
         return getLaunchIntent(context, CallActivity.class)
-                .putExtra(EXTRA_CALLEE_ID, calleeId)
-                .putExtra(EXTRA_ROOM, room)
-                .putExtra(EXTRA_IS_CALLER, isCaller);
+                .putExtra(EXTRA_IS_CALLER, false);
     }
 
     @Override

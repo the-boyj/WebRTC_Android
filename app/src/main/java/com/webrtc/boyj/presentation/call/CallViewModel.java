@@ -46,7 +46,8 @@ public class CallViewModel extends BaseViewModel {
                 }));
     }
 
-    public void createRoom(@NonNull final CreateRoomPayload payload) {
+    public void createRoom(@NonNull final String callerId) {
+        final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
         boyjRTC.createRoom(payload);
     }
 

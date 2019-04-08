@@ -1,14 +1,13 @@
 package com.webrtc.boyj;
 
 import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.presentation.call.CallViewModel;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class SocketTest {
+public class BoyjTest {
     private CallViewModel callViewModel;
     private BoyjRTC boyjRTC;
 
@@ -25,9 +24,7 @@ public class SocketTest {
     @Test
     public void createRoomTest() {
         final String tel = "010-3333-4444";
-        final CreateRoomPayload payload = new CreateRoomPayload.Builder(tel).build();
-
-        callViewModel.createRoom(payload);
-        Mockito.verify(boyjRTC).createRoom(payload);
+        callViewModel.createRoom(tel);
+        Mockito.verify(boyjRTC).createRoom(Mockito.any());
     }
 }

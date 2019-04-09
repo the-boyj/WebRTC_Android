@@ -1,54 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="240dp"
-    android:background="#BB000000"
-    android:gravity="center"
-    android:orientation="horizontal"
-    android:paddingBottom="@dimen/space_large">
 
-    <View
-        android:id="@+id/btn_close"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_margin="@dimen/space_small"
-        android:background="@drawable/ic_arrow_down"
-        app:layout_constraintBottom_toBottomOf="@id/fab_invite"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/fab_invite" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_invite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_small"
-        android:layout_marginTop="@dimen/space_small"
-        android:src="@drawable/ic_call"
-        app:backgroundTint="@color/colorPrimaryLight"
-        app:fabSize="mini"
-        app:layout_constraintStart_toEndOf="@id/btn_close"
-        app:layout_constraintTop_toTopOf="parent" />
+    <data>
 
-    <TextView
-        android:id="@+id/tv_invite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_small"
-        android:text="@string/text_invite_user"
-        android:textColor="@color/colorWhite"
-        app:layout_constraintEnd_toEndOf="@id/fab_invite"
-        app:layout_constraintStart_toStartOf="@id/fab_invite"
-        app:layout_constraintTop_toBottomOf="@id/fab_invite" />
+        <variable
+            name="inviteViewModel"
+            type="com.webrtc.boyj.presentation.call.invite.InviteViewModel" />
+    </data>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_invite_user"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_invite" />
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#BB000000"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="@dimen/space_large">
 
-</android.support.constraint.ConstraintLayout>
+        <View
+            android:id="@+id/btn_close"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_margin="@dimen/space_small"
+            android:background="@drawable/ic_arrow_down"
+            app:layout_constraintBottom_toBottomOf="@id/fab_invite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/fab_invite" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_invite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_small"
+            android:layout_marginTop="@dimen/space_small"
+            android:src="@drawable/ic_call"
+            app:backgroundTint="@color/colorPrimaryLight"
+            app:fabSize="mini"
+            app:layout_constraintEnd_toStartOf="@id/btn_close"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_invite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_small"
+            android:text="@string/text_invite_user"
+            android:textColor="@color/colorWhite"
+            app:layout_constraintEnd_toEndOf="@id/fab_invite"
+            app:layout_constraintStart_toStartOf="@id/fab_invite"
+            app:layout_constraintTop_toBottomOf="@id/fab_invite" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_invite_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_invite" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

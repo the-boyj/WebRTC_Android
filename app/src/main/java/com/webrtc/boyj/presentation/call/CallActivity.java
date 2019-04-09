@@ -42,6 +42,9 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     private void initViews() {
         findViewById(R.id.fab_reject).setOnClickListener(__ -> hangUp());
+        findViewById(R.id.iv_call_menu).setOnClickListener(__ ->
+                CallMenuDialog.newInstance()
+                        .show(getSupportFragmentManager(), "CallMenuDialog"));
     }
 
     private void initViewModel() {

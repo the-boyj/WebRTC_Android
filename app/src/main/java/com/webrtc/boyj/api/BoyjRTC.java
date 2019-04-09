@@ -90,12 +90,14 @@ public class BoyjRTC {
      * @param payload room, callerId 가 담긴 페이로드
      */
     public void createRoom(@NonNull final CreateRoomPayload payload) {
+        Logger.i(payload.toString());
         signalingClient.emitCreateRoom(payload);
     }
 
     //앱 유저로 부터 온 이벤트 처리
-    public void dial(@NonNull final DialPayload dialPayload) {
-        signalingClient.emitDial(dialPayload);
+    public void dial(@NonNull final DialPayload payload) {
+        Logger.i(payload.toString());
+        signalingClient.emitDial(payload);
     }
 
     public void awaken(@NonNull final AwakenPayload payload) {

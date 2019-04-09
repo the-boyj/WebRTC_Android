@@ -10,7 +10,6 @@ import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.utils.JSONUtil;
-import com.webrtc.boyj.utils.Logger;
 
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
@@ -62,12 +61,11 @@ public class SignalingClient {
     }
 
     public void emitCreateRoom(@NonNull final CreateRoomPayload payload) {
-        Logger.i("emitCreateRoom : " + payload.toString());
         socketIOClient.emit(CREATE_ROOM, JSONUtil.toJSONObject(payload));
     }
 
     public void emitDial(@NonNull final DialPayload dialPayload) {
-        socketIOClient.emit(SignalingEventString.EVENT_DIAL, dialPayload.toJsonObject());
+        socketIOClient.emit(SignalingEventString.EVENT_DIAL, JSONUtil.toJSONObject(dialPayload));
     }
 
     public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {

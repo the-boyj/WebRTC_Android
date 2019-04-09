@@ -2,6 +2,8 @@ package com.webrtc.boyj.api.signalling.payload;
 
 import android.support.annotation.NonNull;
 
+import com.webrtc.boyj.utils.JSONUtil;
+
 import java.util.UUID;
 
 public class CreateRoomPayload {
@@ -29,7 +31,7 @@ public class CreateRoomPayload {
     @NonNull
     @Override
     public String toString() {
-        return String.format("'CreateRoomPayload' : {'room' : {%s}, 'callerId' : {%s}}", room, callerId);
+        return JSONUtil.toJson(getClass(), this);
     }
 
     public static class Builder {

@@ -1,4 +1,4 @@
-package com.webrtc.boyj.common;
+package com.webrtc.boyj.presentation.main;
 
 import android.app.Dialog;
 import android.content.Context;

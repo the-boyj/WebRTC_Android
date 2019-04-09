@@ -45,8 +45,6 @@ public class TelManager {
 
     private static String generateTelNumber() {
         final ThreadLocalRandom random = ThreadLocalRandom.current();
-        return String.format("010-%s-%s",
-                random.nextInt(1000, 10000),
-                random.nextInt(1000, 10000));
+        return String.format("010%s", random.nextInt(10000000, 100000000));
     }
 }

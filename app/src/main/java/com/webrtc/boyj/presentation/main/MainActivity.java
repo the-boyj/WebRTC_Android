@@ -14,7 +14,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.common.NameDialog;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;

@@ -7,18 +7,22 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.webrtc.boyj.api.signalling.payload.FCMPayload;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.presentation.ringing.RingingActivity;
 
+import java.util.Objects;
+
 @SuppressWarnings("SpellCheckingInspection")
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private static final String KEY_ROOM = "room";
+    private static final String KEY_CALLER_ID = "callerId";
+
     @Override
     public void onMessageReceived(@NonNull final RemoteMessage remoteMessage) {
-        final FCMPayload payload = new FCMPayload(remoteMessage);
+        final String room = Objects.requireNonNull(remoteMessage.getData().get(KEY_ROOM));
+        final String callerId = Objects.requireNonNull(remoteMessage.getData().get(KEY_CALLER_ID));
 
-        final Intent intent = RingingActivity.getLaunchIntent(getApplicationContext(), payload);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        final Intent intent = RingingActivity.getLaunchIntent(getApplicationContext(), room, callerId);
         startActivity(intent);
     }
 

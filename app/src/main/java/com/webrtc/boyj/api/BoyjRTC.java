@@ -86,27 +86,31 @@ public class BoyjRTC {
 
     /**
      * 처음으로 통화를 요청할 경우 room을 생성한다.
-     *
-     * @param payload room, callerId 가 담긴 페이로드
+     * @param payload room, callerId가 담긴 페이로드
      */
     public void createRoom(@NonNull final CreateRoomPayload payload) {
         Logger.i(payload.toString());
         signalingClient.emitCreateRoom(payload);
     }
 
-    //앱 유저로 부터 온 이벤트 처리
+    /**
+     * Caller가 상대방에게 통화를 요청한다.
+     *
+     * @param payload calleeId가 담긴 페이로드
+     */
     public void dial(@NonNull final DialPayload payload) {
         Logger.i(payload.toString());
         signalingClient.emitDial(payload);
     }
 
+    /**
+     * Callee가 푸시 알람을 수신 후 서버로 응답한다.
+     *
+     * @param payload room, calleeId가 담긴 페이로드
+     */
     public void awaken(@NonNull final AwakenPayload payload) {
+        Logger.i(payload.toString());
         signalingClient.emitAwaken(payload);
-    }
-
-    @NonNull
-    public CompletableSubject knock() {
-        return signalingClient.getKnockSubject();
     }
 
     public void accept() {

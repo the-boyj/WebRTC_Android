@@ -2,30 +2,44 @@ package com.webrtc.boyj.api.signalling.payload;
 
 import android.support.annotation.NonNull;
 
+import com.webrtc.boyj.utils.JSONUtil;
 
-public class AwakenPayload extends Payload {
+public class AwakenPayload {
     @NonNull
-    private String room;
+    private final String room;
+    @NonNull
+    private final String calleeId;
 
-    public void setRoom(@NonNull final String room) {
+    private AwakenPayload() {
+        throw new UnsupportedOperationException();
+    }
+
+    private AwakenPayload(@NonNull String room, @NonNull String calleeId) {
         this.room = room;
+        this.calleeId = calleeId;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return JSONUtil.toJson(getClass(), this);
     }
 
     public static class Builder {
-
-
         @NonNull
         private final String room;
+        @NonNull
+        private final String calleeId;
 
-        public Builder(@NonNull final String room) {
+        public Builder(@NonNull final String room,
+                       @NonNull final String calleeId) {
             this.room = room;
+            this.calleeId = calleeId;
         }
 
         @NonNull
         public AwakenPayload build() {
-            final AwakenPayload payload = new AwakenPayload();
-            payload.setRoom(this.room);
-            return payload;
+            return new AwakenPayload(room, calleeId);
         }
     }
 }

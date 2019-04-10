@@ -24,17 +24,16 @@ import io.reactivex.subjects.PublishSubject;
 public class SignalingClient {
     private static final String CREATE_ROOM = "createRoom";
     private static final String DIAL = "dial";
+    private static final String AWAKEN = "awaken";
 
     // Todo : 모든 이벤트 추가 후 SocketIOClient의 emit 메소드에 어노테이션 추가
     @Retention(RetentionPolicy.SOURCE)
-    @StringDef({CREATE_ROOM, DIAL})
+    @StringDef({CREATE_ROOM, DIAL, AWAKEN})
     private @interface Event {
     }
 
     @NonNull
     private static final SocketIOClient socketIOClient = new SocketIOClient();
-    @NonNull
-    private CompletableSubject knockSubject = CompletableSubject.create();
     @NonNull
     private CompletableSubject readySubject = CompletableSubject.create();
     @NonNull
@@ -45,7 +44,6 @@ public class SignalingClient {
     private PublishSubject<SessionDescription> sdpSubject = PublishSubject.create();
 
     public SignalingClient() {
-        socketIOClient.on(SignalingEventString.EVENT_KNOCK, args -> knockSubject.onComplete());
         socketIOClient.on(SignalingEventString.EVENT_READY, args -> readySubject.onComplete());
 
         socketIOClient.on(SignalingEventString.EVENT_RECEIVE_SDP, args -> {
@@ -65,12 +63,12 @@ public class SignalingClient {
         socketIOClient.emit(CREATE_ROOM, JSONUtil.toJSONObject(payload));
     }
 
-    public void emitDial(@NonNull final DialPayload dialPayload) {
-        socketIOClient.emit(DIAL, JSONUtil.toJSONObject(dialPayload));
+    public void emitDial(@NonNull final DialPayload payload) {
+        socketIOClient.emit(DIAL, JSONUtil.toJSONObject(payload));
     }
 
-    public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {
-        socketIOClient.emit(SignalingEventString.EVENT_AWAKEN, awakenPayload.toJsonObject());
+    public void emitAwaken(@NonNull final AwakenPayload payload) {
+        socketIOClient.emit(AWAKEN, JSONUtil.toJSONObject(payload));
     }
 
     public void emitAccept() {
@@ -95,11 +93,6 @@ public class SignalingClient {
 
     public void disconnect() {
         socketIOClient.disconnect();
-    }
-
-    @NonNull
-    public CompletableSubject getKnockSubject() {
-        return knockSubject;
     }
 
     @NonNull

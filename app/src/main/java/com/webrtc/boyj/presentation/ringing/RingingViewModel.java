@@ -1,46 +1,36 @@
 package com.webrtc.boyj.presentation.ringing;
 
-import android.databinding.ObservableBoolean;
+import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
-
 public class RingingViewModel extends BaseViewModel {
     @NonNull
-    private final String tel;
+    private final ObservableField<String> callerId = new ObservableField<>();
     @NonNull
     private final BoyjRTC boyjRTC;
-    @NonNull
-    private final ObservableBoolean isKnockReceived = new ObservableBoolean();
 
-    RingingViewModel(@NonNull final String tel) {
-        this.tel = tel;
-        this.boyjRTC = new BoyjRTC();
-
-        addDisposable(boyjRTC.knock()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> isKnockReceived.set(true)));
+    public RingingViewModel(@NonNull final BoyjRTC boyjRTC) {
+        this.boyjRTC = boyjRTC;
     }
 
-    void awaken(@NonNull final AwakenPayload payload) {
+    public void awaken(@NonNull final String room, // FCM으로 전달받은 room
+                       @NonNull final String callerId, // 통화가 걸려온 상대 ID
+                       @NonNull final String calleeId) { // 통화 받은 본인 ID
+        this.callerId.set(callerId);
+        final AwakenPayload payload = new AwakenPayload.Builder(room, calleeId).build();
         boyjRTC.awaken(payload);
     }
 
-    void reject() {
+    public void reject() {
         boyjRTC.reject();
     }
 
     @NonNull
-    public String getTel() {
-        return tel;
-    }
-
-    @NonNull
-    public ObservableBoolean getIsKnockReceived() {
-        return isKnockReceived;
+    public ObservableField<String> getCallerId() {
+        return callerId;
     }
 }

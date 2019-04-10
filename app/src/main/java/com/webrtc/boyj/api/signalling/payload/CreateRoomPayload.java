@@ -19,16 +19,6 @@ public class CreateRoomPayload {
     }
 
     @NonNull
-    public String getRoom() {
-        return room;
-    }
-
-    @NonNull
-    public String getCallerId() {
-        return callerId;
-    }
-
-    @NonNull
     @Override
     public String toString() {
         return JSONUtil.toJson(getClass(), this);

@@ -10,10 +10,6 @@ public class AwakenPayload {
     @NonNull
     private final String calleeId;
 
-    private AwakenPayload() {
-        throw new UnsupportedOperationException();
-    }
-
     private AwakenPayload(@NonNull String room, @NonNull String calleeId) {
         this.room = room;
         this.calleeId = calleeId;

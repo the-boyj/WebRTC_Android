@@ -8,10 +8,6 @@ public class DialPayload {
     @NonNull
     private final String calleeId; // Caller가 전화 송신시 상대방 번호
 
-    private DialPayload() {
-        throw new UnsupportedOperationException();
-    }
-
     private DialPayload(@NonNull String calleeId) {
         this.calleeId = calleeId;
     }

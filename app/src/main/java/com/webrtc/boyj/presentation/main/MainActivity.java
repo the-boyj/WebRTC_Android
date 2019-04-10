@@ -29,13 +29,11 @@ import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.RECORD_AUDIO;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
-    @Nullable
     private String tel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initToolbar();
         checkPermission();
     }
@@ -55,11 +53,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                     @Override
                     public void onPermissionGranted() {
                         tel = TelManager.getTelNumber(getApplicationContext());
-                        if (tel == null) {
-                            notExistPhoneNumber();
-                        } else {
-                            init();
-                        }
+                        init();
                     }
 
                     @Override
@@ -70,8 +64,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void init() {
-        assert tel != null;
-
         initViewModel();
         initRecyclerView();
         subscribeViewModel();
@@ -99,15 +91,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 e -> showToast(getString(R.string.ERROR_DEFAULT)));
     }
 
-    private void notExistPhoneNumber() {
-        showToast(getString(R.string.ERROR_PHONE_NUMBER_NOT_EXIST));
-    }
-
     private void showDialog() {
-        if (tel == null) {
-            notExistPhoneNumber();
-            return;
-        }
         final NameDialog dialog = new NameDialog(this);
         dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
         dialog.show();

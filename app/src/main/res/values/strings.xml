@@ -20,4 +20,7 @@
     <string name="text_call_on_message">수신전화</string>
     <string name="text_call_accept">응답</string>
     <string name="text_call_reject">거절</string>
+
+    <!-- Invite -->
+    <string name="text_invite_user">초대</string>
 </resources>

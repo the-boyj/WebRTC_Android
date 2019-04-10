@@ -2,35 +2,37 @@ package com.webrtc.boyj.utils;
 
 import android.util.Log;
 
+import com.webrtc.boyj.BuildConfig;
+
 public class Logger {
     private static final String TAG = "BOYJ";
 
     public static void v(String msg) {
-        if (App.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.v(tag(), msg);
         }
     }
 
     public static void d(String msg) {
-        if (App.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.d(tag(), msg);
         }
     }
 
     public static void i(String msg) {
-        if (App.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.i(tag(), msg);
         }
     }
 
     public static void w(String msg) {
-        if (App.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.w(tag(), msg);
         }
     }
 
     public static void e(String msg) {
-        if (App.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.e(tag(), msg);
         }
     }

@@ -33,8 +33,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
             assert callerId != null;
 
-            binding.getVm().init();
             binding.getVm().createRoom(callerId);
+            binding.getVm().dial(calleeId);
         } else {
             binding.getVm().join();
         }
@@ -47,7 +47,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private void initViewModel() {
         final CallViewModel vm = ViewModelProviders.of(this,
                 new CallViewModelFactory(new BoyjRTC())).get(CallViewModel.class);
-
+        vm.init();
         binding.setVm(vm);
     }
 

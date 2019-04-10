@@ -18,12 +18,18 @@ public class JSONUtil {
      */
     @NonNull
     public static JSONObject toJSONObject(@NonNull final Object object) {
-        JSONObject jsonObject = null;
+        JSONObject jsonObject;
         try {
             jsonObject = new JSONObject(gson.toJson(object));
         } catch (JSONException e) {
             throw new IllegalStateException("object is not valid");
         }
         return jsonObject;
+    }
+
+    @NonNull
+    public static String toJson(@NonNull final Class<?> type,
+                                @NonNull final Object object) {
+        return String.format("%s %s", type.getSimpleName(), gson.toJson(object));
     }
 }

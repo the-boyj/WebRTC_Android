@@ -10,7 +10,6 @@ import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.utils.JSONUtil;
-import com.webrtc.boyj.utils.Logger;
 
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
@@ -24,10 +23,11 @@ import io.reactivex.subjects.PublishSubject;
 
 public class SignalingClient {
     private static final String CREATE_ROOM = "createRoom";
+    private static final String DIAL = "dial";
 
     // Todo : 모든 이벤트 추가 후 SocketIOClient의 emit 메소드에 어노테이션 추가
     @Retention(RetentionPolicy.SOURCE)
-    @StringDef(CREATE_ROOM)
+    @StringDef({CREATE_ROOM, DIAL})
     private @interface Event {
     }
 
@@ -62,12 +62,11 @@ public class SignalingClient {
     }
 
     public void emitCreateRoom(@NonNull final CreateRoomPayload payload) {
-        Logger.i("emitCreateRoom : " + payload.toString());
         socketIOClient.emit(CREATE_ROOM, JSONUtil.toJSONObject(payload));
     }
 
     public void emitDial(@NonNull final DialPayload dialPayload) {
-        socketIOClient.emit(SignalingEventString.EVENT_DIAL, dialPayload.toJsonObject());
+        socketIOClient.emit(DIAL, JSONUtil.toJSONObject(dialPayload));
     }
 
     public void emitAwaken(@NonNull final AwakenPayload awakenPayload) {

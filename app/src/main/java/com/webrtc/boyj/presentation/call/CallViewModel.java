@@ -51,14 +51,13 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC.createRoom(payload);
     }
 
-    //전화 거는 요청
-    void dial(@NonNull final String room) {
+    public void dial(@NonNull final String calleeId) {
         boyjRTC.readyToCall(true);
-        final DialPayload dialPayload = new DialPayload.Builder(room).build();
+        final DialPayload dialPayload = new DialPayload.Builder(calleeId).build();
         boyjRTC.dial(dialPayload);
     }
 
-    void join() {
+    public void join() {
         boyjRTC.readyToCall(false);
         boyjRTC.accept();
     }

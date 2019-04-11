@@ -6,11 +6,10 @@ import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 
 class CustomSdpObserver implements SdpObserver {
-    private String tag;
+    private String tag = getClass().getSimpleName();
 
     CustomSdpObserver(String logTag) {
-        tag = this.getClass().getCanonicalName();
-        this.tag = this.tag + " " + logTag;
+        this.tag += logTag;
     }
 
     @Override

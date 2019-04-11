@@ -35,8 +35,6 @@ public class SignalingClient {
     @NonNull
     private static final SocketIOClient socketIOClient = new SocketIOClient();
     @NonNull
-    private CompletableSubject readySubject = CompletableSubject.create();
-    @NonNull
     private CompletableSubject byeSubject = CompletableSubject.create();
     @NonNull
     private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
@@ -44,8 +42,6 @@ public class SignalingClient {
     private PublishSubject<SessionDescription> sdpSubject = PublishSubject.create();
 
     public SignalingClient() {
-        socketIOClient.on(SignalingEventString.EVENT_READY, args -> readySubject.onComplete());
-
         socketIOClient.on(SignalingEventString.EVENT_RECEIVE_SDP, args -> {
             final SdpPayload payload = SdpPayload.fromJsonObject((JSONObject) args[0]);
             sdpSubject.onNext(payload.getSdp());
@@ -93,11 +89,6 @@ public class SignalingClient {
 
     public void disconnect() {
         socketIOClient.disconnect();
-    }
-
-    @NonNull
-    public CompletableSubject getReadySubject() {
-        return readySubject;
     }
 
     @NonNull

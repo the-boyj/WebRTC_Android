@@ -19,8 +19,6 @@ import io.reactivex.subjects.PublishSubject;
 
 public class PeerConnectionClient {
     @NonNull
-    private final PeerConnection.RTCConfiguration rtcConfiguration;
-    @NonNull
     private final MediaConstraints constraints = new MediaConstraints();
     @NonNull
     private final PeerConnectionFactory peerConnectionFactory;
@@ -35,7 +33,6 @@ public class PeerConnectionClient {
 
     public PeerConnectionClient(@NonNull final PeerConnectionFactory peerConnectionFactory) {
         this.peerConnectionFactory = peerConnectionFactory;
-        this.rtcConfiguration = RtcConfigurationManager.createRtcConfiguration();
 
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
@@ -55,6 +52,11 @@ public class PeerConnectionClient {
         Objects.requireNonNull(connectionMap.get(targetId)).createAnswer();
     }
 
+    public void addStreamToLocalPeer(@NonNull final String targetId,
+                                     @NonNull final MediaStream localMediaStream) {
+        Objects.requireNonNull(connectionMap.get(targetId)).addStreamToLocalPeer(localMediaStream);
+    }
+
     public void setRemoteSdp(@NonNull final String targetId,
                              @NonNull final SessionDescription sdp) {
         Objects.requireNonNull(connectionMap.get(targetId)).setRemoteSdp(sdp);
@@ -63,11 +65,6 @@ public class PeerConnectionClient {
     public void addIceCandidate(@NonNull final String targetId,
                                 @NonNull final IceCandidate iceCandidate) {
         Objects.requireNonNull(connectionMap.get(targetId)).addIceCandidate(iceCandidate);
-    }
-
-    public void addStreamToLocalPeer(@NonNull final String targetId,
-                                     @NonNull final MediaStream localMediaStream) {
-        Objects.requireNonNull(connectionMap.get(targetId)).addStreamToLocalPeer(localMediaStream);
     }
 
     @NonNull
@@ -87,6 +84,7 @@ public class PeerConnectionClient {
 
     public void dispose(@NonNull final String targetId) {
         Objects.requireNonNull(connectionMap.get(targetId)).dispose();
+        connectionMap.remove(targetId);
     }
 
     @SuppressWarnings("SpellCheckingInspection")
@@ -100,6 +98,9 @@ public class PeerConnectionClient {
         }
 
         private void createPeerConncetion() {
+            final PeerConnection.RTCConfiguration rtcConfiguration =
+                    RtcConfigurationManager.createRtcConfiguration();
+
             connection = peerConnectionFactory.createPeerConnection(
                     rtcConfiguration,
                     new BoyjPeerConnectionObserver(id)
@@ -146,11 +147,13 @@ public class PeerConnectionClient {
 
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
+            super.onIceCandidate(iceCandidate);
             iceCandidateSubject.onNext(iceCandidate);
         }
 
         @Override
         public void onAddStream(MediaStream mediaStream) {
+            super.onAddStream(mediaStream);
             remoteMediaStreamSubject.onNext(mediaStream);
         }
     }
@@ -167,6 +170,7 @@ public class PeerConnectionClient {
 
         @Override
         public void onCreateSuccess(SessionDescription sdp) {
+            super.onCreateSuccess(sdp);
             Objects.requireNonNull(connectionMap.get(id)).setLocalDescription(sdp);
             sdpSubject.onNext(sdp);
         }

@@ -9,8 +9,6 @@ import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
-import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
-import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.MediaStream;
@@ -35,6 +33,8 @@ public class BoyjRTC {
         peerConnectionClient = new PeerConnectionClient(factory);
 
         compositeDisposable.addAll(
+                // Todo : SDP, IceCandidate 페이로드 변경 후 타겟 설정
+                /*
                 peerConnectionClient.getSdpSubject().subscribe(sessionDescription -> {
                     final SdpPayload sdpPayload = new SdpPayload.Builder(sessionDescription).build();
                     signalingClient.emitSdp(sdpPayload);
@@ -42,7 +42,8 @@ public class BoyjRTC {
                 peerConnectionClient.getIceCandidateSubject().subscribe(iceCandidate -> {
                     final IceCandidatePayload iceCandidatePayload = new IceCandidatePayload.Builder(iceCandidate).build();
                     signalingClient.emitIceCandidate(iceCandidatePayload);
-                }),
+                })
+
                 signalingClient.getSdpSubject().subscribe(sdp -> {
                     peerConnectionClient.setRemoteSdp(sdp);
                     if (sdp.type == SessionDescription.Type.OFFER) {
@@ -53,17 +54,24 @@ public class BoyjRTC {
                     Logger.d(candidate.toString());
                     peerConnectionClient.addIceCandidate(candidate);
                 })
+                */
         );
     }
 
-    public void readyToCall(final boolean isCaller) {
-        compositeDisposable.add(signalingClient.getReadySubject().subscribe(() -> {
-            peerConnectionClient.createPeerConnection();
-            peerConnectionClient.addStreamToLocalPeer(getUserMedia());
-            if (isCaller) {
-                peerConnectionClient.createOffer();
-            }
-        }));
+    // Todo : accept이후 offer 연결
+    public void createOffer(@NonNull final String targetId) {
+        peerConnectionClient.createPeerConnection(targetId);
+        peerConnectionClient.addStreamToLocalPeer(targetId, getUserMedia());
+        peerConnectionClient.createOffer(targetId);
+    }
+
+    // Todo : sdp를 받은 이후 OFFER에게 온 경우면 호출
+    private void createAnswer(@NonNull final String targetId,
+                              @NonNull final SessionDescription sdp) {
+        peerConnectionClient.createPeerConnection(targetId);
+        peerConnectionClient.setRemoteSdp(targetId, sdp);
+        peerConnectionClient.addStreamToLocalPeer(targetId, getUserMedia());
+        peerConnectionClient.createAnswer(targetId);
     }
 
     public void startCapture() {
@@ -86,7 +94,8 @@ public class BoyjRTC {
 
     /**
      * 처음으로 통화를 요청할 경우 room을 생성한다.
-     * @param payload room, callerId가 담긴 페이로드
+     *
+     * @param payload room, callerId 가 담긴 페이로드
      */
     public void createRoom(@NonNull final CreateRoomPayload payload) {
         Logger.i(payload.toString());
@@ -131,12 +140,13 @@ public class BoyjRTC {
         return signalingClient.getByeSubject();
     }
 
+    public void dispose(@NonNull final String targetId) {
+        peerConnectionClient.dispose(targetId);
+    }
+
     public void release() {
         userMediaManager.stopCapture();
         compositeDisposable.dispose();
         signalingClient.disconnect();
-        peerConnectionClient.dispose();
     }
-
-
 }

@@ -52,13 +52,12 @@ public class CallViewModel extends BaseViewModel {
     }
 
     public void dial(@NonNull final String calleeId) {
-        boyjRTC.readyToCall(true);
         final DialPayload dialPayload = new DialPayload.Builder(calleeId).build();
         boyjRTC.dial(dialPayload);
     }
 
     public void join() {
-        boyjRTC.readyToCall(false);
+        // Todo : Offer 연결 필요 by accept
         boyjRTC.accept();
     }
 

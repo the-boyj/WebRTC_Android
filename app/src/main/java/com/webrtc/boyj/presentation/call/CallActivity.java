@@ -31,8 +31,6 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
             final String callerId = TelManager.getTelNumber(getApplicationContext());
             final String calleeId = getIntent().getStringExtra(CALLEE_ID);
 
-            assert callerId != null;
-
             binding.getVm().createRoom(callerId);
             binding.getVm().dial(calleeId);
         } else {

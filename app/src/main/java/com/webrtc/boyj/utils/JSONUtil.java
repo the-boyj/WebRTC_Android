@@ -32,4 +32,10 @@ public class JSONUtil {
                                 @NonNull final Object object) {
         return String.format("%s %s", type.getSimpleName(), gson.toJson(object));
     }
+
+    @NonNull
+    public static Object fromJson(@NonNull final JSONObject jsonObject,
+                                  @NonNull final Class<?> type) {
+        return gson.fromJson(jsonObject.toString(), type);
+    }
 }

@@ -34,6 +34,10 @@ public class BoyjRTC {
         peerConnectionClient = new PeerConnectionClient(factory);
 
         compositeDisposable.addAll(
+                // Callee의 FCM 수신 이후 시그널링 서버에서 ACK
+                signalingClient.getCreatedSubject().subscribe(calleeId -> {
+                    peerConnectionClient.createPeerConnection(calleeId);
+                })
                 // Todo : SDP, IceCandidate 페이로드 변경 후 타겟 설정
                 /*
                 peerConnectionClient.getSdpSubject().subscribe(sessionDescription -> {
@@ -60,7 +64,7 @@ public class BoyjRTC {
     }
 
     // Todo : accept이후 offer 연결
-    public void createOffer(@NonNull final String targetId) {
+    private void createOffer(@NonNull final String targetId) {
         peerConnectionClient.createPeerConnection(targetId);
         peerConnectionClient.addStreamToLocalPeer(targetId, getUserMedia());
         peerConnectionClient.createOffer(targetId);

@@ -3,6 +3,7 @@ package com.webrtc.boyj.api.peer;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.peer.manager.RtcConfigurationManager;
+import com.webrtc.boyj.data.model.BoyjMediaStream;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -27,7 +28,7 @@ public class PeerConnectionClient {
     @NonNull
     private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<MediaStream> remoteMediaStreamSubject = PublishSubject.create();
+    private PublishSubject<BoyjMediaStream> boyjMediaStreamSubject = PublishSubject.create();
     @NonNull
     private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
 
@@ -78,8 +79,8 @@ public class PeerConnectionClient {
     }
 
     @NonNull
-    public PublishSubject<MediaStream> getRemoteMediaStreamSubject() {
-        return remoteMediaStreamSubject;
+    public PublishSubject<BoyjMediaStream> getBoyjMediaStreamSubject() {
+        return boyjMediaStreamSubject;
     }
 
     public void dispose(@NonNull final String targetId) {
@@ -154,7 +155,8 @@ public class PeerConnectionClient {
         @Override
         public void onAddStream(MediaStream mediaStream) {
             super.onAddStream(mediaStream);
-            remoteMediaStreamSubject.onNext(mediaStream);
+            final BoyjMediaStream boyjMediaStream = new BoyjMediaStream(id, mediaStream);
+            boyjMediaStreamSubject.onNext(boyjMediaStream);
         }
     }
 

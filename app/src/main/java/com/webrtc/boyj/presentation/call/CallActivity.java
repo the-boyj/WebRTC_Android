@@ -62,6 +62,12 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         final SplitLayout splitLayout = findViewById(R.id.splitLayout);
         final BoyjAdapter adapter = new BoyjAdapter();
         splitLayout.setAdapter(adapter);
+
+        binding.getVm().getRemoteMediaStream().observe(this, mediaStream -> {
+            if (mediaStream != null) {
+                adapter.addMediaStream(mediaStream);
+            }
+        });
     }
 
     private void turnOnSpeaker() {

@@ -9,6 +9,7 @@ import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
+import com.webrtc.boyj.data.model.BoyjMediaStream;
 import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.MediaStream;
@@ -88,8 +89,8 @@ public class BoyjRTC {
     }
 
     @NonNull
-    public PublishSubject<MediaStream> remoteMediaStream() {
-        return peerConnectionClient.getRemoteMediaStreamSubject();
+    public PublishSubject<BoyjMediaStream> remoteMediaStream() {
+        return peerConnectionClient.getBoyjMediaStreamSubject();
     }
 
     /**

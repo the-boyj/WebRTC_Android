@@ -8,8 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
@@ -19,16 +17,18 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private static final String EXTRA_ROOM = "room";
     private static final String EXTRA_CALLER_ID = "callerId";
 
+    private String callerId;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final String room = getIntent().getStringExtra(EXTRA_ROOM);
-        final String callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
+        callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
         final String calleeId = TelManager.getTelNumber(getApplicationContext());
 
-        initViews();
         initViewModel();
+        initViews();
 
         binding.getVm().awaken(room, callerId, calleeId);
     }
@@ -42,13 +42,12 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     }
 
     private void initViewModel() {
-        final RingingViewModel vm = ViewModelProviders.of(this,
-                new RingingViewModelFactory(new BoyjRTC())).get(RingingViewModel.class);
+        final RingingViewModel vm = ViewModelProviders.of(this).get(RingingViewModel.class);
         binding.setVm(vm);
     }
 
     private void startCallActivity() {
-        startActivity(CallActivity.getCalleeLaunchIntent(this));
+        startActivity(CallActivity.getCalleeLaunchIntent(this, callerId));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
     }

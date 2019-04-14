@@ -47,19 +47,18 @@ public class CallViewModel extends BaseViewModel {
                 }));
     }
 
-    public void createRoom(@NonNull final String callerId) {
-        final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
-        boyjRTC.createRoom(payload);
-    }
-
     public void dial(@NonNull final String calleeId) {
         final DialPayload dialPayload = new DialPayload.Builder(calleeId).build();
         boyjRTC.dial(dialPayload);
     }
 
-    public void accept() {
-        // Todo : Offer 연결 필요 by accept
-        boyjRTC.accept();
+    public void createRoom(@NonNull final String callerId) {
+        final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
+        boyjRTC.createRoom(payload);
+    }
+
+    public void accept(@NonNull final String callerId) {
+        boyjRTC.accept(callerId);
     }
 
     //전화 연결 되었을때 작업

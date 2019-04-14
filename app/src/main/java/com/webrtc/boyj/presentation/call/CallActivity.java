@@ -15,6 +15,7 @@ import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.utils.TelManager;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
+    private static final String CALLER_ID = "CALLER_ID";
     private static final String CALLEE_ID = "CALLEE_ID";
     private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
@@ -34,7 +35,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
             binding.getVm().createRoom(callerId);
             binding.getVm().dial(calleeId);
         } else {
-            binding.getVm().accept();
+            final String callerId = getIntent().getStringExtra(CALLER_ID);
+            binding.getVm().accept(callerId);
         }
     }
 
@@ -93,8 +95,10 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     @NonNull
-    public static Intent getCalleeLaunchIntent(@NonNull final Context context) {
+    public static Intent getCalleeLaunchIntent(@NonNull final Context context,
+                                               @NonNull final String callerId) {
         return getLaunchIntent(context, CallActivity.class)
+                .putExtra(CALLER_ID, callerId)
                 .putExtra(EXTRA_IS_CALLER, false);
     }
 

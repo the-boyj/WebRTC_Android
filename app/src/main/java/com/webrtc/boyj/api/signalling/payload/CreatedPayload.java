@@ -5,10 +5,9 @@ import android.support.annotation.NonNull;
 import com.webrtc.boyj.utils.JSONUtil;
 
 public class CreatedPayload {
-    @NonNull
-    private final String calleeId;
+    private String calleeId;
 
-    private CreatedPayload(@NonNull final String calleeId) {
+    public void setCalleeId(String calleeId) {
         this.calleeId = calleeId;
     }
 
@@ -21,18 +20,5 @@ public class CreatedPayload {
     @Override
     public String toString() {
         return JSONUtil.toJson(getClass(), this);
-    }
-
-    public static class Builder {
-        @NonNull
-        private final String calleeId;
-
-        public Builder(@NonNull final String calleeId) {
-            this.calleeId = calleeId;
-        }
-
-        public CreatedPayload build() {
-            return new CreatedPayload(calleeId);
-        }
     }
 }

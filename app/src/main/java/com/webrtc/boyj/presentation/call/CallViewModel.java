@@ -28,11 +28,10 @@ public class CallViewModel extends BaseViewModel {
     private final MutableLiveData<MediaStream> localMediaStream = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<BoyjMediaStream> remoteMediaStream = new MutableLiveData<>();
-    @NonNull
-    private final BoyjRTC boyjRTC;
+    private BoyjRTC boyjRTC;
 
-    public CallViewModel(@NonNull final BoyjRTC boyjRTC) {
-        this.boyjRTC = boyjRTC;
+    public CallViewModel() {
+        boyjRTC = new BoyjRTC();
     }
 
     void init() {
@@ -58,7 +57,7 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC.dial(dialPayload);
     }
 
-    public void join() {
+    public void accept() {
         // Todo : Offer 연결 필요 by accept
         boyjRTC.accept();
     }

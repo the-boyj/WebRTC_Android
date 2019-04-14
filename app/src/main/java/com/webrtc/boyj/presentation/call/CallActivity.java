@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.extension.custom.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
@@ -35,13 +34,12 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
             binding.getVm().createRoom(callerId);
             binding.getVm().dial(calleeId);
         } else {
-            binding.getVm().join();
+            binding.getVm().accept();
         }
     }
 
     private void initViewModel() {
-        final CallViewModel vm = ViewModelProviders.of(this,
-                new CallViewModelFactory(new BoyjRTC())).get(CallViewModel.class);
+        final CallViewModel vm = ViewModelProviders.of(this).get(CallViewModel.class);
         vm.init();
         binding.setVm(vm);
     }

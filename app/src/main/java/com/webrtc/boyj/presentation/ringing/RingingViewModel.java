@@ -10,11 +10,10 @@ import com.webrtc.boyj.presentation.BaseViewModel;
 public class RingingViewModel extends BaseViewModel {
     @NonNull
     private final ObservableField<String> callerId = new ObservableField<>();
-    @NonNull
-    private final BoyjRTC boyjRTC;
+    private BoyjRTC boyjRTC;
 
-    public RingingViewModel(@NonNull final BoyjRTC boyjRTC) {
-        this.boyjRTC = boyjRTC;
+    public RingingViewModel() {
+        this.boyjRTC = new BoyjRTC();
     }
 
     public void awaken(@NonNull final String room, // FCM으로 전달받은 room

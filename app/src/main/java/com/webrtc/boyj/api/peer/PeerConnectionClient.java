@@ -3,6 +3,7 @@ package com.webrtc.boyj.api.peer;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.peer.manager.RtcConfigurationManager;
+import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
 
 import org.webrtc.IceCandidate;
@@ -16,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.subjects.PublishSubject;
 
 public class PeerConnectionClient {
@@ -24,13 +27,15 @@ public class PeerConnectionClient {
     @NonNull
     private final PeerConnectionFactory peerConnectionFactory;
     @NonNull
-    private PublishSubject<SessionDescription> sdpSubject = PublishSubject.create();
+    private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
     @NonNull
     private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<BoyjMediaStream> boyjMediaStreamSubject = PublishSubject.create();
     @NonNull
-    private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
+    private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
+    @Nullable
+    private SessionDescription offerSdp;
 
     public PeerConnectionClient(@NonNull final PeerConnectionFactory peerConnectionFactory) {
         this.peerConnectionFactory = peerConnectionFactory;
@@ -69,11 +74,6 @@ public class PeerConnectionClient {
     }
 
     @NonNull
-    public PublishSubject<SessionDescription> getSdpSubject() {
-        return sdpSubject;
-    }
-
-    @NonNull
     public PublishSubject<IceCandidate> getIceCandidateSubject() {
         return iceCandidateSubject;
     }
@@ -82,6 +82,12 @@ public class PeerConnectionClient {
     public PublishSubject<BoyjMediaStream> getBoyjMediaStreamSubject() {
         return boyjMediaStreamSubject;
     }
+
+    @NonNull
+    public PublishSubject<SdpPayload> getSdpPayloadSubject() {
+        return sdpPayloadSubject;
+    }
+
 
     public void dispose(@NonNull final String targetId) {
         Objects.requireNonNull(connectionMap.get(targetId)).dispose();
@@ -173,8 +179,14 @@ public class PeerConnectionClient {
         @Override
         public void onCreateSuccess(SessionDescription sdp) {
             super.onCreateSuccess(sdp);
+            final SdpPayload payload = new SdpPayload(sdp);
+            if (sdp.type == SessionDescription.Type.OFFER) {
+                offerSdp = sdp;
+            } else if (sdp.type == SessionDescription.Type.ANSWER) {
+                payload.setReceiver(id);
+            }
+            sdpPayloadSubject.onNext(payload);
             Objects.requireNonNull(connectionMap.get(id)).setLocalDescription(sdp);
-            sdpSubject.onNext(sdp);
         }
     }
 }

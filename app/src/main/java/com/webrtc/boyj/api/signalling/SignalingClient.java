@@ -15,7 +15,6 @@ import com.webrtc.boyj.utils.Logger;
 
 import org.json.JSONObject;
 import org.webrtc.IceCandidate;
-import org.webrtc.SessionDescription;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,36 +25,47 @@ import io.reactivex.subjects.PublishSubject;
 public class SignalingClient {
     private static final String CREATE_ROOM = "createRoom";
     private static final String DIAL = "dial";
-    private static final String AWAKEN = "awaken";
     private static final String CREATED = "created";
+    private static final String ANSWER = "answer";
+
+    private static final String AWAKEN = "awaken";
+    private static final String ACCEPT = "accept";
+
+    private static final String RECEIVE_SDP = "rsdp";
 
     // Todo : 모든 이벤트 추가 후 SocketIOClient의 emit 메소드에 어노테이션 추가
     @Retention(RetentionPolicy.SOURCE)
-    @StringDef({CREATE_ROOM, DIAL, AWAKEN, CREATED})
+    @StringDef({
+            CREATE_ROOM, DIAL, CREATED, ANSWER, /* Caller */
+            AWAKEN, ACCEPT, /* Callee */
+            RECEIVE_SDP /* 공통 */
+    })
     private @interface Event {
     }
 
     @NonNull
     private static final SocketIOClient socketIOClient = new SocketIOClient();
     @NonNull
-    private PublishSubject<String> createdSubject = PublishSubject.create();
+    private PublishSubject<CreatedPayload> createdPayloadSubject = PublishSubject.create();
     @NonNull
     private CompletableSubject byeSubject = CompletableSubject.create();
     @NonNull
     private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<SessionDescription> sdpSubject = PublishSubject.create();
+    private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
         socketIOClient.on(CREATED, args -> {
             final CreatedPayload payload =
                     (CreatedPayload) JSONUtil.fromJson((JSONObject) args[0], CreatedPayload.class);
             Logger.i(payload.toString());
-            createdSubject.onNext(payload.getCalleeId());
+            createdPayloadSubject.onNext(payload);
         });
-        socketIOClient.on(SignalingEventString.EVENT_RECEIVE_SDP, args -> {
-            final SdpPayload payload = SdpPayload.fromJsonObject((JSONObject) args[0]);
-            sdpSubject.onNext(payload.getSdp());
+        socketIOClient.on(RECEIVE_SDP, args -> {
+            final SdpPayload payload =
+                    (SdpPayload) JSONUtil.fromJson((JSONObject) args[0], SdpPayload.class);
+            Logger.i(payload.toString());
+            sdpPayloadSubject.onNext(payload);
         });
         socketIOClient.on(SignalingEventString.EVENT_RECEIVE_ICE, args -> {
             final IceCandidatePayload payload = IceCandidatePayload.fromJsonObject((JSONObject) args[0]);
@@ -67,27 +77,32 @@ public class SignalingClient {
     }
 
     public void emitCreateRoom(@NonNull final CreateRoomPayload payload) {
+        Logger.i(payload.toString());
         socketIOClient.emit(CREATE_ROOM, JSONUtil.toJSONObject(payload));
     }
 
     public void emitDial(@NonNull final DialPayload payload) {
+        Logger.i(payload.toString());
         socketIOClient.emit(DIAL, JSONUtil.toJSONObject(payload));
     }
 
     public void emitAwaken(@NonNull final AwakenPayload payload) {
+        Logger.i(payload.toString());
         socketIOClient.emit(AWAKEN, JSONUtil.toJSONObject(payload));
     }
 
-    public void emitAccept() {
-        socketIOClient.emit(SignalingEventString.EVENT_ACCEPT);
+    public void emitAccept(@NonNull final SdpPayload payload) {
+        Logger.i(payload.toString());
+        socketIOClient.emit(ACCEPT, payload);
+    }
+
+    public void emitAnswer(@NonNull final SdpPayload payload) {
+        Logger.i(payload.toString());
+        socketIOClient.emit(ANSWER, payload);
     }
 
     public void emitReject() {
         socketIOClient.emit(SignalingEventString.EVENT_REJECT);
-    }
-
-    public void emitSdp(@NonNull final SdpPayload sdpPayload) {
-        socketIOClient.emit(SignalingEventString.EVENT_SEND_SDP, sdpPayload.toJsonObject());
     }
 
     public void emitIceCandidate(@NonNull final IceCandidatePayload iceCandidatePayload) {
@@ -103,13 +118,13 @@ public class SignalingClient {
     }
 
     @NonNull
-    public PublishSubject<String> getCreatedSubject() {
-        return createdSubject;
+    public PublishSubject<CreatedPayload> getCreatedPayloadSubject() {
+        return createdPayloadSubject;
     }
 
     @NonNull
-    public PublishSubject<SessionDescription> getSdpSubject() {
-        return sdpSubject;
+    public PublishSubject<SdpPayload> getSdpPayloadSubject() {
+        return sdpPayloadSubject;
     }
 
     @NonNull

@@ -1,5 +1,6 @@
 package com.webrtc.boyj.presentation.call;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
+import com.webrtc.boyj.data.model.BoyjMediaStream;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
 import org.webrtc.MediaStream;
@@ -25,7 +27,7 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     private final MutableLiveData<MediaStream> localMediaStream = new MutableLiveData<>();
     @NonNull
-    private final MutableLiveData<MediaStream> remoteMediaStream = new MutableLiveData<>();
+    private final MutableLiveData<BoyjMediaStream> remoteMediaStream = new MutableLiveData<>();
     @NonNull
     private final BoyjRTC boyjRTC;
 
@@ -84,12 +86,12 @@ public class CallViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public MutableLiveData<MediaStream> getLocalMediaStream() {
+    public LiveData<MediaStream> getLocalMediaStream() {
         return localMediaStream;
     }
 
     @NonNull
-    public MutableLiveData<MediaStream> getRemoteMediaStream() {
+    public LiveData<BoyjMediaStream> getRemoteMediaStream() {
         return remoteMediaStream;
     }
 

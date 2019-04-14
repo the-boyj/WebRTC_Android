@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
+import com.webrtc.boyj.extension.custom.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.utils.TelManager;
 
@@ -24,8 +25,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
         final boolean isCaller = getIntent().getBooleanExtra(EXTRA_IS_CALLER, true);
 
-        initViews();
         initViewModel();
+        initViews();
 
         if (isCaller) {
             final String callerId = TelManager.getTelNumber(getApplicationContext());
@@ -38,18 +39,35 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         }
     }
 
+    private void initViewModel() {
+        final CallViewModel vm = ViewModelProviders.of(this,
+                new CallViewModelFactory(new BoyjRTC())).get(CallViewModel.class);
+        vm.init();
+        binding.setVm(vm);
+    }
+
     private void initViews() {
+        initButton();
+        initSplitLayout();
+    }
+
+    private void initButton() {
         findViewById(R.id.fab_reject).setOnClickListener(__ -> hangUp());
         findViewById(R.id.iv_call_menu).setOnClickListener(__ ->
                 CallMenuDialog.newInstance()
                         .show(getSupportFragmentManager(), "CallMenuDialog"));
     }
 
-    private void initViewModel() {
-        final CallViewModel vm = ViewModelProviders.of(this,
-                new CallViewModelFactory(new BoyjRTC())).get(CallViewModel.class);
-        vm.init();
-        binding.setVm(vm);
+    private void initSplitLayout() {
+        final SplitLayout splitLayout = findViewById(R.id.splitLayout);
+        final BoyjAdapter adapter = new BoyjAdapter();
+        splitLayout.setAdapter(adapter);
+
+        binding.getVm().getRemoteMediaStream().observe(this, mediaStream -> {
+            if (mediaStream != null) {
+                adapter.addMediaStream(mediaStream);
+            }
+        });
     }
 
     private void turnOnSpeaker() {

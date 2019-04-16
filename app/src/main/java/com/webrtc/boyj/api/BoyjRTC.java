@@ -51,11 +51,22 @@ public class BoyjRTC {
 
                 // Offer, Answer를 받은 이후 커넥션으로 연결
                 signalingClient.getSdpPayloadSubject().subscribe(sdpPayload -> {
+                    // A1 -> A2, A2 -> A3 통화 상황에서 A1 -> A3으로 Answer를 보냈을 때
+                    // 새로운 커넥션을 만들고 Offer로 설정한다.
+                    if (sdpPayload.getType() == SessionDescription.Type.ANSWER &&
+                            !peerConnectionClient.isConnectedById(sdpPayload.getSender())) {
+                        peerConnectionClient.createPeerConnection(sdpPayload.getSender());
+                        peerConnectionClient.connectOffer(sdpPayload.getSender());
+                    }
                     peerConnectionClient.setRemoteSdp(sdpPayload.getSender(), sdpPayload.getSdp());
 
-                    if (sdpPayload.getSdp().type == SessionDescription.Type.OFFER) {
-                        createAnswer(sdpPayload.getSender());
+                    if (sdpPayload.getType() == SessionDescription.Type.OFFER) {
+                        peerConnectionClient.createAnswer(sdpPayload.getSender());
                     }
+                }),
+
+                peerConnectionClient.getIceCandidatePayloadSubject().subscribe(iceCandidatePayload -> {
+                    signalingClient.emitIceCandidate(iceCandidatePayload);
                 }),
 
                 // P2P 통신 중 IceCandidate의 교환
@@ -120,20 +131,12 @@ public class BoyjRTC {
      */
     public void accept(@NonNull final String callerId) {
         createPeerConnection(callerId);
-        createOffer(callerId);
+        peerConnectionClient.createOffer(callerId);
     }
 
     private void createPeerConnection(@NonNull final String targetId) {
         peerConnectionClient.createPeerConnection(targetId);
         peerConnectionClient.addStreamToLocalPeer(targetId, getUserMedia());
-    }
-
-    private void createOffer(@NonNull final String targetId) {
-        peerConnectionClient.createOffer(targetId);
-    }
-
-    private void createAnswer(@NonNull final String targetId) {
-        peerConnectionClient.createAnswer(targetId);
     }
 
     public void reject() {

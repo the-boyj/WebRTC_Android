@@ -55,6 +55,10 @@ public class PeerConnectionClient {
         Objects.requireNonNull(connectionMap.get(targetId)).createOffer();
     }
 
+    public void connectOffer(@NonNull final String targetId) {
+        Objects.requireNonNull(connectionMap.get(targetId)).connectOffer();
+    }
+
     public void createAnswer(@NonNull final String targetId) {
         Objects.requireNonNull(connectionMap.get(targetId)).createAnswer();
     }
@@ -90,6 +94,10 @@ public class PeerConnectionClient {
         return iceCandidatePayloadSubject;
     }
 
+    public boolean isConnectedById(@NonNull final String id) {
+        return connectionMap.get(id) != null;
+    }
+
     public void dispose(@NonNull final String targetId) {
         Objects.requireNonNull(connectionMap.get(targetId)).dispose();
         connectionMap.remove(targetId);
@@ -119,6 +127,10 @@ public class PeerConnectionClient {
             connection.createOffer(new BoyjSdpObserver(id), constraints);
         }
 
+        private void connectOffer() {
+            connection.setLocalDescription(new LogSdpObserver(id), offerSdp);
+        }
+
         private void createAnswer() {
             connection.createAnswer(new BoyjSdpObserver(id), constraints);
         }
@@ -128,11 +140,11 @@ public class PeerConnectionClient {
         }
 
         private void setLocalDescription(@NonNull SessionDescription sdp) {
-            connection.setLocalDescription(new CustomSdpObserver(id), sdp);
+            connection.setLocalDescription(new LogSdpObserver(id), sdp);
         }
 
         private void setRemoteSdp(@NonNull final SessionDescription sdp) {
-            connection.setRemoteDescription(new CustomSdpObserver(id), sdp);
+            connection.setRemoteDescription(new LogSdpObserver(id), sdp);
         }
 
         private void addIceCandidate(@NonNull final IceCandidate candidate) {
@@ -169,7 +181,7 @@ public class PeerConnectionClient {
     }
 
     @SuppressWarnings("SpellCheckingInspection")
-    private class BoyjSdpObserver extends CustomSdpObserver {
+    private class BoyjSdpObserver extends LogSdpObserver {
         @NonNull
         private final String id;
 

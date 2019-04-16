@@ -3,6 +3,7 @@ package com.webrtc.boyj.api.peer;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.peer.manager.RtcConfigurationManager;
+import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
 
@@ -29,9 +30,9 @@ public class PeerConnectionClient {
     @NonNull
     private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
     @NonNull
-    private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
-    @NonNull
     private PublishSubject<BoyjMediaStream> boyjMediaStreamSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<IceCandidatePayload> iceCandidatePayloadSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
     @Nullable
@@ -74,11 +75,6 @@ public class PeerConnectionClient {
     }
 
     @NonNull
-    public PublishSubject<IceCandidate> getIceCandidateSubject() {
-        return iceCandidateSubject;
-    }
-
-    @NonNull
     public PublishSubject<BoyjMediaStream> getBoyjMediaStreamSubject() {
         return boyjMediaStreamSubject;
     }
@@ -88,6 +84,11 @@ public class PeerConnectionClient {
         return sdpPayloadSubject;
     }
 
+
+    @NonNull
+    public PublishSubject<IceCandidatePayload> getIceCandidatePayloadSubject() {
+        return iceCandidatePayloadSubject;
+    }
 
     public void dispose(@NonNull final String targetId) {
         Objects.requireNonNull(connectionMap.get(targetId)).dispose();
@@ -155,7 +156,8 @@ public class PeerConnectionClient {
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
             super.onIceCandidate(iceCandidate);
-            iceCandidateSubject.onNext(iceCandidate);
+            final IceCandidatePayload payload = new IceCandidatePayload(iceCandidate);
+            iceCandidatePayloadSubject.onNext(payload);
         }
 
         @Override

@@ -56,6 +56,14 @@ public class BoyjRTC {
                     if (sdpPayload.getSdp().type == SessionDescription.Type.OFFER) {
                         createAnswer(sdpPayload.getSender());
                     }
+                }),
+
+                // P2P 통신 중 IceCandidate의 교환
+                signalingClient.getIceCandidatePayloadSubject().subscribe(iceCandidatePayload -> {
+                    peerConnectionClient.addIceCandidate(
+                            iceCandidatePayload.getSender(),
+                            iceCandidatePayload.getIceCandidate()
+                    );
                 })
         );
     }

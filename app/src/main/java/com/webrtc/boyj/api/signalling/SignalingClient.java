@@ -14,7 +14,6 @@ import com.webrtc.boyj.utils.JSONUtil;
 import com.webrtc.boyj.utils.Logger;
 
 import org.json.JSONObject;
-import org.webrtc.IceCandidate;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,13 +31,15 @@ public class SignalingClient {
     private static final String ACCEPT = "accept";
 
     private static final String RECEIVE_SDP = "rsdp";
+    private static final String SEND_ICE = "sice";
+    private static final String RECEIVE_ICE = "rice";
 
     // Todo : 모든 이벤트 추가 후 SocketIOClient의 emit 메소드에 어노테이션 추가
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({
             CREATE_ROOM, DIAL, CREATED, ANSWER, /* Caller */
             AWAKEN, ACCEPT, /* Callee */
-            RECEIVE_SDP /* 공통 */
+            RECEIVE_SDP, SEND_ICE, RECEIVE_ICE /* 공통 */
     })
     private @interface Event {
     }
@@ -50,26 +51,31 @@ public class SignalingClient {
     @NonNull
     private CompletableSubject byeSubject = CompletableSubject.create();
     @NonNull
-    private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
+    private PublishSubject<IceCandidatePayload> iceCandidatePayloadSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
+        // AWAKEN(Callee) -> SEND CREATED(Signaling) -> RECEIVE CREATED(Caller) *
         socketIOClient.on(CREATED, args -> {
             final CreatedPayload payload =
                     (CreatedPayload) JSONUtil.fromJson((JSONObject) args[0], CreatedPayload.class);
             Logger.i(payload.toString());
             createdPayloadSubject.onNext(payload);
         });
+        // ACCEPT(Callee) -> SEND SDP(Signaling) -> RECEIVE_SDP(Caller) *
         socketIOClient.on(RECEIVE_SDP, args -> {
             final SdpPayload payload =
                     (SdpPayload) JSONUtil.fromJson((JSONObject) args[0], SdpPayload.class);
             Logger.i(payload.toString());
             sdpPayloadSubject.onNext(payload);
         });
-        socketIOClient.on(SignalingEventString.EVENT_RECEIVE_ICE, args -> {
-            final IceCandidatePayload payload = IceCandidatePayload.fromJsonObject((JSONObject) args[0]);
-            iceCandidateSubject.onNext(payload.getIceCandidate());
+        // P2P SEND_ICE(Caller or Callee) -> SEND_ICE(Signaling) -> RECEIVE_ICE(Caller or Callee) *
+        socketIOClient.on(RECEIVE_ICE, args -> {
+            final IceCandidatePayload payload =
+                    (IceCandidatePayload) JSONUtil.fromJson((JSONObject) args[0], IceCandidatePayload.class);
+            Logger.i(payload.toString());
+            iceCandidatePayloadSubject.onNext(payload);
         });
         socketIOClient.on(SignalingEventString.EVENT_BYE, args -> byeSubject.onComplete());
 
@@ -93,20 +99,21 @@ public class SignalingClient {
 
     public void emitAccept(@NonNull final SdpPayload payload) {
         Logger.i(payload.toString());
-        socketIOClient.emit(ACCEPT, payload);
+        socketIOClient.emit(ACCEPT, JSONUtil.toJSONObject(payload));
     }
 
     public void emitAnswer(@NonNull final SdpPayload payload) {
         Logger.i(payload.toString());
-        socketIOClient.emit(ANSWER, payload);
+        socketIOClient.emit(ANSWER, JSONUtil.toJSONObject(payload));
+    }
+
+    public void emitIceCandidate(@NonNull final IceCandidatePayload payload) {
+        Logger.i(payload.toString());
+        socketIOClient.emit(SEND_ICE, JSONUtil.toJSONObject(payload));
     }
 
     public void emitReject() {
         socketIOClient.emit(SignalingEventString.EVENT_REJECT);
-    }
-
-    public void emitIceCandidate(@NonNull final IceCandidatePayload iceCandidatePayload) {
-        socketIOClient.emit(SignalingEventString.EVENT_SEND_ICE, iceCandidatePayload.toJsonObject());
     }
 
     public void emitBye() {
@@ -128,8 +135,8 @@ public class SignalingClient {
     }
 
     @NonNull
-    public PublishSubject<IceCandidate> getIceCandidateSubject() {
-        return iceCandidateSubject;
+    public PublishSubject<IceCandidatePayload> getIceCandidatePayloadSubject() {
+        return iceCandidatePayloadSubject;
     }
 
     @NonNull

@@ -8,7 +8,6 @@ import com.webrtc.boyj.api.peer.manager.UserMediaManager;
 import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
-import com.webrtc.boyj.api.signalling.payload.CreatedPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
 
@@ -52,11 +51,11 @@ public class BoyjRTC implements BoyjContract {
 
     // Callee의 FCM 수신 이후 시그널링 서버에서 ACK : Caller 커넥션 생성 시점
     private void subscribeCreated() {
-        addDisposable(
+/*        addDisposable(
                 signalingClient.getCreatedPayloadSubject()
                         .map(CreatedPayload::getCalleeId)
                         .subscribe(this::createPeerConnection)
-        );
+        );*/
     }
 
     private void subscribeSdp() {

@@ -1,12 +1,10 @@
 package com.webrtc.boyj.api.signalling;
 
-
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
-import com.webrtc.boyj.api.signalling.payload.CreatedPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
@@ -18,28 +16,33 @@ import org.json.JSONObject;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 public class SignalingClient {
-    private static final String CREATE_ROOM = "createRoom";
-    private static final String DIAL = "dial";
-    private static final String CREATED = "created";
-    private static final String ANSWER = "answer";
+    private static final String CREATE_ROOM = "CREATE_ROOM";
+    private static final String DIAL = "DIAL";
+    private static final String ANSWER = "ANSWER";
+    private static final String NOTIFY_REJECT = "NOTIFY_REJECT";
+    private static final String RELAY_OFFER = "RELAY_OFFER";
 
-    private static final String AWAKEN = "awaken";
-    private static final String ACCEPT = "accept";
+    private static final String AWAKEN = "AWAKEN";
+    private static final String ACCEPT = "ACCEPT";
+    private static final String REJECT = "REJECT";
+    private static final String RELAY_ANSWER = "RELAY_ANSWER";
 
-    private static final String RECEIVE_SDP = "rsdp";
-    private static final String SEND_ICE = "sice";
-    private static final String RECEIVE_ICE = "rice";
+    private static final String SEND_ICE_CANDIDATE = "SEND_ICE_CANDIDATE";
+    private static final String RELAY_ICE_CANDIDATE = "RELAY_ICE_CANDIDATE";
+    private static final String END_OF_CALL = "END_OF_CALL";
+    private static final String NOTIFY_END_OF_CALL = "NOTIFY_END_OF_CALL";
+    private static final String PEER_TO_SERVER_ERROR = "PEER_TO_SERVER_ERROR";
+    private static final String SERVER_TO_PEER_ERROR = "SERVER_TO_PEER_ERROR";
 
-    // Todo : 모든 이벤트 추가 후 SocketIOClient의 emit 메소드에 어노테이션 추가
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({
-            CREATE_ROOM, DIAL, CREATED, ANSWER, /* Caller */
-            AWAKEN, ACCEPT, /* Callee */
-            RECEIVE_SDP, SEND_ICE, RECEIVE_ICE /* 공통 */
+            CREATE_ROOM, DIAL, ANSWER, NOTIFY_REJECT, RELAY_OFFER, /* Caller */
+            AWAKEN, ACCEPT, REJECT, RELAY_ANSWER, /* Callee */
+            SEND_ICE_CANDIDATE, RELAY_ICE_CANDIDATE, END_OF_CALL, NOTIFY_END_OF_CALL, /* 공통 */
+            PEER_TO_SERVER_ERROR, SERVER_TO_PEER_ERROR /* 에러 */
     })
     private @interface Event {
     }
@@ -47,38 +50,25 @@ public class SignalingClient {
     @NonNull
     private static final SocketIOClient socketIOClient = new SocketIOClient();
     @NonNull
-    private PublishSubject<CreatedPayload> createdPayloadSubject = PublishSubject.create();
-    @NonNull
-    private CompletableSubject byeSubject = CompletableSubject.create();
-    @NonNull
     private PublishSubject<IceCandidatePayload> iceCandidatePayloadSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
-        // AWAKEN(Callee) -> SEND CREATED(Signaling) -> RECEIVE CREATED(Caller) *
-        socketIOClient.on(CREATED, args -> {
-            final CreatedPayload payload =
-                    (CreatedPayload) JSONUtil.fromJson((JSONObject) args[0], CreatedPayload.class);
-            Logger.i(payload.toString());
-            createdPayloadSubject.onNext(payload);
-        });
-        // ACCEPT(Callee) -> SEND SDP(Signaling) -> RECEIVE_SDP(Caller) *
-        socketIOClient.on(RECEIVE_SDP, args -> {
+        // ACCEPT(Callee) -> SEND SDP(Signaling) -> RELAY_SDP(Caller) *
+        socketIOClient.on(RELAY_OFFER, args -> {
             final SdpPayload payload =
                     (SdpPayload) JSONUtil.fromJson((JSONObject) args[0], SdpPayload.class);
             Logger.i(payload.toString());
             sdpPayloadSubject.onNext(payload);
         });
-        // P2P SEND_ICE(Caller or Callee) -> SEND_ICE(Signaling) -> RECEIVE_ICE(Caller or Callee) *
-        socketIOClient.on(RECEIVE_ICE, args -> {
+        // P2P SEND_ICE_CANDIDATE(Caller or Callee) -> SEND_ICE_CANDIDATE(Signaling) -> RELAY_ICE_CANDIDATE(Caller or Callee) *
+        socketIOClient.on(RELAY_ICE_CANDIDATE, args -> {
             final IceCandidatePayload payload =
                     (IceCandidatePayload) JSONUtil.fromJson((JSONObject) args[0], IceCandidatePayload.class);
             Logger.i(payload.toString());
             iceCandidatePayloadSubject.onNext(payload);
         });
-        socketIOClient.on(SignalingEventString.EVENT_BYE, args -> byeSubject.onComplete());
-
         socketIOClient.connect();
     }
 
@@ -109,7 +99,7 @@ public class SignalingClient {
 
     public void emitIceCandidate(@NonNull final IceCandidatePayload payload) {
         Logger.i(payload.toString());
-        socketIOClient.emit(SEND_ICE, JSONUtil.toJSONObject(payload));
+        socketIOClient.emit(SEND_ICE_CANDIDATE, JSONUtil.toJSONObject(payload));
     }
 
     public void emitReject() {
@@ -125,11 +115,6 @@ public class SignalingClient {
     }
 
     @NonNull
-    public PublishSubject<CreatedPayload> getCreatedPayloadSubject() {
-        return createdPayloadSubject;
-    }
-
-    @NonNull
     public PublishSubject<SdpPayload> getSdpPayloadSubject() {
         return sdpPayloadSubject;
     }
@@ -137,10 +122,5 @@ public class SignalingClient {
     @NonNull
     public PublishSubject<IceCandidatePayload> getIceCandidatePayloadSubject() {
         return iceCandidatePayloadSubject;
-    }
-
-    @NonNull
-    public CompletableSubject getByeSubject() {
-        return byeSubject;
     }
 }

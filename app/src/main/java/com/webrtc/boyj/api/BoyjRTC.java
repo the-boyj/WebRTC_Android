@@ -139,7 +139,7 @@ public class BoyjRTC implements BoyjContract {
     }
 
     @NonNull
-    public PublishSubject<EndOfCallPayload> getByeSubject() {
+    public PublishSubject<EndOfCallPayload> getEndOfCallSubject() {
         validateInitRTC();
         return signalingClient.getEndOfCallPayloadSubject();
     }

@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
@@ -57,11 +58,14 @@ public class SignalingClient {
     private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<RejectPayload> rejectPayloadSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<EndOfCallPayload> endOfCallPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
         subscribeReject();
         subscribeSdp();
         subscribeIceCandidate();
+        subscribeEndOfCall();
         socketIOClient.connect();
     }
 
@@ -90,6 +94,15 @@ public class SignalingClient {
                     (IceCandidatePayload) JSONUtil.fromJson((JSONObject) args[0], IceCandidatePayload.class);
             Logger.i(payload.toString());
             iceCandidatePayloadSubject.onNext(payload);
+        });
+    }
+
+    private void subscribeEndOfCall() {
+        socketIOClient.on(NOTIFY_END_OF_CALL, args -> {
+            final EndOfCallPayload payload =
+                    (EndOfCallPayload) JSONUtil.fromJson((JSONObject) args[0], EndOfCallPayload.class);
+            Logger.i(payload.toString());
+            endOfCallPayloadSubject.onNext(payload);
         });
     }
 
@@ -127,6 +140,10 @@ public class SignalingClient {
         socketIOClient.emit(REJECT, payload);
     }
 
+    public void emitEndOfCall() {
+        socketIOClient.emit(END_OF_CALL);
+    }
+
     public void disconnect() {
         socketIOClient.disconnect();
     }
@@ -144,5 +161,10 @@ public class SignalingClient {
     @NonNull
     public PublishSubject<IceCandidatePayload> getIceCandidatePayloadSubject() {
         return iceCandidatePayloadSubject;
+    }
+
+    @NonNull
+    public PublishSubject<EndOfCallPayload> getEndOfCallPayloadSubject() {
+        return endOfCallPayloadSubject;
     }
 }

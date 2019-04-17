@@ -7,6 +7,7 @@ import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.BoyjRTC;
+import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
@@ -29,9 +30,11 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     private final MutableLiveData<BoyjMediaStream> remoteMediaStream = new MutableLiveData<>();
     @NonNull
-    private final MutableLiveData<Boolean> endOfCall = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isEnded = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<String> rejectedUserName = new MutableLiveData<>();
+    @NonNull
+    private final MutableLiveData<String> byeUserName = new MutableLiveData<>();
     private BoyjRTC boyjRTC;
 
     public CallViewModel() {
@@ -58,11 +61,17 @@ public class CallViewModel extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(response -> {
                     if (!isCalling.get()) { // 최초 통화 거부
-                        endOfCall.setValue(true);
+                        isEnded.setValue(true);
                     } else { // 기존 통화 중 거부
                         rejectedUserName.setValue(response.getSender());
                     }
                 })
+        );
+
+        addDisposable(boyjRTC.getByeSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(EndOfCallPayload::getSender)
+                .subscribe(byeUserName::setValue)
         );
 
     }
@@ -81,7 +90,9 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC.accept(callerId);
     }
 
-    //전화 연결 되었을때 작업
+    /**
+     * 최초 전화연결 이후 호출
+     */
     private void call() {
         isCalling.set(true);
 
@@ -91,19 +102,42 @@ public class CallViewModel extends BaseViewModel {
                 .subscribe(callTime::set));
     }
 
+    /**
+     * 사용자가 전화를 끊는 경우 END_OF_CALL 이벤트를 시그널링 서버로 송신 후 release 한다.
+     */
+    public void hangUp() {
+        boyjRTC.endOfCall();
+        endOfCall();
+    }
+
+    /**
+     * 모든 통화가 종료되었을때 호출
+     * 1. 통화중인 유저가 모두 나갔을 경우
+     * 2. 사용자가 통화 종료를 누른 경우
+     */
+    public void endOfCall() {
+        boyjRTC.release();
+        isEnded.setValue(true);
+    }
+
     @NonNull
     public ObservableBoolean getIsCalling() {
         return isCalling;
     }
 
     @NonNull
-    public LiveData<Boolean> getEndOfCall() {
-        return endOfCall;
+    public LiveData<Boolean> getIsEnded() {
+        return isEnded;
     }
 
     @NonNull
     public LiveData<String> getRejectedUserName() {
         return rejectedUserName;
+    }
+
+    @NonNull
+    public LiveData<String> getByeUserName() {
+        return byeUserName;
     }
 
     @NonNull

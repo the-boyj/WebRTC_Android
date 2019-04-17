@@ -103,7 +103,12 @@ public class PeerConnectionClient {
         connectionMap.remove(targetId);
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
+    public void disposeAll() {
+        for (BoyjPeerConnection pc : connectionMap.values()) {
+            pc.dispose();
+        }
+    }
+
     private class BoyjPeerConnection {
         @NonNull
         private final String id;
@@ -156,7 +161,6 @@ public class PeerConnectionClient {
         }
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
     private class BoyjPeerConnectionObserver extends CustomPeerConnectionObserver {
         @NonNull
         private final String id;
@@ -181,7 +185,6 @@ public class PeerConnectionClient {
         }
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
     private class BoyjSdpObserver extends LogSdpObserver {
         @NonNull
         private final String id;

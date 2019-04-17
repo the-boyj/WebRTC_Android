@@ -7,6 +7,7 @@ import com.webrtc.boyj.api.peer.manager.PeerConnectionFactoryManager;
 import com.webrtc.boyj.api.peer.manager.UserMediaManager;
 import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.RejectPayload;
@@ -47,6 +48,7 @@ public class BoyjRTC implements BoyjContract {
 
         subscribeSdp();
         subscribeIceCandidate();
+        subscribeEndOfCall();
     }
 
     private void subscribeSdp() {
@@ -101,6 +103,14 @@ public class BoyjRTC implements BoyjContract {
         );
     }
 
+    private void subscribeEndOfCall() {
+        addDisposable(
+                signalingClient.getEndOfCallPayloadSubject()
+                        .subscribe(endOfCallPayload ->
+                                peerConnectionClient.dispose(endOfCallPayload.getSender()))
+        );
+    }
+
     public void startCapture() {
         validateInitRTC();
         userMediaManager.startCapture();
@@ -126,6 +136,12 @@ public class BoyjRTC implements BoyjContract {
     public PublishSubject<BoyjMediaStream> getRemoetStreamSubject() {
         validateInitRTC();
         return peerConnectionClient.getBoyjMediaStreamSubject();
+    }
+
+    @NonNull
+    public PublishSubject<EndOfCallPayload> getByeSubject() {
+        validateInitRTC();
+        return signalingClient.getEndOfCallPayloadSubject();
     }
 
     @Override
@@ -157,7 +173,8 @@ public class BoyjRTC implements BoyjContract {
     }
 
     @Override
-    public void bye() {
+    public void endOfCall() {
+        signalingClient.emitEndOfCall();
     }
 
     private void createPeerConnection(@NonNull final String targetId) {
@@ -177,14 +194,11 @@ public class BoyjRTC implements BoyjContract {
         signalingClient.disconnect();
     }
 
-    public void dispose(@NonNull final String targetId) {
-        peerConnectionClient.dispose(targetId);
-    }
-
     public void release() {
-        compositeDisposable.dispose();
+        peerConnectionClient.disposeAll();
         userMediaManager.stopCapture();
         signalingClient.disconnect();
+        compositeDisposable.dispose();
     }
 
     private void addDisposable(@NonNull final Disposable disposable) {

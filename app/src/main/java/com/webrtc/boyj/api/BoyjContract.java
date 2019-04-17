@@ -37,7 +37,15 @@ public interface BoyjContract {
      */
     void accept(@NonNull String callerId);
 
+    /**
+     * 통화를 수신받은 사용자가 요청을 거부할 경우 응답 결과를 시그너링 서버로 전송한다.
+     *
+     * @param rejectPayload : sender가 담긴 페이로드
+     */
     void reject(@NonNull RejectPayload rejectPayload);
 
-    void bye();
+    /**
+     * 통화중인 사용자가 종료 버튼을 통해 통화를 종료한 경우 호출한다.
+     */
+    void endOfCall();
 }

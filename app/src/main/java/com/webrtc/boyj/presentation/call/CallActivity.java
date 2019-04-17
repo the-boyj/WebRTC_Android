@@ -20,6 +20,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
     private CallViewModel vm;
+    private BoyjAdapter adapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,14 +51,28 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     private void subscribeViewModel() {
-        vm.getEndOfCall().observe(this, isEnd -> {
-            if (Boolean.TRUE.equals(isEnd)) {
+        vm.getIsEnded().observe(this, isEnded -> {
+            if (Boolean.TRUE.equals(isEnded)) {
                 finish();
             }
         });
 
+        vm.getRemoteMediaStream().observe(this, mediaStream -> {
+            if (mediaStream != null) {
+                adapter.addMediaStream(mediaStream);
+            }
+        });
+
         vm.getRejectedUserName().observe(this, name -> {
-            // Todo : Reject Action
+            if (name != null) {
+                adapter.removeMediaStreamfromId(name);
+            }
+        });
+
+        vm.getByeUserName().observe(this, name -> {
+            if (name != null) {
+                adapter.removeMediaStreamfromId(name);
+            }
         });
     }
 
@@ -67,7 +82,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     private void initButton() {
-        findViewById(R.id.fab_reject).setOnClickListener(__ -> hangUp());
+        findViewById(R.id.fab_reject).setOnClickListener(__ -> vm.hangUp());
         findViewById(R.id.iv_call_menu).setOnClickListener(__ ->
                 CallMenuDialog.newInstance()
                         .show(getSupportFragmentManager(), "CallMenuDialog"));
@@ -75,14 +90,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     private void initSplitLayout() {
         final SplitLayout splitLayout = findViewById(R.id.splitLayout);
-        final BoyjAdapter adapter = new BoyjAdapter();
+        adapter = new BoyjAdapter(vm::endOfCall);
         splitLayout.setAdapter(adapter);
-
-        vm.getRemoteMediaStream().observe(this, mediaStream -> {
-            if (mediaStream != null) {
-                adapter.addMediaStream(mediaStream);
-            }
-        });
     }
 
     private void turnOnSpeaker() {
@@ -90,11 +99,6 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         if (!manager.isSpeakerphoneOn()) {
             manager.setSpeakerphoneOn(true);
         }
-    }
-
-    // Todo : Hangup handling
-    private void hangUp() {
-        finish();
     }
 
     /**

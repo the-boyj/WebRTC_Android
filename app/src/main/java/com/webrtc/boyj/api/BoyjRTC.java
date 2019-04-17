@@ -18,11 +18,10 @@ import org.webrtc.SessionDescription;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 @SuppressWarnings("SpellCheckingInspection")
-public class BoyjRTC {
+public class BoyjRTC implements BoyjContract {
     private PeerConnectionClient peerConnectionClient;
     private UserMediaManager userMediaManager;
     private final SignalingClient signalingClient = new SignalingClient();
@@ -56,7 +55,7 @@ public class BoyjRTC {
         addDisposable(
                 signalingClient.getCreatedPayloadSubject()
                         .map(CreatedPayload::getCalleeId)
-                        .subscribe(peerConnectionClient::createPeerConnection)
+                        .subscribe(this::createPeerConnection)
         );
     }
 
@@ -81,7 +80,7 @@ public class BoyjRTC {
                             // 새로운 커넥션을 만들고 Offer로 설정한다.
                             if (sdpPayload.getType() == SessionDescription.Type.ANSWER &&
                                     !peerConnectionClient.isConnectedById(sdpPayload.getSender())) {
-                                peerConnectionClient.createPeerConnection(sdpPayload.getSender());
+                                createPeerConnection(sdpPayload.getSender());
                                 peerConnectionClient.connectOffer(sdpPayload.getSender());
                             }
                             peerConnectionClient.setRemoteSdp(sdpPayload.getSender(), sdpPayload.getSdp());
@@ -113,73 +112,62 @@ public class BoyjRTC {
     }
 
     public void startCapture() {
-        if (!isInitialized) {
-            throw new IllegalStateException(ERROR_INITIALIZED);
-        }
+        validateInitRTC();
+
         userMediaManager.startCapture();
     }
 
     public void stopCapture() {
-        if (!isInitialized) {
-            throw new IllegalStateException(ERROR_INITIALIZED);
-        }
+        validateInitRTC();
+
         userMediaManager.stopCapture();
     }
 
     @NonNull
     public MediaStream getLocalMediaStream() {
-        if (!isInitialized) {
-            throw new IllegalStateException(ERROR_INITIALIZED);
-        }
+        validateInitRTC();
+
         return userMediaManager.getLocalMediaStream();
     }
 
     @NonNull
     public PublishSubject<BoyjMediaStream> getRemoteMediaStream() {
-        if (!isInitialized) {
-            throw new IllegalStateException(ERROR_INITIALIZED);
-        }
+        validateInitRTC();
+
         return peerConnectionClient.getBoyjMediaStreamSubject();
     }
 
-    /**
-     * 처음으로 통화를 요청할 경우 room을 생성한다.
-     *
-     * @param payload room, callerId 가 담긴 페이로드
-     */
+    @Override
     public void createRoom(@NonNull final CreateRoomPayload payload) {
         signalingClient.emitCreateRoom(payload);
     }
 
-    /**
-     * Caller가 상대방에게 통화를 요청한다.
-     *
-     * @param payload calleeId가 담긴 페이로드
-     */
+    @Override
     public void dial(@NonNull final DialPayload payload) {
         signalingClient.emitDial(payload);
     }
 
-    /**
-     * Callee가 푸시 알람을 수신 후 서버로 응답한다.
-     *
-     * @param payload room, calleeId가 담긴 페이로드
-     */
+    @Override
     public void awaken(@NonNull final AwakenPayload payload) {
         signalingClient.emitAwaken(payload);
     }
 
-    /**
-     * Callee가 전화를 승인한 후 커넥션 생성 및 Accept를 서버로 전송한다.
-     *
-     * @param callerId 전화가 걸려온 상대 아이디
-     */
+    @Override
     public void accept(@NonNull final String callerId) {
-        if (!isInitialized) {
-            throw new IllegalStateException(ERROR_INITIALIZED);
-        }
+        validateInitRTC();
+
         createPeerConnection(callerId);
         peerConnectionClient.createOffer(callerId);
+    }
+
+    @Override
+    public void reject() {
+        signalingClient.emitReject();
+    }
+
+    @Override
+    public void bye() {
+
     }
 
     private void createPeerConnection(@NonNull final String targetId) {
@@ -187,18 +175,9 @@ public class BoyjRTC {
         peerConnectionClient.addStreamToLocalPeer(targetId, userMediaManager.getLocalMediaStream());
     }
 
-    public void reject() {
-        signalingClient.emitReject();
-    }
-
     public void hangUp() {
         signalingClient.emitBye();
         release();
-    }
-
-    @NonNull
-    public CompletableSubject bye() {
-        return signalingClient.getByeSubject();
     }
 
     public void dispose(@NonNull final String targetId) {
@@ -213,5 +192,14 @@ public class BoyjRTC {
 
     private void addDisposable(@NonNull final Disposable disposable) {
         compositeDisposable.add(disposable);
+    }
+
+    /**
+     * @throws IllegalStateException initRTC()가 호출되지 않은 경우 발생
+     */
+    private void validateInitRTC() {
+        if (!isInitialized) {
+            throw new IllegalStateException(ERROR_INITIALIZED);
+        }
     }
 }

@@ -34,7 +34,7 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC = new BoyjRTC();
     }
 
-    void init() {
+    public void init() {
         boyjRTC.initRTC();
         boyjRTC.startCapture();
 
@@ -65,20 +65,13 @@ public class CallViewModel extends BaseViewModel {
     }
 
     //전화 연결 되었을때 작업
-    public void call() {
+    private void call() {
         isCalling.set(true);
 
         addDisposable(Observable.interval(1, TimeUnit.SECONDS)
                 .map(Long::intValue)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
-
-        addDisposable(boyjRTC.bye().subscribe(this::hangUp)
-        );
-    }
-
-    void hangUp() {
-        boyjRTC.hangUp();
     }
 
     @NonNull

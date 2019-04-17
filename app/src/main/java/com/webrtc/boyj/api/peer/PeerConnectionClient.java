@@ -22,11 +22,12 @@ import javax.annotation.Nullable;
 
 import io.reactivex.subjects.PublishSubject;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class PeerConnectionClient {
     @NonNull
-    private final MediaConstraints constraints = new MediaConstraints();
-    @NonNull
     private final PeerConnectionFactory peerConnectionFactory;
+    @NonNull
+    private final MediaConstraints constraints = new MediaConstraints();
     @NonNull
     private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
     @NonNull
@@ -87,7 +88,6 @@ public class PeerConnectionClient {
     public PublishSubject<SdpPayload> getSdpPayloadSubject() {
         return sdpPayloadSubject;
     }
-
 
     @NonNull
     public PublishSubject<IceCandidatePayload> getIceCandidatePayloadSubject() {
@@ -169,6 +169,7 @@ public class PeerConnectionClient {
         public void onIceCandidate(IceCandidate iceCandidate) {
             super.onIceCandidate(iceCandidate);
             final IceCandidatePayload payload = new IceCandidatePayload(iceCandidate);
+            payload.setReceiver(id);
             iceCandidatePayloadSubject.onNext(payload);
         }
 

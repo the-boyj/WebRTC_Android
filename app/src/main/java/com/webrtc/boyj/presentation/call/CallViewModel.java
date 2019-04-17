@@ -37,14 +37,17 @@ public class CallViewModel extends BaseViewModel {
     void init() {
         boyjRTC.initRTC();
         boyjRTC.startCapture();
-        localMediaStream.setValue(boyjRTC.getUserMedia());
 
-        addDisposable(boyjRTC.remoteMediaStream()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mediaStream -> {
-                    call();
-                    this.remoteMediaStream.setValue(mediaStream);
-                }));
+        localMediaStream.setValue(boyjRTC.getLocalMediaStream());
+
+        addDisposable(
+                boyjRTC.getRemoteMediaStream()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(mediaStream -> {
+                            call();
+                            this.remoteMediaStream.setValue(mediaStream);
+                        })
+        );
     }
 
     public void dial(@NonNull final String calleeId) {

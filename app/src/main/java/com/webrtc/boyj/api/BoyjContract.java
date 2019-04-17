@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
+import com.webrtc.boyj.api.signalling.payload.RejectPayload;
 
 @SuppressWarnings("SpellCheckingInspection")
 public interface BoyjContract {
@@ -36,7 +37,7 @@ public interface BoyjContract {
      */
     void accept(@NonNull String callerId);
 
-    void reject();
+    void reject(@NonNull RejectPayload rejectPayload);
 
     void bye();
 }

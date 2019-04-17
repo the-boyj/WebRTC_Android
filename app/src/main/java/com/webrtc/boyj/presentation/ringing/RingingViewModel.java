@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.BoyjRTC;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.RejectPayload;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
 public class RingingViewModel extends BaseViewModel {
@@ -24,8 +25,10 @@ public class RingingViewModel extends BaseViewModel {
         boyjRTC.awaken(payload);
     }
 
-    public void reject() {
-        boyjRTC.reject();
+    public void reject(@NonNull final String callerId) {
+        final RejectPayload payload = new RejectPayload();
+        payload.setReceiver(callerId);
+        boyjRTC.reject(payload);
     }
 
     @NonNull

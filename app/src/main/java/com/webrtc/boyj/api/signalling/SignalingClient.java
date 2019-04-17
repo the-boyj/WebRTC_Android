@@ -7,6 +7,7 @@ import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.signalling.payload.RejectPayload;
 import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.utils.JSONUtil;
 import com.webrtc.boyj.utils.Logger;
@@ -45,7 +46,7 @@ public class SignalingClient {
             SEND_ICE_CANDIDATE, RELAY_ICE_CANDIDATE, END_OF_CALL, NOTIFY_END_OF_CALL, /* 공통 */
             PEER_TO_SERVER_ERROR, SERVER_TO_PEER_ERROR /* 에러 */
     })
-    private @interface Event {
+    @interface Event {
     }
 
     @NonNull
@@ -54,24 +55,42 @@ public class SignalingClient {
     private PublishSubject<IceCandidatePayload> iceCandidatePayloadSubject = PublishSubject.create();
     @NonNull
     private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<RejectPayload> rejectPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
+        subscribeReject();
+        subscribeSdp();
+        subscribeIceCandidate();
+        socketIOClient.connect();
+    }
+
+    private void subscribeReject() {
+        socketIOClient.on(NOTIFY_REJECT, args -> {
+            final RejectPayload payload =
+                    (RejectPayload) JSONUtil.fromJson((JSONObject) args[0], RejectPayload.class);
+            rejectPayloadSubject.onNext(payload);
+        });
+    }
+
+    private void subscribeSdp() {
         final Emitter.Listener sdpListener = args -> {
             final SdpPayload payload =
                     (SdpPayload) JSONUtil.fromJson((JSONObject) args[0], SdpPayload.class);
             Logger.i(payload.toString());
             sdpPayloadSubject.onNext(payload);
         };
-
         socketIOClient.on(RELAY_OFFER, sdpListener);
         socketIOClient.on(RELAY_ANSWER, sdpListener);
+    }
+
+    private void subscribeIceCandidate() {
         socketIOClient.on(RELAY_ICE_CANDIDATE, args -> {
             final IceCandidatePayload payload =
                     (IceCandidatePayload) JSONUtil.fromJson((JSONObject) args[0], IceCandidatePayload.class);
             Logger.i(payload.toString());
             iceCandidatePayloadSubject.onNext(payload);
         });
-        socketIOClient.connect();
     }
 
     public void emitCreateRoom(@NonNull final CreateRoomPayload payload) {
@@ -104,12 +123,17 @@ public class SignalingClient {
         socketIOClient.emit(SEND_ICE_CANDIDATE, JSONUtil.toJSONObject(payload));
     }
 
-    public void emitReject() {
-        socketIOClient.emit(REJECT);
+    public void emitReject(@NonNull final RejectPayload payload) {
+        socketIOClient.emit(REJECT, payload);
     }
 
     public void disconnect() {
         socketIOClient.disconnect();
+    }
+
+    @NonNull
+    public PublishSubject<RejectPayload> getRejectPayloadSubject() {
+        return rejectPayloadSubject;
     }
 
     @NonNull

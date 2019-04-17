@@ -9,6 +9,7 @@ import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
+import com.webrtc.boyj.api.signalling.payload.RejectPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
 
 import org.webrtc.MediaStream;
@@ -111,13 +112,18 @@ public class BoyjRTC implements BoyjContract {
     }
 
     @NonNull
-    public MediaStream getLocalMediaStream() {
+    public PublishSubject<RejectPayload> getRejectSubject() {
+        return signalingClient.getRejectPayloadSubject();
+    }
+
+    @NonNull
+    public MediaStream getLocalStream() {
         validateInitRTC();
         return userMediaManager.getLocalMediaStream();
     }
 
     @NonNull
-    public PublishSubject<BoyjMediaStream> getRemoteMediaStream() {
+    public PublishSubject<BoyjMediaStream> getRemoetStreamSubject() {
         validateInitRTC();
         return peerConnectionClient.getBoyjMediaStreamSubject();
     }
@@ -145,8 +151,9 @@ public class BoyjRTC implements BoyjContract {
     }
 
     @Override
-    public void reject() {
-        signalingClient.emitReject();
+    public void reject(@NonNull final RejectPayload payload) {
+        signalingClient.emitReject(payload);
+        disconnect();
     }
 
     @Override
@@ -166,13 +173,17 @@ public class BoyjRTC implements BoyjContract {
         peerConnectionClient.createAnswer(targetId);
     }
 
+    private void disconnect() {
+        signalingClient.disconnect();
+    }
+
     public void dispose(@NonNull final String targetId) {
         peerConnectionClient.dispose(targetId);
     }
 
     public void release() {
-        userMediaManager.stopCapture();
         compositeDisposable.dispose();
+        userMediaManager.stopCapture();
         signalingClient.disconnect();
     }
 

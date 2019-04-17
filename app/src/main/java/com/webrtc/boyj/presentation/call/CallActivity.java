@@ -19,6 +19,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String CALLEE_ID = "CALLEE_ID";
     private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
+    private CallViewModel vm;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,18 +34,31 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
             final String callerId = TelManager.getTelNumber(getApplicationContext());
             final String calleeId = getIntent().getStringExtra(CALLEE_ID);
 
-            binding.getVm().createRoom(callerId);
-            binding.getVm().dial(calleeId);
+            vm.createRoom(callerId);
+            vm.dial(calleeId);
         } else {
             final String callerId = getIntent().getStringExtra(CALLER_ID);
-            binding.getVm().accept(callerId);
+            vm.accept(callerId);
         }
     }
 
     private void initViewModel() {
-        final CallViewModel vm = ViewModelProviders.of(this).get(CallViewModel.class);
+        vm = ViewModelProviders.of(this).get(CallViewModel.class);
         vm.init();
         binding.setVm(vm);
+        subscribeViewModel();
+    }
+
+    private void subscribeViewModel() {
+        vm.getEndOfCall().observe(this, isEnd -> {
+            if (Boolean.TRUE.equals(isEnd)) {
+                finish();
+            }
+        });
+
+        vm.getRejectedUserName().observe(this, name -> {
+            // Todo : Reject Action
+        });
     }
 
     private void initViews() {
@@ -63,7 +78,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         final BoyjAdapter adapter = new BoyjAdapter();
         splitLayout.setAdapter(adapter);
 
-        binding.getVm().getRemoteMediaStream().observe(this, mediaStream -> {
+        vm.getRemoteMediaStream().observe(this, mediaStream -> {
             if (mediaStream != null) {
                 adapter.addMediaStream(mediaStream);
             }

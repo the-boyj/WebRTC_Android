@@ -36,7 +36,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private void initViews() {
         findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
         findViewById(R.id.fab_reject).setOnClickListener(__ -> {
-            binding.getVm().reject();
+            binding.getVm().reject(callerId);
             finish();
         });
     }

@@ -28,6 +28,10 @@ public class CallViewModel extends BaseViewModel {
     private final MutableLiveData<MediaStream> localMediaStream = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<BoyjMediaStream> remoteMediaStream = new MutableLiveData<>();
+    @NonNull
+    private final MutableLiveData<Boolean> endOfCall = new MutableLiveData<>();
+    @NonNull
+    private final MutableLiveData<String> rejectedUserName = new MutableLiveData<>();
     private BoyjRTC boyjRTC;
 
     public CallViewModel() {
@@ -38,16 +42,29 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC.initRTC();
         boyjRTC.startCapture();
 
-        localMediaStream.setValue(boyjRTC.getLocalMediaStream());
+        localMediaStream.setValue(boyjRTC.getLocalStream());
 
-        addDisposable(
-                boyjRTC.getRemoteMediaStream()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(mediaStream -> {
-                            call();
-                            this.remoteMediaStream.setValue(mediaStream);
-                        })
+        addDisposable(boyjRTC.getRemoetStreamSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mediaStream -> {
+                    if (!isCalling.get()) { // 최초 통화의 경우 타이머 작동
+                        call();
+                    }
+                    this.remoteMediaStream.setValue(mediaStream);
+                })
         );
+
+        addDisposable(boyjRTC.getRejectSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response -> {
+                    if (!isCalling.get()) { // 최초 통화 거부
+                        endOfCall.setValue(true);
+                    } else { // 기존 통화 중 거부
+                        rejectedUserName.setValue(response.getSender());
+                    }
+                })
+        );
+
     }
 
     public void dial(@NonNull final String calleeId) {
@@ -77,6 +94,16 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     public ObservableBoolean getIsCalling() {
         return isCalling;
+    }
+
+    @NonNull
+    public LiveData<Boolean> getEndOfCall() {
+        return endOfCall;
+    }
+
+    @NonNull
+    public LiveData<String> getRejectedUserName() {
+        return rejectedUserName;
     }
 
     @NonNull

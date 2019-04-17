@@ -20,7 +20,7 @@ public class RingingViewModel extends BaseViewModel {
                        @NonNull final String callerId, // 통화가 걸려온 상대 ID
                        @NonNull final String calleeId) { // 통화 받은 본인 ID
         this.callerId.set(callerId);
-        final AwakenPayload payload = new AwakenPayload.Builder(room, calleeId).build();
+        final AwakenPayload payload = new AwakenPayload.Builder(room, callerId, calleeId).build();
         boyjRTC.awaken(payload);
     }
 

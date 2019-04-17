@@ -44,18 +44,8 @@ public class BoyjRTC implements BoyjContract {
         peerConnectionClient = new PeerConnectionClient(factory);
         isInitialized = true;
 
-        subscribeCreated();
         subscribeSdp();
         subscribeIceCandidate();
-    }
-
-    // Callee의 FCM 수신 이후 시그널링 서버에서 ACK : Caller 커넥션 생성 시점
-    private void subscribeCreated() {
-/*        addDisposable(
-                signalingClient.getCreatedPayloadSubject()
-                        .map(CreatedPayload::getCalleeId)
-                        .subscribe(this::createPeerConnection)
-        );*/
     }
 
     private void subscribeSdp() {
@@ -71,25 +61,26 @@ public class BoyjRTC implements BoyjContract {
                         })
         );
 
-        // Offer, Answer를 받은 이후 커넥션으로 연결
+        /*
+         * 참고 : A1 -> A2 || A2 -> A3의 총 3명에 대한 통화 상황을 가정. Answer를 전달받은 상황에서
+         * 커넥션이 만들어져있지 않다면 이는 A1 - A3의 추가 연결을 뜻한다. 이런 경우 Peer Client가
+         * 가지고 있는 offer sdp를 이용해 새로운 커넥션을 만든다.
+         */
         addDisposable(
                 signalingClient.getSdpPayloadSubject()
                         .subscribe(sdpPayload -> {
-                            // A1 -> A2, A2 -> A3 통화 상황에서 A1 -> A3으로 Answer를 보냈을 때
-                            // 새로운 커넥션을 만들고 Offer로 설정한다.
-                            if (sdpPayload.getType() == SessionDescription.Type.ANSWER &&
-                                    !peerConnectionClient.isConnectedById(sdpPayload.getSender())) {
+                            if (sdpPayload.getType() == SessionDescription.Type.OFFER) {
                                 createPeerConnection(sdpPayload.getSender());
-                                peerConnectionClient.connectOffer(sdpPayload.getSender());
+                                createAnswer(sdpPayload.getSender());
+                            } else if (sdpPayload.getType() == SessionDescription.Type.ANSWER) {
+                                if (!peerConnectionClient.isConnectedById(sdpPayload.getSender())) {
+                                    createPeerConnection(sdpPayload.getSender());
+                                    peerConnectionClient.connectOffer(sdpPayload.getSender());
+                                }
                             }
                             peerConnectionClient.setRemoteSdp(sdpPayload.getSender(), sdpPayload.getSdp());
-
-                            if (sdpPayload.getType() == SessionDescription.Type.OFFER) {
-                                peerConnectionClient.createAnswer(sdpPayload.getSender());
-                            }
                         })
         );
-
     }
 
     private void subscribeIceCandidate() {
@@ -98,7 +89,6 @@ public class BoyjRTC implements BoyjContract {
                         .subscribe(signalingClient::emitIceCandidate)
         );
 
-        // P2P 중 IceCandidate의 교환
         addDisposable(
                 signalingClient.getIceCandidatePayloadSubject()
                         .subscribe(iceCandidatePayload ->
@@ -112,27 +102,23 @@ public class BoyjRTC implements BoyjContract {
 
     public void startCapture() {
         validateInitRTC();
-
         userMediaManager.startCapture();
     }
 
     public void stopCapture() {
         validateInitRTC();
-
         userMediaManager.stopCapture();
     }
 
     @NonNull
     public MediaStream getLocalMediaStream() {
         validateInitRTC();
-
         return userMediaManager.getLocalMediaStream();
     }
 
     @NonNull
     public PublishSubject<BoyjMediaStream> getRemoteMediaStream() {
         validateInitRTC();
-
         return peerConnectionClient.getBoyjMediaStreamSubject();
     }
 
@@ -154,9 +140,8 @@ public class BoyjRTC implements BoyjContract {
     @Override
     public void accept(@NonNull final String callerId) {
         validateInitRTC();
-
         createPeerConnection(callerId);
-        peerConnectionClient.createOffer(callerId);
+        createOffer(callerId);
     }
 
     @Override
@@ -166,7 +151,6 @@ public class BoyjRTC implements BoyjContract {
 
     @Override
     public void bye() {
-
     }
 
     private void createPeerConnection(@NonNull final String targetId) {
@@ -174,9 +158,12 @@ public class BoyjRTC implements BoyjContract {
         peerConnectionClient.addStreamToLocalPeer(targetId, userMediaManager.getLocalMediaStream());
     }
 
-    public void hangUp() {
-        signalingClient.emitBye();
-        release();
+    private void createOffer(@NonNull final String targetId) {
+        peerConnectionClient.createOffer(targetId);
+    }
+
+    private void createAnswer(@NonNull final String targetId) {
+        peerConnectionClient.createAnswer(targetId);
     }
 
     public void dispose(@NonNull final String targetId) {

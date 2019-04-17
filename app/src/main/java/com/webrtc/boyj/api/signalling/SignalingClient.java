@@ -17,6 +17,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import io.reactivex.subjects.PublishSubject;
+import io.socket.emitter.Emitter;
 
 public class SignalingClient {
     private static final String CREATE_ROOM = "CREATE_ROOM";
@@ -55,14 +56,15 @@ public class SignalingClient {
     private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
-        // ACCEPT(Callee) -> SEND SDP(Signaling) -> RELAY_SDP(Caller) *
-        socketIOClient.on(RELAY_OFFER, args -> {
+        final Emitter.Listener sdpListener = args -> {
             final SdpPayload payload =
                     (SdpPayload) JSONUtil.fromJson((JSONObject) args[0], SdpPayload.class);
             Logger.i(payload.toString());
             sdpPayloadSubject.onNext(payload);
-        });
-        // P2P SEND_ICE_CANDIDATE(Caller or Callee) -> SEND_ICE_CANDIDATE(Signaling) -> RELAY_ICE_CANDIDATE(Caller or Callee) *
+        };
+
+        socketIOClient.on(RELAY_OFFER, sdpListener);
+        socketIOClient.on(RELAY_ANSWER, sdpListener);
         socketIOClient.on(RELAY_ICE_CANDIDATE, args -> {
             final IceCandidatePayload payload =
                     (IceCandidatePayload) JSONUtil.fromJson((JSONObject) args[0], IceCandidatePayload.class);
@@ -103,11 +105,7 @@ public class SignalingClient {
     }
 
     public void emitReject() {
-        socketIOClient.emit(SignalingEventString.EVENT_REJECT);
-    }
-
-    public void emitBye() {
-        socketIOClient.emit(SignalingEventString.EVENT_BYE);
+        socketIOClient.emit(REJECT);
     }
 
     public void disconnect() {

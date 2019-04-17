@@ -8,10 +8,15 @@ public class AwakenPayload {
     @NonNull
     private final String room;
     @NonNull
+    private final String callerId;
+    @NonNull
     private final String calleeId;
 
-    private AwakenPayload(@NonNull String room, @NonNull String calleeId) {
+    private AwakenPayload(@NonNull final String room,
+                          @NonNull final String callerId,
+                          @NonNull final String calleeId) {
         this.room = room;
+        this.callerId = callerId;
         this.calleeId = calleeId;
     }
 
@@ -25,17 +30,21 @@ public class AwakenPayload {
         @NonNull
         private final String room;
         @NonNull
+        private final String callerId;
+        @NonNull
         private final String calleeId;
 
         public Builder(@NonNull final String room,
+                       @NonNull final String callerId,
                        @NonNull final String calleeId) {
             this.room = room;
+            this.callerId = callerId;
             this.calleeId = calleeId;
         }
 
         @NonNull
         public AwakenPayload build() {
-            return new AwakenPayload(room, calleeId);
+            return new AwakenPayload(room, callerId, calleeId);
         }
     }
 }

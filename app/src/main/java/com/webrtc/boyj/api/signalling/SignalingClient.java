@@ -137,6 +137,7 @@ public class SignalingClient {
     }
 
     public void emitReject(@NonNull final RejectPayload payload) {
+        Logger.i(payload.toString());
         socketIOClient.emit(REJECT, payload);
     }
 

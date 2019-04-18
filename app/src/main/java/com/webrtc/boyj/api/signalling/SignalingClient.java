@@ -62,14 +62,14 @@ public class SignalingClient {
     private PublishSubject<EndOfCallPayload> endOfCallPayloadSubject = PublishSubject.create();
 
     public SignalingClient() {
-        subscribeReject();
-        subscribeSdp();
-        subscribeIceCandidate();
-        subscribeEndOfCall();
+        listenReject();
+        listenSdp();
+        listenIceCandidate();
+        listenEndOfCall();
         socketIOClient.connect();
     }
 
-    private void subscribeReject() {
+    private void listenReject() {
         socketIOClient.on(NOTIFY_REJECT, args -> {
             final RejectPayload payload =
                     (RejectPayload) JSONUtil.fromJson((JSONObject) args[0], RejectPayload.class);
@@ -77,7 +77,7 @@ public class SignalingClient {
         });
     }
 
-    private void subscribeSdp() {
+    private void listenSdp() {
         final Emitter.Listener sdpListener = args -> {
             final SdpPayload payload =
                     (SdpPayload) JSONUtil.fromJson((JSONObject) args[0], SdpPayload.class);
@@ -88,7 +88,7 @@ public class SignalingClient {
         socketIOClient.on(RELAY_ANSWER, sdpListener);
     }
 
-    private void subscribeIceCandidate() {
+    private void listenIceCandidate() {
         socketIOClient.on(RELAY_ICE_CANDIDATE, args -> {
             final IceCandidatePayload payload =
                     (IceCandidatePayload) JSONUtil.fromJson((JSONObject) args[0], IceCandidatePayload.class);
@@ -97,7 +97,7 @@ public class SignalingClient {
         });
     }
 
-    private void subscribeEndOfCall() {
+    private void listenEndOfCall() {
         socketIOClient.on(NOTIFY_END_OF_CALL, args -> {
             final EndOfCallPayload payload =
                     (EndOfCallPayload) JSONUtil.fromJson((JSONObject) args[0], EndOfCallPayload.class);

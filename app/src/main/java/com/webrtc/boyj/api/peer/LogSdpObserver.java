@@ -5,10 +5,10 @@ import android.util.Log;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 
-class CustomSdpObserver implements SdpObserver {
+class LogSdpObserver implements SdpObserver {
     private String tag = getClass().getSimpleName();
 
-    CustomSdpObserver(String logTag) {
+    LogSdpObserver(String logTag) {
         this.tag += logTag;
     }
 

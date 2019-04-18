@@ -4,28 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.utils.JSONUtil;
 
-import org.webrtc.IceCandidate;
-
-public class IceCandidatePayload {
-    private IceCandidate iceCandidate;
+public class RejectPayload {
     private String sender;
     private String receiver;
-
-    public IceCandidatePayload() {
-
-    }
-
-    public IceCandidatePayload(@NonNull final IceCandidate iceCandidate) {
-        this.iceCandidate = iceCandidate;
-    }
-
-    public IceCandidate getIceCandidate() {
-        return iceCandidate;
-    }
-
-    public void setIceCandidate(IceCandidate iceCandidate) {
-        this.iceCandidate = iceCandidate;
-    }
 
     public String getSender() {
         return sender;

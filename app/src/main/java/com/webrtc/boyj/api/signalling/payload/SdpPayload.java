@@ -2,48 +2,54 @@ package com.webrtc.boyj.api.signalling.payload;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.Gson;
+import com.webrtc.boyj.utils.JSONUtil;
 
-import org.json.JSONObject;
 import org.webrtc.SessionDescription;
 
-public class SdpPayload extends Payload {
-    @NonNull
+public class SdpPayload {
     private SessionDescription sdp;
+    private String sender;
+    private String receiver;
 
-    public void setSdp(@NonNull final SessionDescription sdp) {
+    public SdpPayload() {
+
+    }
+
+    public SdpPayload(@NonNull final SessionDescription sdp) {
         this.sdp = sdp;
     }
 
-    @NonNull
-    public static SdpPayload fromJsonObject(@NonNull final JSONObject jsonObject) {
-        return new Gson().fromJson(jsonObject.toString(), SdpPayload.class);
-    }
-
-
-    @NonNull
     public SessionDescription getSdp() {
         return sdp;
     }
 
-    public static class Builder {
-        @NonNull
-        private final SessionDescription sdp;
-
-        public Builder(@NonNull final SessionDescription sdp) {
-            this.sdp = sdp;
-        }
-
-        @NonNull
-        public SdpPayload build() {
-            final SdpPayload sdpPayload = new SdpPayload();
-            sdpPayload.setSdp(this.sdp);
-            return sdpPayload;
-        }
+    public void setSdp(SessionDescription sdp) {
+        this.sdp = sdp;
     }
 
+    public String getSender() {
+        return sender;
+    }
 
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(String receiver) {
+        this.receiver = receiver;
+    }
+
+    public SessionDescription.Type getType() {
+        return sdp.type;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return JSONUtil.toJson(getClass(), this);
+    }
 }
-
-
-

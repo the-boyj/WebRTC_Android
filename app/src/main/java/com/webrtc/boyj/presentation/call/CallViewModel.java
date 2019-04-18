@@ -7,6 +7,7 @@ import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.BoyjRTC;
+import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
@@ -29,28 +30,50 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     private final MutableLiveData<BoyjMediaStream> remoteMediaStream = new MutableLiveData<>();
     @NonNull
-    private final BoyjRTC boyjRTC;
+    private final MutableLiveData<Boolean> isEnded = new MutableLiveData<>();
+    @NonNull
+    private final MutableLiveData<String> rejectedUserName = new MutableLiveData<>();
+    @NonNull
+    private final MutableLiveData<String> byeUserName = new MutableLiveData<>();
+    private BoyjRTC boyjRTC;
 
-    public CallViewModel(@NonNull final BoyjRTC boyjRTC) {
-        this.boyjRTC = boyjRTC;
+    public CallViewModel() {
+        boyjRTC = new BoyjRTC();
     }
 
-    void init() {
+    public void init() {
         boyjRTC.initRTC();
         boyjRTC.startCapture();
-        localMediaStream.setValue(boyjRTC.getUserMedia());
 
-        addDisposable(boyjRTC.remoteMediaStream()
+        localMediaStream.setValue(boyjRTC.getLocalStream());
+
+        addDisposable(boyjRTC.getRemoetStreamSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mediaStream -> {
-                    call();
+                    if (!isCalling.get()) { // 최초 통화의 경우 타이머 작동
+                        call();
+                    }
                     this.remoteMediaStream.setValue(mediaStream);
-                }));
-    }
+                })
+        );
 
-    public void createRoom(@NonNull final String callerId) {
-        final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
-        boyjRTC.createRoom(payload);
+        addDisposable(boyjRTC.getRejectSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response -> {
+                    if (!isCalling.get()) { // 최초 통화 거부
+                        isEnded.setValue(true);
+                    } else { // 기존 통화 중 거부
+                        rejectedUserName.setValue(response.getSender());
+                    }
+                })
+        );
+
+        addDisposable(boyjRTC.getEndOfCallSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(EndOfCallPayload::getSender)
+                .subscribe(byeUserName::setValue)
+        );
+
     }
 
     public void dial(@NonNull final String calleeId) {
@@ -58,31 +81,63 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC.dial(dialPayload);
     }
 
-    public void join() {
-        // Todo : Offer 연결 필요 by accept
-        boyjRTC.accept();
+    public void createRoom(@NonNull final String callerId) {
+        final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
+        boyjRTC.createRoom(payload);
     }
 
-    //전화 연결 되었을때 작업
-    public void call() {
+    public void accept(@NonNull final String callerId) {
+        boyjRTC.accept(callerId);
+    }
+
+    /**
+     * 최초 전화연결 이후 호출
+     */
+    private void call() {
         isCalling.set(true);
 
         addDisposable(Observable.interval(1, TimeUnit.SECONDS)
                 .map(Long::intValue)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
-
-        addDisposable(boyjRTC.bye().subscribe(this::hangUp)
-        );
     }
 
-    void hangUp() {
-        boyjRTC.hangUp();
+    /**
+     * 사용자가 전화를 끊는 경우 END_OF_CALL 이벤트를 시그널링 서버로 송신 후 release 한다.
+     */
+    public void hangUp() {
+        boyjRTC.endOfCall();
+        endOfCall();
+    }
+
+    /**
+     * 모든 통화가 종료되었을때 호출
+     * 1. 통화중인 유저가 모두 나갔을 경우
+     * 2. 사용자가 통화 종료를 누른 경우
+     */
+    public void endOfCall() {
+        boyjRTC.release();
+        isEnded.setValue(true);
     }
 
     @NonNull
     public ObservableBoolean getIsCalling() {
         return isCalling;
+    }
+
+    @NonNull
+    public LiveData<Boolean> getIsEnded() {
+        return isEnded;
+    }
+
+    @NonNull
+    public LiveData<String> getRejectedUserName() {
+        return rejectedUserName;
+    }
+
+    @NonNull
+    public LiveData<String> getByeUserName() {
+        return byeUserName;
     }
 
     @NonNull

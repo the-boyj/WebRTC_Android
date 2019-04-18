@@ -3,6 +3,8 @@ package com.webrtc.boyj.api.peer;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.peer.manager.RtcConfigurationManager;
+import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.signalling.payload.SdpPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
 
 import org.webrtc.IceCandidate;
@@ -16,21 +18,26 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.annotation.Nullable;
+
 import io.reactivex.subjects.PublishSubject;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class PeerConnectionClient {
-    @NonNull
-    private final MediaConstraints constraints = new MediaConstraints();
     @NonNull
     private final PeerConnectionFactory peerConnectionFactory;
     @NonNull
-    private PublishSubject<SessionDescription> sdpSubject = PublishSubject.create();
+    private final MediaConstraints constraints = new MediaConstraints();
     @NonNull
-    private PublishSubject<IceCandidate> iceCandidateSubject = PublishSubject.create();
+    private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
     @NonNull
     private PublishSubject<BoyjMediaStream> boyjMediaStreamSubject = PublishSubject.create();
     @NonNull
-    private Map<String, BoyjPeerConnection> connectionMap = new HashMap<>();
+    private PublishSubject<IceCandidatePayload> iceCandidatePayloadSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<SdpPayload> sdpPayloadSubject = PublishSubject.create();
+    @Nullable
+    private SessionDescription offerSdp;
 
     public PeerConnectionClient(@NonNull final PeerConnectionFactory peerConnectionFactory) {
         this.peerConnectionFactory = peerConnectionFactory;
@@ -47,6 +54,10 @@ public class PeerConnectionClient {
 
     public void createOffer(@NonNull final String targetId) {
         Objects.requireNonNull(connectionMap.get(targetId)).createOffer();
+    }
+
+    public void connectOffer(@NonNull final String targetId) {
+        Objects.requireNonNull(connectionMap.get(targetId)).connectOffer();
     }
 
     public void createAnswer(@NonNull final String targetId) {
@@ -69,18 +80,22 @@ public class PeerConnectionClient {
     }
 
     @NonNull
-    public PublishSubject<SessionDescription> getSdpSubject() {
-        return sdpSubject;
-    }
-
-    @NonNull
-    public PublishSubject<IceCandidate> getIceCandidateSubject() {
-        return iceCandidateSubject;
-    }
-
-    @NonNull
     public PublishSubject<BoyjMediaStream> getBoyjMediaStreamSubject() {
         return boyjMediaStreamSubject;
+    }
+
+    @NonNull
+    public PublishSubject<SdpPayload> getSdpPayloadSubject() {
+        return sdpPayloadSubject;
+    }
+
+    @NonNull
+    public PublishSubject<IceCandidatePayload> getIceCandidatePayloadSubject() {
+        return iceCandidatePayloadSubject;
+    }
+
+    public boolean isConnectedById(@NonNull final String id) {
+        return connectionMap.get(id) != null;
     }
 
     public void dispose(@NonNull final String targetId) {
@@ -88,7 +103,12 @@ public class PeerConnectionClient {
         connectionMap.remove(targetId);
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
+    public void disposeAll() {
+        for (BoyjPeerConnection pc : connectionMap.values()) {
+            pc.dispose();
+        }
+    }
+
     private class BoyjPeerConnection {
         @NonNull
         private final String id;
@@ -112,6 +132,10 @@ public class PeerConnectionClient {
             connection.createOffer(new BoyjSdpObserver(id), constraints);
         }
 
+        private void connectOffer() {
+            connection.setLocalDescription(new LogSdpObserver(id), offerSdp);
+        }
+
         private void createAnswer() {
             connection.createAnswer(new BoyjSdpObserver(id), constraints);
         }
@@ -121,11 +145,11 @@ public class PeerConnectionClient {
         }
 
         private void setLocalDescription(@NonNull SessionDescription sdp) {
-            connection.setLocalDescription(new CustomSdpObserver(id), sdp);
+            connection.setLocalDescription(new LogSdpObserver(id), sdp);
         }
 
         private void setRemoteSdp(@NonNull final SessionDescription sdp) {
-            connection.setRemoteDescription(new CustomSdpObserver(id), sdp);
+            connection.setRemoteDescription(new LogSdpObserver(id), sdp);
         }
 
         private void addIceCandidate(@NonNull final IceCandidate candidate) {
@@ -137,7 +161,6 @@ public class PeerConnectionClient {
         }
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
     private class BoyjPeerConnectionObserver extends CustomPeerConnectionObserver {
         @NonNull
         private final String id;
@@ -149,7 +172,9 @@ public class PeerConnectionClient {
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
             super.onIceCandidate(iceCandidate);
-            iceCandidateSubject.onNext(iceCandidate);
+            final IceCandidatePayload payload = new IceCandidatePayload(iceCandidate);
+            payload.setReceiver(id);
+            iceCandidatePayloadSubject.onNext(payload);
         }
 
         @Override
@@ -160,8 +185,7 @@ public class PeerConnectionClient {
         }
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
-    private class BoyjSdpObserver extends CustomSdpObserver {
+    private class BoyjSdpObserver extends LogSdpObserver {
         @NonNull
         private final String id;
 
@@ -173,8 +197,14 @@ public class PeerConnectionClient {
         @Override
         public void onCreateSuccess(SessionDescription sdp) {
             super.onCreateSuccess(sdp);
+            final SdpPayload payload = new SdpPayload(sdp);
+            if (sdp.type == SessionDescription.Type.OFFER) {
+                offerSdp = sdp;
+            } else if (sdp.type == SessionDescription.Type.ANSWER) {
+                payload.setReceiver(id);
+            }
+            sdpPayloadSubject.onNext(payload);
             Objects.requireNonNull(connectionMap.get(id)).setLocalDescription(sdp);
-            sdpSubject.onNext(sdp);
         }
     }
 }

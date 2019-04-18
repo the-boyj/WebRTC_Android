@@ -16,7 +16,17 @@ import org.webrtc.VideoTrack;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class BoyjAdapter extends SplitLayout.Adapter {
+    public BoyjAdapter(@NonNull final OnEndOfCallListener onEndOfCallListener) {
+        this.onEndOfCallListener = onEndOfCallListener;
+    }
+
+    interface OnEndOfCallListener {
+        void onEnd();
+    }
+
+    private final OnEndOfCallListener onEndOfCallListener;
     private final List<BoyjMediaStream> mediaStreamList = new ArrayList<>();
 
     public void addMediaStream(@NonNull final BoyjMediaStream mediaStream) {
@@ -25,7 +35,6 @@ public class BoyjAdapter extends SplitLayout.Adapter {
     }
 
     public void removeMediaStreamfromId(@NonNull final String id) {
-        // Todo : remote 적용 후 업데이트
         for (int i = 0; i < mediaStreamList.size(); i++) {
             final BoyjMediaStream mediaStream = mediaStreamList.get(i);
             if (mediaStream.getId().equals(id)) {
@@ -33,6 +42,10 @@ public class BoyjAdapter extends SplitLayout.Adapter {
                 notifyDataSetChanged();
                 return;
             }
+        }
+
+        if (mediaStreamList.isEmpty()) {
+            onEndOfCallListener.onEnd();
         }
     }
 

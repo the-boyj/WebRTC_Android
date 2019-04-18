@@ -7,151 +7,210 @@ import com.webrtc.boyj.api.peer.manager.PeerConnectionFactoryManager;
 import com.webrtc.boyj.api.peer.manager.UserMediaManager;
 import com.webrtc.boyj.api.signalling.SignalingClient;
 import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
+import com.webrtc.boyj.api.signalling.payload.RejectPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
-import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.CompletableSubject;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 
-public class BoyjRTC {
-    @NonNull
-    private SignalingClient signalingClient = new SignalingClient();
+@SuppressWarnings("SpellCheckingInspection")
+public class BoyjRTC implements BoyjContract {
     private PeerConnectionClient peerConnectionClient;
     private UserMediaManager userMediaManager;
-    @NonNull
+    private final SignalingClient signalingClient = new SignalingClient();
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
+
+    /**
+     * initRTC()가 호출되면 true로 변경된다.
+     */
+    private boolean isInitialized = false;
+
+    /**
+     * PeerConnection 사용을 위한 기본 설정. 호출하지 않으면 RTC 기능 사용시 Runtime Exception 발생
+     */
     public void initRTC() {
-        final PeerConnectionFactory factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
+        final PeerConnectionFactory factory =
+                PeerConnectionFactoryManager.createPeerConnectionFactory();
+
         userMediaManager = new UserMediaManager(factory);
         peerConnectionClient = new PeerConnectionClient(factory);
+        isInitialized = true;
 
-        compositeDisposable.addAll(
-                // Callee의 FCM 수신 이후 시그널링 서버에서 ACK
-                signalingClient.getCreatedSubject().subscribe(calleeId -> {
-                    peerConnectionClient.createPeerConnection(calleeId);
-                })
-                // Todo : SDP, IceCandidate 페이로드 변경 후 타겟 설정
-                /*
-                peerConnectionClient.getSdpSubject().subscribe(sessionDescription -> {
-                    final SdpPayload sdpPayload = new SdpPayload.Builder(sessionDescription).build();
-                    signalingClient.emitSdp(sdpPayload);
-                }),
-                peerConnectionClient.getIceCandidateSubject().subscribe(iceCandidate -> {
-                    final IceCandidatePayload iceCandidatePayload = new IceCandidatePayload.Builder(iceCandidate).build();
-                    signalingClient.emitIceCandidate(iceCandidatePayload);
-                })
+        subscribeSdp();
+        subscribeIceCandidate();
+        subscribeEndOfCall();
+    }
 
-                signalingClient.getSdpSubject().subscribe(sdp -> {
-                    peerConnectionClient.setRemoteSdp(sdp);
-                    if (sdp.type == SessionDescription.Type.OFFER) {
-                        peerConnectionClient.createAnswer();
-                    }
-                }),
-                signalingClient.getIceCandidateSubject().subscribe(candidate -> {
-                    Logger.d(candidate.toString());
-                    peerConnectionClient.addIceCandidate(candidate);
-                })
-                */
+    private void subscribeSdp() {
+        // Offer, Answer를 만들고 난 이후 시그널링 서버로 전송
+        addDisposable(
+                peerConnectionClient.getSdpPayloadSubject()
+                        .subscribe(sdpPayload -> {
+                            if (sdpPayload.getType() == SessionDescription.Type.OFFER) {
+                                signalingClient.emitAccept(sdpPayload);
+                            } else if (sdpPayload.getType() == SessionDescription.Type.ANSWER) {
+                                signalingClient.emitAnswer(sdpPayload);
+                            }
+                        })
+        );
+
+        /*
+         * 참고 : A1 -> A2 || A2 -> A3의 총 3명에 대한 통화 상황을 가정. Answer를 전달받은 상황에서
+         * 커넥션이 만들어져있지 않다면 이는 A1 - A3의 추가 연결을 뜻한다. 이런 경우 Peer Client가
+         * 가지고 있는 offer sdp를 이용해 새로운 커넥션을 만든다.
+         */
+        addDisposable(
+                signalingClient.getSdpPayloadSubject()
+                        .subscribe(sdpPayload -> {
+                            if (sdpPayload.getType() == SessionDescription.Type.OFFER) {
+                                createPeerConnection(sdpPayload.getSender());
+                                createAnswer(sdpPayload.getSender());
+                            } else if (sdpPayload.getType() == SessionDescription.Type.ANSWER) {
+                                if (!peerConnectionClient.isConnectedById(sdpPayload.getSender())) {
+                                    createPeerConnection(sdpPayload.getSender());
+                                    peerConnectionClient.connectOffer(sdpPayload.getSender());
+                                }
+                            }
+                            peerConnectionClient.setRemoteSdp(sdpPayload.getSender(), sdpPayload.getSdp());
+                        })
         );
     }
 
-    // Todo : accept이후 offer 연결
-    private void createOffer(@NonNull final String targetId) {
-        peerConnectionClient.createPeerConnection(targetId);
-        peerConnectionClient.addStreamToLocalPeer(targetId, getUserMedia());
-        peerConnectionClient.createOffer(targetId);
+    private void subscribeIceCandidate() {
+        addDisposable(
+                peerConnectionClient.getIceCandidatePayloadSubject()
+                        .subscribe(signalingClient::emitIceCandidate)
+        );
+
+        addDisposable(
+                signalingClient.getIceCandidatePayloadSubject()
+                        .subscribe(iceCandidatePayload ->
+                                peerConnectionClient.addIceCandidate(
+                                        iceCandidatePayload.getSender(),
+                                        iceCandidatePayload.getIceCandidate()
+                                )
+                        )
+        );
     }
 
-    // Todo : sdp를 받은 이후 OFFER에게 온 경우면 호출
-    private void createAnswer(@NonNull final String targetId,
-                              @NonNull final SessionDescription sdp) {
-        peerConnectionClient.createPeerConnection(targetId);
-        peerConnectionClient.setRemoteSdp(targetId, sdp);
-        peerConnectionClient.addStreamToLocalPeer(targetId, getUserMedia());
-        peerConnectionClient.createAnswer(targetId);
+    private void subscribeEndOfCall() {
+        addDisposable(
+                signalingClient.getEndOfCallPayloadSubject()
+                        .subscribe(endOfCallPayload ->
+                                peerConnectionClient.dispose(endOfCallPayload.getSender()))
+        );
     }
 
     public void startCapture() {
+        validateInitRTC();
         userMediaManager.startCapture();
     }
 
     public void stopCapture() {
+        validateInitRTC();
         userMediaManager.stopCapture();
     }
 
     @NonNull
-    public MediaStream getUserMedia() {
+    public PublishSubject<RejectPayload> getRejectSubject() {
+        return signalingClient.getRejectPayloadSubject();
+    }
+
+    @NonNull
+    public MediaStream getLocalStream() {
+        validateInitRTC();
         return userMediaManager.getLocalMediaStream();
     }
 
     @NonNull
-    public PublishSubject<BoyjMediaStream> remoteMediaStream() {
+    public PublishSubject<BoyjMediaStream> getRemoetStreamSubject() {
+        validateInitRTC();
         return peerConnectionClient.getBoyjMediaStreamSubject();
     }
 
-    /**
-     * 처음으로 통화를 요청할 경우 room을 생성한다.
-     *
-     * @param payload room, callerId 가 담긴 페이로드
-     */
+    @NonNull
+    public PublishSubject<EndOfCallPayload> getEndOfCallSubject() {
+        validateInitRTC();
+        return signalingClient.getEndOfCallPayloadSubject();
+    }
+
+    @Override
     public void createRoom(@NonNull final CreateRoomPayload payload) {
-        Logger.i(payload.toString());
         signalingClient.emitCreateRoom(payload);
     }
 
-    /**
-     * Caller가 상대방에게 통화를 요청한다.
-     *
-     * @param payload calleeId가 담긴 페이로드
-     */
+    @Override
     public void dial(@NonNull final DialPayload payload) {
-        Logger.i(payload.toString());
         signalingClient.emitDial(payload);
     }
 
-    /**
-     * Callee가 푸시 알람을 수신 후 서버로 응답한다.
-     *
-     * @param payload room, calleeId가 담긴 페이로드
-     */
+    @Override
     public void awaken(@NonNull final AwakenPayload payload) {
-        Logger.i(payload.toString());
         signalingClient.emitAwaken(payload);
     }
 
-    public void accept() {
-        signalingClient.emitAccept();
+    @Override
+    public void accept(@NonNull final String callerId) {
+        validateInitRTC();
+        createPeerConnection(callerId);
+        createOffer(callerId);
     }
 
-    public void reject() {
-        signalingClient.emitReject();
+    @Override
+    public void reject(@NonNull final RejectPayload payload) {
+        signalingClient.emitReject(payload);
+        disconnect();
     }
 
-    public void hangUp() {
-        signalingClient.emitBye();
-        release();
+    @Override
+    public void endOfCall() {
+        signalingClient.emitEndOfCall();
     }
 
-    @NonNull
-    public CompletableSubject bye() {
-        return signalingClient.getByeSubject();
+    private void createPeerConnection(@NonNull final String targetId) {
+        peerConnectionClient.createPeerConnection(targetId);
+        peerConnectionClient.addStreamToLocalPeer(targetId, userMediaManager.getLocalMediaStream());
     }
 
-    public void dispose(@NonNull final String targetId) {
-        peerConnectionClient.dispose(targetId);
+    private void createOffer(@NonNull final String targetId) {
+        peerConnectionClient.createOffer(targetId);
+    }
+
+    private void createAnswer(@NonNull final String targetId) {
+        peerConnectionClient.createAnswer(targetId);
+    }
+
+    private void disconnect() {
+        signalingClient.disconnect();
     }
 
     public void release() {
+        peerConnectionClient.disposeAll();
         userMediaManager.stopCapture();
-        compositeDisposable.dispose();
         signalingClient.disconnect();
+        compositeDisposable.dispose();
+    }
+
+    private void addDisposable(@NonNull final Disposable disposable) {
+        compositeDisposable.add(disposable);
+    }
+
+    /**
+     * @throws IllegalStateException initRTC()가 호출되지 않은 경우 발생
+     */
+    private void validateInitRTC() {
+        if (!isInitialized) {
+            throw new IllegalStateException(ERROR_INITIALIZED);
+        }
     }
 }

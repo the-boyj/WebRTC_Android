@@ -42,15 +42,13 @@ class SocketIOClient {
         socket.disconnect();
     }
 
-    void emit(@NonNull final String event, @Nullable final Object... args) {
+    void emit(@NonNull @SignalingClient.Event String event,
+              @Nullable final Object... args) {
         socket.emit(event, args);
     }
 
-    void on(@NonNull final String event, @NonNull final Emitter.Listener fn) {
+    void on(@NonNull @SignalingClient.Event String event,
+            @NonNull final Emitter.Listener fn) {
         socket.on(event, fn);
-    }
-
-    void off() {
-        socket.off();
     }
 }

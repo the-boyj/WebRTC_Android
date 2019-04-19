@@ -7,7 +7,8 @@ import android.support.annotation.NonNull;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.webrtc.boyj.data.repository.UserRepositoryImpl;
+import com.webrtc.boyj.data.source.preferences.TokenDataSource;
+import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
 import com.webrtc.boyj.presentation.ringing.RingingActivity;
 
 import java.util.Objects;
@@ -28,10 +29,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(@NonNull final String token) {
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        pref.edit()
-                .putString(UserRepositoryImpl.FIELD_USER_TOKEN, token)
-                .putBoolean(UserRepositoryImpl.CHANGED, true)
-                .apply();
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final TokenDataSource tokenDataSource = TokenDataSourceImpl.getInstance(pref);
+        tokenDataSource.registerToken(token);
     }
 }

@@ -1,6 +1,5 @@
 package com.webrtc.boyj.data.repository;
 
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentReference;
@@ -9,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.firestore.response.UserResponse;
+import com.webrtc.boyj.data.source.preferences.TokenDataSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,38 +21,33 @@ import io.reactivex.schedulers.Schedulers;
 @SuppressWarnings("SpellCheckingInspection")
 public class UserRepositoryImpl implements UserRepository {
     private static final String COLLECTION_USER = "user";
-
     private static final String FIELD_USER_NAME = "name";
-    public static final String FIELD_USER_TOKEN = "deviceToken";
-    public static final String CHANGED = "CHANGED";
 
-    private static final String UNKNOWN = "Unknown";
     private static final String ERROR_USER_NOT_EXIST = "User is not exists";
-    private static final String ERROR_TOKEN_NOT_EXIST = "Token is not exists";
+
+    @NonNull
+    private final FirebaseFirestore firestore;
+    @NonNull
+    private final TokenDataSource tokenDataSource;
 
     private static volatile UserRepositoryImpl INSTANCE;
 
     public static UserRepository getInstance(@NonNull final FirebaseFirestore firestore,
-                                             @NonNull final SharedPreferences pref) {
+                                             @NonNull TokenDataSource tokenDataSource) {
         if (INSTANCE == null) {
             synchronized (UserRepositoryImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UserRepositoryImpl(firestore, pref);
+                    INSTANCE = new UserRepositoryImpl(firestore, tokenDataSource);
                 }
             }
         }
         return INSTANCE;
     }
 
-    @NonNull
-    private final FirebaseFirestore firestore;
-    @NonNull
-    private final SharedPreferences pref;
-
     private UserRepositoryImpl(@NonNull FirebaseFirestore firestore,
-                               @NonNull SharedPreferences pref) {
+                               @NonNull TokenDataSource tokenDataSource) {
         this.firestore = firestore;
-        this.pref = pref;
+        this.tokenDataSource = tokenDataSource;
 
         final FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setTimestampsInSnapshotsEnabled(true)
@@ -92,26 +87,21 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     @Override
     public Completable updateToken(@NonNull final String tel) {
-        final String token = pref.getString(FIELD_USER_TOKEN, null);
-        final boolean isChanged = pref.getBoolean(CHANGED, false);
-        if (token == null) {
-            return Completable.error(new IllegalArgumentException(ERROR_TOKEN_NOT_EXIST));
-        }
         final DocumentReference docRef = firestore.collection(COLLECTION_USER).document(tel);
 
-        if (isChanged) {
+        if (tokenDataSource.isNewToken()) {
             return Completable.create(emitter ->
                     firestore.runTransaction(transaction -> {
-                        if (!transaction.get(docRef).exists()) {
-                            transaction.set(docRef, new User(tel, UNKNOWN, token));
+                        final String token = tokenDataSource.getToken();
+
+                        if (transaction.get(docRef).exists()) {
+                            transaction.update(docRef, "deviceToken", token);
                         } else {
-                            transaction.update(docRef, FIELD_USER_TOKEN, token);
+                            transaction.set(docRef, new User(tel, "UNKNOWN", token));
                         }
                         return null;
                     }).addOnSuccessListener(__ -> {
-                        pref.edit()
-                                .putBoolean(CHANGED, false)
-                                .apply();
+                        tokenDataSource.unsetNewToken();
                         emitter.onComplete();
                     }).addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io());
         } else {
@@ -128,19 +118,15 @@ public class UserRepositoryImpl implements UserRepository {
                         .document(tel)
                         .update(FIELD_USER_NAME, name)
                         .addOnSuccessListener(__ -> emitter.onComplete())
-                        .addOnFailureListener(emitter::onError)).subscribeOn(Schedulers.io())
-                .andThen(Single.create((SingleOnSubscribe<User>) emitter -> {
-                    firestore.collection(COLLECTION_USER)
-                            .document(tel)
-                            .get()
-                            .addOnSuccessListener(snapshot -> {
-                                final User user = snapshot.toObject(User.class);
-                                if (user == null) {
-                                    emitter.onError(new IllegalArgumentException(ERROR_USER_NOT_EXIST));
-                                } else {
-                                    emitter.onSuccess(user);
-                                }
-                            }).addOnFailureListener(emitter::onError);
-                })).subscribeOn(Schedulers.io());
+                        .addOnFailureListener(emitter::onError))
+                .subscribeOn(Schedulers.io())
+                .andThen(Single.create((SingleOnSubscribe<User>) emitter ->
+                        firestore.collection(COLLECTION_USER)
+                                .document(tel)
+                                .get()
+                                .addOnSuccessListener(snapshot ->
+                                        emitter.onSuccess(snapshot.toObject(User.class)))
+                                .addOnFailureListener(emitter::onError)))
+                .subscribeOn(Schedulers.io());
     }
 }

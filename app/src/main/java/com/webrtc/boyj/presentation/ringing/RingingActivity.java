@@ -1,9 +1,17 @@
 package com.webrtc.boyj.presentation.ringing;
 
+import android.annotation.TargetApi;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -17,11 +25,16 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private static final String EXTRA_ROOM = "room";
     private static final String EXTRA_CALLER_ID = "callerId";
 
+    private Ringtone ringTone = null;
+    private Vibrator vibrator = null;
     private String callerId;
 
+    @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        turnOnRingTone();
 
         final String room = getIntent().getStringExtra(EXTRA_ROOM);
         callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
@@ -34,11 +47,45 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     }
 
     private void initViews() {
-        findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
+        findViewById(R.id.fab_accept).setOnClickListener(__ -> {
+            turnOffRingTone();
+            startCallActivity();
+
+        });
         findViewById(R.id.fab_reject).setOnClickListener(__ -> {
+            turnOffRingTone();
             binding.getVm().reject(callerId);
             finish();
         });
+    }
+
+    private void turnOnRingTone() {
+        AudioManager am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        if (am.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            ringTone = RingtoneManager.getRingtone(getApplicationContext(), uri);
+            ringTone.play();
+        } else if (am.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+            vibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createWaveform(new long[]{500, 1000}, 1));
+            } else {
+                vibrator.vibrate(new long[]{500, 1000}, 1);
+            }
+        }
+    }
+
+    private void turnOffRingTone() {
+        if (ringTone != null) {
+            ringTone.stop();
+            ringTone = null;
+        }
+
+        if (vibrator != null) {
+            vibrator.cancel();
+            vibrator = null;
+        }
     }
 
     private void initViewModel() {
@@ -69,5 +116,11 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     @Override
     public void onBackPressed() {
         // disabled back press
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        turnOffRingTone();
     }
 }

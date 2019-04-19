@@ -1,6 +1,7 @@
 package com.webrtc.boyj.presentation.main;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
+import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
@@ -70,10 +72,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void initViewModel() {
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final MainViewModel vm = ViewModelProviders.of(this,
                 new MainViewModelFactory(UserRepositoryImpl.getInstance(
                         FirebaseFirestore.getInstance(),
-                        PreferenceManager.getDefaultSharedPreferences(this))))
+                        TokenDataSourceImpl.getInstance(pref))))
                 .get(MainViewModel.class);
 
         binding.setVm(vm);

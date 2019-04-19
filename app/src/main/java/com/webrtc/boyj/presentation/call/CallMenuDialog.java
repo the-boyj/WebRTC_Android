@@ -1,6 +1,7 @@
 package com.webrtc.boyj.presentation.call;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -16,6 +17,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.repository.UserRepositoryImpl;
+import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
 import com.webrtc.boyj.presentation.call.invite.InviteViewModel;
@@ -53,10 +55,11 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
     }
 
     private void initViewModel() {
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         final InviteViewModel vm = ViewModelProviders.of(this,
                 new InviteViewModel.Factory(UserRepositoryImpl.getInstance(
                         FirebaseFirestore.getInstance(),
-                        PreferenceManager.getDefaultSharedPreferences(App.getContext()))))
+                        TokenDataSourceImpl.getInstance(pref))))
                 .get(InviteViewModel.class);
 
         binding.setInviteViewModel(vm);

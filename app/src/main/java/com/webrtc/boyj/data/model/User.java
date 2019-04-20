@@ -1,5 +1,6 @@
 package com.webrtc.boyj.data.model;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.Serializable;
@@ -19,6 +20,10 @@ public class User implements Serializable {
         this.tel = tel;
         this.name = name;
         this.deviceToken = deviceToken;
+    }
+
+    public static User createFromId(@NonNull final String id) {
+        return new User(id, null, null);
     }
 
     public String getTel() {

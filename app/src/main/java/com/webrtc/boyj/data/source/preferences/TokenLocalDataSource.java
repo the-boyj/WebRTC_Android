@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.source.TokenDataSource;
 
-public class TokenDataSourceImpl implements TokenDataSource {
+public class TokenLocalDataSource implements TokenDataSource {
     private static final String KEY_DEVICE_TOKEN = "KEY_DEVICE_TOKEN";
     private static final String KEY_IS_NEW_TOKEN = "KEY_IS_NEW_TOKEN";
 
@@ -13,15 +13,15 @@ public class TokenDataSourceImpl implements TokenDataSource {
     private final SharedPreferences pref;
     private static volatile TokenDataSource INSTANCE;
 
-    private TokenDataSourceImpl(@NonNull final SharedPreferences pref) {
+    private TokenLocalDataSource(@NonNull final SharedPreferences pref) {
         this.pref = pref;
     }
 
     public static TokenDataSource getInstance(@NonNull final SharedPreferences pref) {
         if (INSTANCE == null) {
-            synchronized (TokenDataSourceImpl.class) {
+            synchronized (TokenLocalDataSource.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TokenDataSourceImpl(pref);
+                    INSTANCE = new TokenLocalDataSource(pref);
                 }
             }
         }

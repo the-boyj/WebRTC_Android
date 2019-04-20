@@ -16,7 +16,7 @@ import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
+import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final MainViewModelFactory factory = new MainViewModelFactory(
                 UserRepositoryImpl.getInstance(
                         UserRemoteDataSource.getInstance(),
-                        TokenDataSourceImpl.getInstance(pref)));
+                        TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
         vm.init(tel);
         binding.setVm(vm);

@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
+import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
@@ -60,7 +60,7 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
         final InviteViewModel.Factory factory = new InviteViewModel.Factory(
                 UserRepositoryImpl.getInstance(
                         UserRemoteDataSource.getInstance(),
-                        TokenDataSourceImpl.getInstance(pref)));
+                        TokenLocalDataSource.getInstance(pref)));
         final InviteViewModel vm = ViewModelProviders.of(this, factory).get(InviteViewModel.class);
         binding.setInviteViewModel(vm);
     }

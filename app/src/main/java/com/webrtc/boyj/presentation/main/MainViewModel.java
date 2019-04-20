@@ -6,7 +6,7 @@ import android.databinding.ObservableBoolean;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.repository.UserRepository;
+import com.webrtc.boyj.data.source.UserRepository;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
 import java.util.List;
@@ -29,46 +29,38 @@ public class MainViewModel extends BaseViewModel {
         this.repository = repository;
     }
 
-    void init(@NonNull final String tel) {
-        loading();
-        addDisposable(repository.updateToken(tel)
-                .andThen(repository.getUserList(tel))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                    final List<User> userList = response.getOtherUserList();
-                    final User user = response.getUser();
-                    this.otherUserList.setValue(userList);
-                    this.user.setValue(user);
-                    unLoading();
-                }, e -> {
-                    unLoading();
-                    error.setValue(e);
-                }));
-    }
-
-    void updateUserName(@NonNull final String tel,
-                        @NonNull final String name) {
-        loading();
-        addDisposable(repository.updateUserName(tel, name)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(user -> {
-                    final User newUser = new User(user.getTel(),
-                            user.getName(),
-                            user.getDeviceToken());
-                    this.user.setValue(newUser);
-                    unLoading();
-                }, e -> {
-                    unLoading();
-                    error.setValue(e);
-                }));
-    }
-
-    private void loading() {
+    void init(@NonNull final String id) {
         loading.set(true);
+
+        addDisposable(repository.getUser(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMapCompletable(user -> {
+                    this.user.setValue(user);
+                    return repository.updateDeviceToken(id);
+                }).subscribe(() -> { /* doNothing */ }, this.error::setValue)
+        );
+
+        addDisposable(repository.getOtherUserList(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userList -> {
+                    loading.set(false);
+                    this.otherUserList.setValue(userList);
+                }, error -> {
+                    loading.set(false);
+                    this.error.setValue(error);
+                })
+        );
     }
 
-    private void unLoading() {
-        loading.set(false);
+    void updateUserName(@NonNull final String id,
+                        @NonNull final String name) {
+        addDisposable(repository.updateUserName(id, name)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    final User newUser = new User(id, name, null);
+                    this.user.setValue(newUser);
+                }, this.error::setValue)
+        );
     }
 
     @NonNull

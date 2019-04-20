@@ -7,7 +7,7 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.repository.UserRepository;
+import com.webrtc.boyj.data.source.UserRepository;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
 import java.util.List;
@@ -22,11 +22,11 @@ public class InviteViewModel extends BaseViewModel {
         this.repository = repository;
     }
 
-    public void init(@NonNull final String tel) {
-        addDisposable(repository.getUserList(tel)
+    public void init(@NonNull final String id) {
+        addDisposable(repository.getOtherUserList(id)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userResponse ->
-                        otherUserList.setValue(userResponse.getOtherUserList())));
+                .subscribe(this.otherUserList::setValue)
+        );
     }
 
     public LiveData<List<User>> getOtherUserList() {

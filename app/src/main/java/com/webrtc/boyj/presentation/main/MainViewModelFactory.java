@@ -4,7 +4,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.data.repository.UserRepository;
+import com.webrtc.boyj.data.source.UserRepository;
 
 public class MainViewModelFactory implements ViewModelProvider.Factory {
     @NonNull

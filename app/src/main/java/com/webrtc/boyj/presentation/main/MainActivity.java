@@ -11,13 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.repository.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
+import com.webrtc.boyj.data.source.UserRepositoryImpl;
+import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
@@ -68,17 +68,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         initViewModel();
         initRecyclerView();
         subscribeViewModel();
-        binding.getVm().init(tel);
     }
 
     private void initViewModel() {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final MainViewModel vm = ViewModelProviders.of(this,
-                new MainViewModelFactory(UserRepositoryImpl.getInstance(
-                        FirebaseFirestore.getInstance(),
-                        TokenDataSourceImpl.getInstance(pref))))
-                .get(MainViewModel.class);
-
+        final MainViewModelFactory factory = new MainViewModelFactory(
+                UserRepositoryImpl.getInstance(
+                        UserRemoteDataSource.getInstance(),
+                        TokenLocalDataSource.getInstance(pref)));
+        final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
+        vm.init(tel);
         binding.setVm(vm);
     }
 

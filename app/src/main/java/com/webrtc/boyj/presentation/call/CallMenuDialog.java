@@ -13,11 +13,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.repository.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.preferences.TokenDataSourceImpl;
+import com.webrtc.boyj.data.source.UserRepositoryImpl;
+import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
 import com.webrtc.boyj.presentation.call.invite.InviteViewModel;
@@ -56,12 +56,12 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
 
     private void initViewModel() {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-        final InviteViewModel vm = ViewModelProviders.of(this,
-                new InviteViewModel.Factory(UserRepositoryImpl.getInstance(
-                        FirebaseFirestore.getInstance(),
-                        TokenDataSourceImpl.getInstance(pref))))
-                .get(InviteViewModel.class);
 
+        final InviteViewModel.Factory factory = new InviteViewModel.Factory(
+                UserRepositoryImpl.getInstance(
+                        UserRemoteDataSource.getInstance(),
+                        TokenLocalDataSource.getInstance(pref)));
+        final InviteViewModel vm = ViewModelProviders.of(this, factory).get(InviteViewModel.class);
         binding.setInviteViewModel(vm);
     }
 

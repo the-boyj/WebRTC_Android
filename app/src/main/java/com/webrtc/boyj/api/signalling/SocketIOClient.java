@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.BuildConfig;
+import com.webrtc.boyj.api.signalling.payload.Payload;
+import com.webrtc.boyj.utils.JSONUtil;
+import com.webrtc.boyj.utils.Logger;
 
 import java.net.URISyntaxException;
 
@@ -31,10 +34,7 @@ class SocketIOClient {
     }
 
     void connect() {
-        if (!socket.connected()) {
-            socket.connect();
-        }
-
+        socket.connect();
     }
 
     void disconnect() {
@@ -42,13 +42,20 @@ class SocketIOClient {
         socket.disconnect();
     }
 
-    void emit(@NonNull @SignalingClient.Event String event,
-              @Nullable final Object... args) {
-        socket.emit(event, args);
+    void emit(@NonNull SignalingEvent event,
+              @NonNull final Payload payload) {
+        Logger.i(payload.toString());
+        socket.emit(event.toString(), JSONUtil.toJSONObject(payload));
     }
 
-    void on(@NonNull @SignalingClient.Event String event,
+    void emit(@NonNull SignalingEvent event,
+              @Nullable final Object... args) {
+        Logger.i(event.toString());
+        socket.emit(event.toString(), args);
+    }
+
+    void on(@NonNull SignalingEvent event,
             @NonNull final Emitter.Listener fn) {
-        socket.on(event, fn);
+        socket.on(event.toString(), fn);
     }
 }

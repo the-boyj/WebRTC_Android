@@ -3,6 +3,7 @@ package com.webrtc.boyj.utils;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.webrtc.boyj.api.signalling.payload.Payload;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,8 +35,9 @@ public class JSONUtil {
     }
 
     @NonNull
-    public static Object fromJson(@NonNull final JSONObject jsonObject,
-                                  @NonNull final Class<?> type) {
+    public static <T extends Payload> T fromJson(@NonNull final Object object,
+                                                 @NonNull final Class<T> type) {
+        final JSONObject jsonObject = (JSONObject) object;
         return gson.fromJson(jsonObject.toString(), type);
     }
 }

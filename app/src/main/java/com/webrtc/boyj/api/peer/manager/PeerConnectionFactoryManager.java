@@ -1,6 +1,7 @@
 package com.webrtc.boyj.api.peer.manager;
 
-import com.webrtc.boyj.utils.App;
+import android.content.Context;
+import android.support.annotation.NonNull;
 
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
@@ -11,10 +12,10 @@ public final class PeerConnectionFactoryManager {
 
     }
 
-    static {
+    public static void initialize(@NonNull final Context context) {
         PeerConnectionFactory.initialize(
                 PeerConnectionFactory.InitializationOptions
-                        .builder(App.getContext())
+                        .builder(context)
                         .createInitializationOptions()
         );
     }

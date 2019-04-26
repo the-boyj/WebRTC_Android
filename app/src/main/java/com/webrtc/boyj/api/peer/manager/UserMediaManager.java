@@ -1,8 +1,7 @@
 package com.webrtc.boyj.api.peer.manager;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
-
-import com.webrtc.boyj.utils.App;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
@@ -23,13 +22,16 @@ public final class UserMediaManager {
     @NonNull
     private final PeerConnectionFactory peerConnectionFactory;
     @NonNull
-    private final VideoCapturer capturer = createVideoCapturer();
+    private final VideoCapturer capturer;
 
-    public UserMediaManager(@NonNull final PeerConnectionFactory peerConnectionFactory) {
+    public UserMediaManager(@NonNull final Context context,
+                            @NonNull final PeerConnectionFactory peerConnectionFactory) {
         this.peerConnectionFactory = peerConnectionFactory;
         mediaStream = peerConnectionFactory.createLocalMediaStream("LocalMediaStream");
-        mediaStream.addTrack(createVideoTrack());
+        mediaStream.addTrack(createVideoTrack(context));
         mediaStream.addTrack(createAudioTrack());
+
+        capturer = createVideoCapturer(context);
     }
 
     public void startCapture() {
@@ -49,14 +51,14 @@ public final class UserMediaManager {
     }
 
     @NonNull
-    private VideoTrack createVideoTrack() {
+    private VideoTrack createVideoTrack(@NonNull final Context context) {
         final SurfaceTextureHelper helper = SurfaceTextureHelper.create(
                 "SurfaceTexture",
                 EglBaseManager.getEglBase().getEglBaseContext()
         );
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(true);
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack("VideoTrack", videoSource);
-        capturer.initialize(helper, App.getContext(), videoSource.getCapturerObserver());
+        capturer.initialize(helper, context, videoSource.getCapturerObserver());
 
         return videoTrack;
     }
@@ -68,11 +70,11 @@ public final class UserMediaManager {
     }
 
     @NonNull
-    private VideoCapturer createVideoCapturer() {
+    private VideoCapturer createVideoCapturer(@NonNull final Context context) {
         final CameraEnumerator enumerator;
 
-        enumerator = isCamera2Supported() ?
-                new Camera2Enumerator(App.getContext()) :
+        enumerator = isCamera2Supported(context) ?
+                new Camera2Enumerator(context) :
                 new Camera1Enumerator(false);
 
         for (final String deviceName : enumerator.getDeviceNames()) {
@@ -83,7 +85,7 @@ public final class UserMediaManager {
         throw new IllegalStateException("Camera is not supported");
     }
 
-    private boolean isCamera2Supported() {
-        return Camera2Enumerator.isSupported(App.getContext());
+    private boolean isCamera2Supported(@NonNull final Context context) {
+        return Camera2Enumerator.isSupported(context);
     }
 }

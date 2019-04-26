@@ -20,7 +20,9 @@ public class OfferSdpObserver extends BoyjSdpObserver {
     }
 
     private SdpPayload createSdpPayload(@NonNull final SessionDescription sdp) {
-        return new SdpPayload(sdp);
+        final SdpPayload payload = new SdpPayload(sdp);
+        payload.setReceiver(getId());
+        return payload;
     }
 
 }

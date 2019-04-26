@@ -41,6 +41,11 @@ public class PeerConnectionClient {
         boyjPeerConnection.addLocalStream(targetId, localMediaStream);
     }
 
+    public void setLocalDescription(@NonNull final String id,
+                                    @NonNull SessionDescription sdp) {
+        boyjPeerConnection.setLocalDescription(id, sdp);
+    }
+
     public void setRemoteSdp(@NonNull final String targetId,
                              @NonNull final SessionDescription sdp) {
         boyjPeerConnection.setRemoteSdp(targetId, sdp);

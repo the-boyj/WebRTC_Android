@@ -34,7 +34,7 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     @NonNull
     private final PublishSubject<String> rejectNameSubject = PublishSubject.create();
     @NonNull
-    private final PublishSubject<String> endOfCallSubject = PublishSubject.create();
+    private final PublishSubject<String> endOfCallNameSubject = PublishSubject.create();
 
     private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
 
@@ -83,8 +83,8 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     }
 
     @NonNull
-    public PublishSubject<String> endOfCallSubject() {
-        return endOfCallSubject;
+    public PublishSubject<String> endOfCallNameSubject() {
+        return endOfCallNameSubject;
     }
 
     @Override
@@ -150,11 +150,13 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
     @Override
     public void onOfferSdpPayloadFromPeer(@NonNull SdpPayload sdpPayload) {
+        peerConnectionClient.setLocalDescription(sdpPayload.getReceiver(), sdpPayload.getSdp());
         signalingClient.emitAccept(sdpPayload);
     }
 
     @Override
     public void onAnswerSdpPayloadFromPeer(@NonNull SdpPayload sdpPayload) {
+        peerConnectionClient.setLocalDescription(sdpPayload.getReceiver(), sdpPayload.getSdp());
         signalingClient.emitAnswer(sdpPayload);
     }
 
@@ -208,6 +210,6 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     @Override
     public void onEndOfCallPayloadFromSig(@NonNull EndOfCallPayload endOfCallPayload) {
         peerConnectionClient.dispose(endOfCallPayload.getSender());
-        endOfCallSubject.onNext(endOfCallPayload.getSender());
+        endOfCallNameSubject.onNext(endOfCallPayload.getSender());
     }
 }

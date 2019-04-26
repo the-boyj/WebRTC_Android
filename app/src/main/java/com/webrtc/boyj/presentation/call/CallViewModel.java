@@ -71,7 +71,7 @@ public class CallViewModel extends BaseViewModel {
     }
 
     private void subscribeEndOfCall() {
-        addDisposable(boyjRTC.endOfCallSubject()
+        addDisposable(boyjRTC.endOfCallNameSubject()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(byeUserName::setValue)
         );

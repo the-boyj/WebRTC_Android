@@ -87,30 +87,30 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         binding.rvUser.setAdapter(adapter);
     }
 
+    private void startCallActivity(@NonNull final User user) {
+        startActivity(CallActivity.getCallerLaunchIntent(this, user.getId()));
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
+
     private void subscribeViewModel() {
         binding.getVm().getError().observe(this,
                 e -> showToast(getString(R.string.ERROR_DEFAULT)));
-    }
-
-    private void showDialog() {
-        final NameDialog dialog = new NameDialog(this);
-        dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
-        dialog.show();
     }
 
     private void showToast(@NonNull final String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void startCallActivity(@NonNull final User user) {
-        startActivity(CallActivity.getCallerLaunchIntent(this, user.getTel()));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    private void showDialog() {
+        final NameDialog dialog = new NameDialog(this);
+        dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
+        dialog.show();
     }
 
     @Override

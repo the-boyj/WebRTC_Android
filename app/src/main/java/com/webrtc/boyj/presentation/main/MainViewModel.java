@@ -11,61 +11,76 @@ import com.webrtc.boyj.presentation.BaseViewModel;
 
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainViewModel extends BaseViewModel {
     @NonNull
-    private final MutableLiveData<User> user = new MutableLiveData<>();
+    private final MutableLiveData<User> profile = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<List<User>> otherUserList = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<Throwable> error = new MutableLiveData<>();
     @NonNull
-    private final ObservableBoolean loading = new ObservableBoolean(true);
+    private final ObservableBoolean loading = new ObservableBoolean();
     @NonNull
     private final UserRepository repository;
 
-    MainViewModel(@NonNull UserRepository repository) {
+    public MainViewModel(@NonNull UserRepository repository) {
         this.repository = repository;
     }
 
-    void init(@NonNull final String id) {
-        loading.set(true);
+    public void init(@NonNull final String id) {
+        loadProfile(id);
+        loadOtherUserList(id);
+    }
 
-        addDisposable(repository.getUser(id)
+    private void loadProfile(@NonNull final String id) {
+        addDisposable(repository.getProfile(id)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .flatMapCompletable(user -> {
-                    this.user.setValue(user);
-                    return repository.updateDeviceToken(id);
-                }).subscribe(() -> { /* doNothing */ }, this.error::setValue)
-        );
-
-        addDisposable(repository.getOtherUserList(id)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userList -> {
-                    loading.set(false);
-                    this.otherUserList.setValue(userList);
-                }, error -> {
-                    loading.set(false);
-                    this.error.setValue(error);
-                })
+                .doOnSuccess(this.profile::setValue)
+                .flatMapCompletable(__ -> updateDeviceToken(id))
+                .subscribe(() -> { /* doNothing */ }, this.error::setValue)
         );
     }
 
-    void updateUserName(@NonNull final String id,
-                        @NonNull final String name) {
-        addDisposable(repository.updateUserName(id, name)
+    private Completable updateDeviceToken(@NonNull final String id) {
+        return repository.updateDeviceToken(id).subscribeOn(Schedulers.io());
+    }
+
+    private void loadOtherUserList(@NonNull final String id) {
+        addDisposable(repository.getOtherUserList(id)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    final User newUser = new User(id, name);
-                    this.user.setValue(newUser);
-                }, this.error::setValue)
+                .doOnSubscribe(__ -> showLoading())
+                .doFinally(this::hideLoading)
+                .subscribe(this.otherUserList::setValue, this.error::setValue)
         );
+    }
+
+    public void updateUserName(@NonNull final String id, @NonNull final String name) {
+        addDisposable(repository.updateUserName(id, name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        () -> this.profile.setValue(new User(id, name)), // onComplete
+                        this.error::setValue) // onError
+        );
+    }
+
+    private void showLoading() {
+        loading.set(true);
+    }
+
+    private void hideLoading() {
+        loading.set(false);
     }
 
     @NonNull
-    public LiveData<User> getUser() {
-        return user;
+    public LiveData<User> getProfile() {
+        return profile;
     }
 
     @NonNull
@@ -74,7 +89,7 @@ public class MainViewModel extends BaseViewModel {
     }
 
     @NonNull
-    MutableLiveData<Throwable> getError() {
+    public LiveData<Throwable> getError() {
         return error;
     }
 

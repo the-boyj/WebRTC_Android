@@ -7,7 +7,6 @@ import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.signalling.payload.DialPayload;
 import com.webrtc.boyj.data.model.BoyjMediaStream;
@@ -35,64 +34,63 @@ public class CallViewModel extends BaseViewModel {
     private final MutableLiveData<String> rejectedUserName = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<String> byeUserName = new MutableLiveData<>();
-    private BoyjRTC boyjRTC;
+    @NonNull
+    private final BoyjRTC boyjRTC;
 
-    public CallViewModel() {
-        boyjRTC = new BoyjRTC();
+    public CallViewModel(@NonNull final BoyjRTC boyjRTC) {
+        this.boyjRTC = boyjRTC;
+        localMediaStream.setValue(boyjRTC.getLocalMediaStream());
+
+        subscribeRemoteSubject();
+        subscribeRejectSubject();
+        subscribeEndOfCall();
     }
 
-    public void init() {
-        boyjRTC.initRTC();
-        boyjRTC.startCapture();
-
-        localMediaStream.setValue(boyjRTC.getLocalStream());
-
-        addDisposable(boyjRTC.getRemoetStreamSubject()
-                .observeOn(AndroidSchedulers.mainThread())
+    private void subscribeRemoteSubject() {
+        addDisposable(boyjRTC.remoteMediaStreamSubject()
                 .subscribe(mediaStream -> {
-                    if (!isCalling.get()) { // 최초 통화의 경우 타이머 작동
+                    if (isNotCalling()) { // 최초 통화의 경우 타이머 작동
                         call();
                     }
                     this.remoteMediaStream.setValue(mediaStream);
                 })
         );
+    }
 
-        addDisposable(boyjRTC.getRejectSubject()
+    private void subscribeRejectSubject() {
+        addDisposable(boyjRTC.rejectNameSubject()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                    if (!isCalling.get()) { // 최초 통화 거부
+                .subscribe(name -> {
+                    if (isNotCalling()) { // 최초 통화 거부
                         isEnded.setValue(true);
                     } else { // 기존 통화 중 거부
-                        rejectedUserName.setValue(response.getSender());
+                        rejectedUserName.setValue(name);
                     }
                 })
         );
-
-        addDisposable(boyjRTC.getEndOfCallSubject()
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(EndOfCallPayload::getSender)
-                .subscribe(byeUserName::setValue)
-        );
-
     }
 
-    public void dial(@NonNull final String calleeId) {
-        final DialPayload dialPayload = new DialPayload.Builder(calleeId).build();
-        boyjRTC.dial(dialPayload);
+    private void subscribeEndOfCall() {
+        addDisposable(boyjRTC.endOfCallSubject()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(byeUserName::setValue)
+        );
     }
 
     public void createRoom(@NonNull final String callerId) {
-        final CreateRoomPayload payload = new CreateRoomPayload.Builder(callerId).build();
+        final CreateRoomPayload payload = new CreateRoomPayload(callerId);
         boyjRTC.createRoom(payload);
+    }
+
+    public void dial(@NonNull final String calleeId) {
+        final DialPayload dialPayload = new DialPayload(calleeId);
+        boyjRTC.dial(dialPayload);
     }
 
     public void accept(@NonNull final String callerId) {
         boyjRTC.accept(callerId);
     }
 
-    /**
-     * 최초 전화연결 이후 호출
-     */
     private void call() {
         isCalling.set(true);
 
@@ -100,6 +98,10 @@ public class CallViewModel extends BaseViewModel {
                 .map(Long::intValue)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(callTime::set));
+    }
+
+    private boolean isNotCalling() {
+        return !isCalling.get();
     }
 
     /**

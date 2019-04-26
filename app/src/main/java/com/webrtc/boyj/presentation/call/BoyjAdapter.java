@@ -1,6 +1,7 @@
 package com.webrtc.boyj.presentation.call;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,6 @@ import org.webrtc.VideoTrack;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("SpellCheckingInspection")
 public class BoyjAdapter extends SplitLayout.Adapter {
     public BoyjAdapter(@NonNull final OnEndOfCallListener onEndOfCallListener) {
         this.onEndOfCallListener = onEndOfCallListener;
@@ -29,23 +29,27 @@ public class BoyjAdapter extends SplitLayout.Adapter {
     private final OnEndOfCallListener onEndOfCallListener;
     private final List<BoyjMediaStream> mediaStreamList = new ArrayList<>();
 
-    public void addMediaStream(@NonNull final BoyjMediaStream mediaStream) {
-        this.mediaStreamList.add(mediaStream);
-        notifyDataSetChanged();
+    public void addMediaStream(@Nullable final BoyjMediaStream mediaStream) {
+        if (mediaStream != null) {
+            this.mediaStreamList.add(mediaStream);
+            notifyDataSetChanged();
+        }
     }
 
-    public void removeMediaStreamfromId(@NonNull final String id) {
-        for (int i = 0; i < mediaStreamList.size(); i++) {
-            final BoyjMediaStream mediaStream = mediaStreamList.get(i);
-            if (mediaStream.getId().equals(id)) {
-                mediaStreamList.remove(i);
-                notifyDataSetChanged();
-                return;
+    public void removeMediaStreamfromId(@Nullable final String id) {
+        if (id != null) {
+            for (int i = 0; i < mediaStreamList.size(); i++) {
+                final BoyjMediaStream mediaStream = mediaStreamList.get(i);
+                if (mediaStream.getId().equals(id)) {
+                    mediaStreamList.remove(i);
+                    notifyDataSetChanged();
+                    return;
+                }
             }
-        }
 
-        if (mediaStreamList.isEmpty()) {
-            onEndOfCallListener.onEnd();
+            if (mediaStreamList.isEmpty()) {
+                onEndOfCallListener.onEnd();
+            }
         }
     }
 

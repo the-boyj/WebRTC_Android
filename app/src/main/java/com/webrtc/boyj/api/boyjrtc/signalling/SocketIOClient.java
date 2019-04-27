@@ -1,11 +1,11 @@
-package com.webrtc.boyj.api.signalling;
+package com.webrtc.boyj.api.boyjrtc.signalling;
 
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.BuildConfig;
-import com.webrtc.boyj.api.signalling.payload.Payload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.Payload;
 import com.webrtc.boyj.utils.JSONUtil;
 import com.webrtc.boyj.utils.Logger;
 
@@ -42,19 +42,19 @@ class SocketIOClient {
         socket.disconnect();
     }
 
-    void emit(@NonNull SignalingEvent event,
+    void emit(@NonNull SocketEvent event,
               @NonNull final Payload payload) {
         Logger.i(payload.toString());
         socket.emit(event.toString(), JSONUtil.toJSONObject(payload));
     }
 
-    void emit(@NonNull SignalingEvent event,
+    void emit(@NonNull SocketEvent event,
               @Nullable final Object... args) {
         Logger.i(event.toString());
         socket.emit(event.toString(), args);
     }
 
-    void on(@NonNull SignalingEvent event,
+    void on(@NonNull SocketEvent event,
             @NonNull final Emitter.Listener fn) {
         socket.on(event.toString(), fn);
     }

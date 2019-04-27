@@ -1,8 +1,8 @@
-package com.webrtc.boyj.api.signalling;
+package com.webrtc.boyj.api.boyjrtc.signalling;
 
 import android.support.annotation.NonNull;
 
-public enum SignalingEvent {
+public enum SocketEvent {
     CREATE_ROOM("CREATE_ROOM"),
     DIAL("DIAL"),
     ANSWER("ANSWER"),
@@ -23,7 +23,7 @@ public enum SignalingEvent {
 
     private final String event;
 
-    SignalingEvent(String event) {
+    SocketEvent(String event) {
         this.event = event;
     }
 

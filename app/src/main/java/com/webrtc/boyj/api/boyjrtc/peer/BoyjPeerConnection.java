@@ -1,12 +1,13 @@
-package com.webrtc.boyj.api.peer;
+package com.webrtc.boyj.api.boyjrtc.peer;
 
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.peer.manager.RtcConfigurationManager;
-import com.webrtc.boyj.api.peer.observer.AnswerSdpObserver;
-import com.webrtc.boyj.api.peer.observer.BoyjPeerConnectionObserver;
-import com.webrtc.boyj.api.peer.observer.NoOpSdpObserver;
-import com.webrtc.boyj.api.peer.observer.OfferSdpObserver;
+import com.webrtc.boyj.api.boyjrtc.PeerCallback;
+import com.webrtc.boyj.api.boyjrtc.peer.manager.RtcConfigurationManager;
+import com.webrtc.boyj.api.boyjrtc.peer.observer.AnswerSdpObserver;
+import com.webrtc.boyj.api.boyjrtc.peer.observer.BoyjPeerConnectionObserver;
+import com.webrtc.boyj.api.boyjrtc.peer.observer.NoOpSdpObserver;
+import com.webrtc.boyj.api.boyjrtc.peer.observer.OfferSdpObserver;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -82,6 +83,10 @@ public class BoyjPeerConnection {
     void dispose(@NonNull final String id) {
         getConnectionById(id).dispose();
         connections.remove(id);
+
+        if (connections.isEmpty()) {
+            callback.onCallFinish();
+        }
     }
 
     void disposeAll() {

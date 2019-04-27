@@ -1,6 +1,8 @@
-package com.webrtc.boyj.api.peer;
+package com.webrtc.boyj.api.boyjrtc.peer;
 
 import android.support.annotation.NonNull;
+
+import com.webrtc.boyj.api.boyjrtc.PeerCallback;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;

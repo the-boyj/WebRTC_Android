@@ -1,4 +1,4 @@
-package com.webrtc.boyj.api.peer;
+package com.webrtc.boyj.api.boyjrtc.peer;
 
 import org.webrtc.PeerConnection;
 

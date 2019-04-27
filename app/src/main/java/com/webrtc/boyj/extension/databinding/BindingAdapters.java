@@ -12,7 +12,10 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.TextView;
 
+import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.extension.custom.BoyjSurfaceView;
+import com.webrtc.boyj.extension.custom.SplitLayout;
+import com.webrtc.boyj.presentation.call.CallAdapter;
 
 import org.webrtc.MediaStream;
 import org.webrtc.VideoTrack;
@@ -51,12 +54,24 @@ public class BindingAdapters {
         }
     }
 
-    @BindingAdapter({"mediaStream"})
-    public static void setMediaStream(@NonNull final BoyjSurfaceView surfaceView,
-                                      @Nullable final MediaStream mediaStream) {
+    @BindingAdapter({"localStream"})
+    public static void bindMediaStream(@NonNull final BoyjSurfaceView surfaceView,
+                                       @Nullable final MediaStream mediaStream) {
         if (mediaStream != null) {
             final VideoTrack track = mediaStream.videoTracks.get(0);
             track.addSink(surfaceView);
+        }
+    }
+
+    @BindingAdapter({"remoteStreams"})
+    public static void bindMediaStreams(@NonNull final SplitLayout splitLayout,
+                                        @Nullable final List<BoyjMediaStream> mediaStreams) {
+        final CallAdapter adapter = (CallAdapter) splitLayout.getAdapter();
+        if (adapter != null) {
+            adapter.submitMediaStreams(
+                    mediaStreams == null ?
+                            new ArrayList<>() :
+                            new ArrayList<>(mediaStreams));
         }
     }
 

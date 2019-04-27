@@ -1,48 +1,40 @@
-package com.webrtc.boyj.api;
+package com.webrtc.boyj.api.boyjrtc;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.peer.PeerCallback;
-import com.webrtc.boyj.api.peer.PeerConnectionClient;
-import com.webrtc.boyj.api.peer.manager.PeerConnectionFactoryManager;
-import com.webrtc.boyj.api.peer.manager.UserMediaManager;
-import com.webrtc.boyj.api.signalling.SignalingCallback;
-import com.webrtc.boyj.api.signalling.SignalingClient;
-import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
-import com.webrtc.boyj.api.signalling.payload.CreateRoomPayload;
-import com.webrtc.boyj.api.signalling.payload.DialPayload;
-import com.webrtc.boyj.api.signalling.payload.EndOfCallPayload;
-import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
-import com.webrtc.boyj.api.signalling.payload.RejectPayload;
-import com.webrtc.boyj.api.signalling.payload.SdpPayload;
-import com.webrtc.boyj.data.model.BoyjMediaStream;
+import com.webrtc.boyj.api.boyjrtc.peer.PeerConnectionClient;
+import com.webrtc.boyj.api.boyjrtc.peer.manager.PeerConnectionFactoryManager;
+import com.webrtc.boyj.api.boyjrtc.peer.manager.UserMediaManager;
+import com.webrtc.boyj.api.boyjrtc.signalling.SignalingClient;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.EndOfCallPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
-import io.reactivex.subjects.PublishSubject;
+import java.util.List;
 
-@SuppressWarnings("SpellCheckingInspection")
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+
 public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
+    private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
+
     private UserMediaManager userMediaManager;
     private PeerConnectionClient peerConnectionClient;
     private SignalingClient signalingClient;
     @NonNull
-    private final PublishSubject<BoyjMediaStream> remoteMediaStream = PublishSubject.create();
-    @NonNull
-    private final PublishSubject<String> rejectNameSubject = PublishSubject.create();
-    @NonNull
-    private final PublishSubject<String> endOfCallNameSubject = PublishSubject.create();
-
-    private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
+    private final BoyjPublisher publisher = new BoyjPublisher();
 
     private boolean isInitialized = false;
 
-    /**
-     * PeerConnection 사용을 위한 기본 설정. 호출하지 않으면 RTC 기능 사용시 Runtime Exception 발생
-     */
     public void initRTC(@NonNull final Context context) {
         PeerConnectionFactoryManager.initialize(context);
         final PeerConnectionFactory factory =
@@ -64,27 +56,6 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     public void stopCapture() {
         validateInitRTC();
         userMediaManager.stopCapture();
-    }
-
-    @NonNull
-    public MediaStream getLocalMediaStream() {
-        validateInitRTC();
-        return userMediaManager.getLocalMediaStream();
-    }
-
-    @NonNull
-    public PublishSubject<BoyjMediaStream> remoteMediaStreamSubject() {
-        return remoteMediaStream;
-    }
-
-    @NonNull
-    public PublishSubject<String> rejectNameSubject() {
-        return rejectNameSubject;
-    }
-
-    @NonNull
-    public PublishSubject<String> endOfCallNameSubject() {
-        return endOfCallNameSubject;
     }
 
     @Override
@@ -139,9 +110,6 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
         signalingClient.disconnect();
     }
 
-    /**
-     * @throws IllegalStateException initRTC()가 호출되지 않은 경우 발생
-     */
     private void validateInitRTC() {
         if (!isInitialized) {
             throw new IllegalStateException(ERROR_INITIALIZED);
@@ -167,7 +135,8 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
     @Override
     public void onRemoteStreamFromPeer(@NonNull BoyjMediaStream mediaStream) {
-        remoteMediaStream.onNext(mediaStream);
+        publisher.completeCall();
+        publisher.submitRemoteStream(mediaStream);
     }
 
     @Override
@@ -184,6 +153,11 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     private void setRemoteSdp(@NonNull final String targetId,
                               @NonNull final SessionDescription sdp) {
         peerConnectionClient.setRemoteSdp(targetId, sdp);
+    }
+
+    @Override
+    public void onCallFinish() {
+        publisher.completeEndOfCall();
     }
 
     @Override
@@ -204,12 +178,47 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
     @Override
     public void onRejectPayloadFromSig(@NonNull RejectPayload rejectPayload) {
-        rejectNameSubject.onNext(rejectPayload.getSender());
+        publisher.submitReject(rejectPayload.getSender());
     }
 
     @Override
     public void onEndOfCallPayloadFromSig(@NonNull EndOfCallPayload endOfCallPayload) {
+        publisher.submitLeave(endOfCallPayload.getSender());
         peerConnectionClient.dispose(endOfCallPayload.getSender());
-        endOfCallNameSubject.onNext(endOfCallPayload.getSender());
+    }
+
+    @NonNull
+    public Observable<String> onRejected() {
+        return publisher.getRejectSubject().hide();
+    }
+
+    @NonNull
+    public Completable onCalled() {
+        validateInitRTC();
+        return publisher.getCallSubject().hide();
+    }
+
+    @NonNull
+    public Observable<String> onLeaved() {
+        validateInitRTC();
+        return publisher.getLeaveSubject().hide();
+    }
+
+    @NonNull
+    public Completable onEndOfCall() {
+        validateInitRTC();
+        return publisher.getEndOfCallSubject().hide();
+    }
+
+    @NonNull
+    public MediaStream localStream() {
+        validateInitRTC();
+        return userMediaManager.getLocalMediaStream();
+    }
+
+    @NonNull
+    public Observable<List<BoyjMediaStream>> remoteStreams() {
+        validateInitRTC();
+        return publisher.getRemoteStreamSubject().hide();
     }
 }

@@ -28,26 +28,27 @@ public class PeerConnectionClient {
     public void createOffers(@NonNull final List<Participant> participants,
                              @NonNull final MediaStream localMediaStream) {
         for (final Participant participant : participants) {
-            createOffer(participant.getUserId(), localMediaStream);
+            createPeerConnection(participant.getUserId());
+            createOffer(participant.getUserId());
+            addLocalStream(participant.getUserId(), localMediaStream);
         }
     }
 
-    private void createOffer(@NonNull final String targetId,
-                             @NonNull final MediaStream localMediaStream) {
-        initPeerConnection(targetId, localMediaStream);
+    public void createPeerConnection(@NonNull final String targetId) {
+        boyjPeerConnection.createPeerConnection(targetId, peerConnectionFactory);
+    }
+
+    private void createOffer(@NonNull final String targetId) {
         boyjPeerConnection.createOffer(targetId);
     }
 
-    public void createAnswer(@NonNull final String targetId,
-                             @NonNull final MediaStream localMediaStream) {
-        initPeerConnection(targetId, localMediaStream);
+    public void createAnswer(@NonNull final String targetId) {
         boyjPeerConnection.createAnswer(targetId);
     }
 
-    private void initPeerConnection(@NonNull final String targetId,
-                                    @NonNull final MediaStream localMediaStream) {
-        boyjPeerConnection.createPeerConnection(targetId, peerConnectionFactory);
-        boyjPeerConnection.addLocalStream(targetId, localMediaStream);
+    private void addLocalStream(@NonNull final String targetId,
+                                @NonNull final MediaStream localStream) {
+        boyjPeerConnection.addLocalStream(targetId, localStream);
     }
 
     public void setLocalSdp(@NonNull final String targetId,

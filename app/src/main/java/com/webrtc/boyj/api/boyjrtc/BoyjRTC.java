@@ -149,8 +149,9 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
     @Override
     public void onOfferSdpPayloadFromSig(@NonNull SdpPayload payload) {
-        peerConnectionClient.createAnswer(payload.getSender(), localStream());
+        peerConnectionClient.createPeerConnection(payload.getSender());
         peerConnectionClient.setRemoteSdp(payload.getSender(), payload.getSdp());
+        peerConnectionClient.createAnswer(payload.getSender());
     }
 
     @Override

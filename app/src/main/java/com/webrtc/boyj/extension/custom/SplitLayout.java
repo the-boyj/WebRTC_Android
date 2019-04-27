@@ -79,6 +79,11 @@ public class SplitLayout extends LinearLayout {
         }
     }
 
+    @Nullable
+    public Adapter getAdapter() {
+        return adapter;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();

@@ -1,10 +1,9 @@
-package com.webrtc.boyj.api.peer;
+package com.webrtc.boyj.api.boyjrtc;
 
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
-import com.webrtc.boyj.api.signalling.payload.SdpPayload;
-import com.webrtc.boyj.data.model.BoyjMediaStream;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 
 public interface PeerCallback {
     void onOfferSdpPayloadFromPeer(@NonNull final SdpPayload sdpPayload);
@@ -14,4 +13,6 @@ public interface PeerCallback {
     void onIceCandidatePayloadFromPeer(@NonNull final IceCandidatePayload iceCandidatePayload);
 
     void onRemoteStreamFromPeer(@NonNull final BoyjMediaStream mediaStream);
+
+    void onCallFinish();
 }

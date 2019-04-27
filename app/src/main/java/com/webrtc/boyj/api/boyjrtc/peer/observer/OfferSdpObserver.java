@@ -1,9 +1,9 @@
-package com.webrtc.boyj.api.peer.observer;
+package com.webrtc.boyj.api.boyjrtc.peer.observer;
 
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.peer.PeerCallback;
-import com.webrtc.boyj.api.signalling.payload.SdpPayload;
+import com.webrtc.boyj.api.boyjrtc.PeerCallback;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 
 import org.webrtc.SessionDescription;
 

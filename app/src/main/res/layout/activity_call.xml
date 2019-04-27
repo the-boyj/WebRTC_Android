@@ -17,7 +17,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <com.webrtc.boyj.extension.custom.SplitLayout
             android:id="@+id/splitLayout"
             android:layout_width="0dp"
@@ -25,10 +24,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:remoteStreams="@{vm.remoteMediaStreams}" />
 
         <com.webrtc.boyj.extension.custom.BoyjSurfaceView
-            android:id="@+id/view_local"
+            android:id="@+id/local_boyj_surface_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:callAnimation="@{vm.isCalling}"
@@ -36,7 +36,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:mediaStream="@{vm.localMediaStream}" />
+            app:localStream="@{vm.localMediaStream}" />
 
         <TextView
             android:id="@+id/tv_timer"
@@ -75,6 +75,7 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_reject"
+            android:onClick="@{() -> vm.hangUp()}"
             style="@style/CallFabDefault"
             android:backgroundTint="@color/colorRed"
             android:src="@drawable/ic_call_end"

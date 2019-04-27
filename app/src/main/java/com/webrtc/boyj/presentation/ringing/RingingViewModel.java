@@ -3,9 +3,9 @@ package com.webrtc.boyj.presentation.ringing;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
-import com.webrtc.boyj.api.signalling.payload.RejectPayload;
+import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
 public class RingingViewModel extends BaseViewModel {

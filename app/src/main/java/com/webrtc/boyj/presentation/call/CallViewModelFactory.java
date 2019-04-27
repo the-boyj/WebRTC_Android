@@ -4,7 +4,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.BoyjRTC;
+import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 
 public class CallViewModelFactory implements ViewModelProvider.Factory {
     @NonNull

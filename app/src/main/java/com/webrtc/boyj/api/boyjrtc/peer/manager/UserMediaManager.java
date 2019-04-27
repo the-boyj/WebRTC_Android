@@ -1,4 +1,4 @@
-package com.webrtc.boyj.api.peer.manager;
+package com.webrtc.boyj.api.boyjrtc.peer.manager;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -32,18 +32,6 @@ public final class UserMediaManager {
         mediaStream.addTrack(createAudioTrack());
 
         capturer = createVideoCapturer(context);
-    }
-
-    public void startCapture() {
-        capturer.startCapture(1024, 720, 30);
-    }
-
-    public void stopCapture() {
-        try {
-            capturer.stopCapture();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public MediaStream getLocalMediaStream() {
@@ -87,5 +75,17 @@ public final class UserMediaManager {
 
     private boolean isCamera2Supported(@NonNull final Context context) {
         return Camera2Enumerator.isSupported(context);
+    }
+
+    public void startCapture() {
+        capturer.startCapture(1024, 720, 30);
+    }
+
+    public void stopCapture() {
+        try {
+            capturer.stopCapture();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

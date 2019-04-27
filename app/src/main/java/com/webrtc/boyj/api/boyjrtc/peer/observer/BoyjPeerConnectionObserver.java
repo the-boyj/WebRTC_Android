@@ -1,10 +1,10 @@
-package com.webrtc.boyj.api.peer.observer;
+package com.webrtc.boyj.api.boyjrtc.peer.observer;
 
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.peer.PeerCallback;
-import com.webrtc.boyj.api.signalling.payload.IceCandidatePayload;
-import com.webrtc.boyj.data.model.BoyjMediaStream;
+import com.webrtc.boyj.api.boyjrtc.PeerCallback;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;

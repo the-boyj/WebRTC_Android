@@ -1,4 +1,4 @@
-package com.webrtc.boyj.api.peer.manager;
+package com.webrtc.boyj.api.boyjrtc.peer.manager;
 
 import android.support.annotation.NonNull;
 

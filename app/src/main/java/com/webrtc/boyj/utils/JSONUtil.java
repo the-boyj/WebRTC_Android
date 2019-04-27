@@ -3,7 +3,7 @@ package com.webrtc.boyj.utils;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
-import com.webrtc.boyj.api.signalling.payload.Payload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.Payload;
 
 import org.json.JSONException;
 import org.json.JSONObject;

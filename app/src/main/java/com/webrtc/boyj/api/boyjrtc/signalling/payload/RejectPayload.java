@@ -1,4 +1,4 @@
-package com.webrtc.boyj.api.signalling.payload;
+package com.webrtc.boyj.api.boyjrtc.signalling.payload;
 
 public class RejectPayload extends Payload {
     private String sender;

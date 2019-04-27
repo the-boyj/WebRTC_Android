@@ -1,8 +1,8 @@
-package com.webrtc.boyj.api.peer.observer;
+package com.webrtc.boyj.api.boyjrtc.peer.observer;
 
 import android.support.annotation.NonNull;
 
-import com.webrtc.boyj.api.peer.PeerCallback;
+import com.webrtc.boyj.api.boyjrtc.PeerCallback;
 import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.SdpObserver;
@@ -31,12 +31,12 @@ public abstract class BoyjSdpObserver implements SdpObserver {
 
     @Override
     public void onSetFailure(String s) {
-        Logger.d(id + "onSetFailure() called with: s = [" + s + "]");
+        Logger.d(id + "onSetFailure() called withLayout: s = [" + s + "]");
     }
 
     @Override
     public void onCreateSuccess(SessionDescription sessionDescription) {
-        Logger.d(id + "onCreateSuccess() called with s = [" + sessionDescription + "]");
+        Logger.d(id + "onCreateSuccess() called withLayout s = [" + sessionDescription + "]");
         onSessionDescription(sessionDescription);
     }
 
@@ -44,6 +44,6 @@ public abstract class BoyjSdpObserver implements SdpObserver {
 
     @Override
     public void onCreateFailure(String s) {
-        Logger.d(id + "onCreateFailure() called with: s = [" + s + "]");
+        Logger.d(id + "onCreateFailure() called withLayout: s = [" + s + "]");
     }
 }

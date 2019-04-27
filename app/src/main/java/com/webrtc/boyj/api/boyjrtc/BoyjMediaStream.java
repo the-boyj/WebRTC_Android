@@ -1,4 +1,4 @@
-package com.webrtc.boyj.data.model;
+package com.webrtc.boyj.api.boyjrtc;
 
 import android.support.annotation.NonNull;
 

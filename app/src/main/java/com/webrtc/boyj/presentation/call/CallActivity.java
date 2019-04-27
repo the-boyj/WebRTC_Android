@@ -11,11 +11,11 @@ import android.widget.Toast;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.extension.custom.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.utils.App;
-import com.webrtc.boyj.utils.TelManager;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
@@ -30,7 +30,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         initViewModel();
 
         if (calleeId != null) {
-            initCaller(calleeId);
+            final String callerId = IDManager.getSavedUserId(this);
+            initCaller(callerId, calleeId);
         } else {
             initCallee();
         }
@@ -47,7 +48,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     public void showCallMenuDialog(View view) {
-        final CallMenuDialog dialog = new CallMenuDialog();
+        final CallMenuDialog dialog = CallMenuDialog.newInstance();
         dialog.setOnInviteListener(user -> binding.getVm().invite(user.getId()));
         dialog.show(getSupportFragmentManager(), "CallMenuDialog");
     }
@@ -91,8 +92,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         });
     }
 
-    private void initCaller(@NonNull final String calleeId) {
-        final String callerId = TelManager.getTelNumber(getApplicationContext());
+    private void initCaller(@NonNull final String callerId,
+                            @NonNull final String calleeId) {
         binding.getVm().initCaller(callerId, calleeId);
     }
 

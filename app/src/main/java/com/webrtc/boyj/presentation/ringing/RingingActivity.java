@@ -16,10 +16,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
-import com.webrtc.boyj.utils.TelManager;
 
 public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private static final String EXTRA_ROOM = "room";
@@ -37,11 +37,11 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
         turnOnRingTone();
 
         final String room = getIntent().getStringExtra(EXTRA_ROOM);
+        final String calleeId = IDManager.getSavedUserId(this);
         callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
-        final String calleeId = TelManager.getTelNumber(getApplicationContext());
 
-        initViewModel();
         initViews();
+        initViewModel();
 
         binding.getVm().awaken(room, callerId, calleeId);
     }

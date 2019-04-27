@@ -22,7 +22,6 @@ import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
 import com.webrtc.boyj.presentation.call.invite.InviteViewModel;
 import com.webrtc.boyj.utils.App;
-import com.webrtc.boyj.utils.TelManager;
 
 public class CallMenuDialog extends BottomSheetDialogFragment {
     private DialogCallMenuBinding binding;
@@ -49,9 +48,6 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         initViewModel();
         initView();
-
-        binding.getInviteViewModel()
-                .init(TelManager.getTelNumber(App.getContext()));
     }
 
     private void initViewModel() {
@@ -76,8 +72,7 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         final InviteAdapter adapter = new InviteAdapter();
 
-        adapter.setOnDialListener(user ->
-                onInviteListener.onInvite(user));
+        adapter.setOnDialListener(user -> onInviteListener.onInvite(user));
 
         binding.rvInviteUser.setAdapter(adapter);
         binding.getInviteViewModel()

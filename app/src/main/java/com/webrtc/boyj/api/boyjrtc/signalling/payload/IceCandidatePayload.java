@@ -9,10 +9,6 @@ public class IceCandidatePayload extends Payload {
     private String sender;
     private String receiver;
 
-    public IceCandidatePayload() {
-
-    }
-
     public IceCandidatePayload(@NonNull final IceCandidate iceCandidate) {
         this.iceCandidate = iceCandidate;
     }

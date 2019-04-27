@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.Toast;
 
 import com.webrtc.boyj.R;
@@ -17,45 +18,38 @@ import com.webrtc.boyj.utils.App;
 import com.webrtc.boyj.utils.TelManager;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
-    private static final String EXTRA_CALLER_ID = "EXTRA_CALLER_ID";
     private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
-    private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final Intent intent = getIntent();
-        final boolean isCaller = intent.getBooleanExtra(EXTRA_IS_CALLER, true);
+        final String calleeId = getIntent().getStringExtra(EXTRA_CALLEE_ID);
 
         initViews();
         initViewModel();
 
-        if (isCaller) {
-            initCaller(intent);
+        if (calleeId != null) {
+            initCaller(calleeId);
         } else {
-            initCallee(intent);
+            initCallee();
         }
     }
 
     private void initViews() {
-        initFloatingButton();
         initSplitLayout();
-    }
-
-    private void initFloatingButton() {
-        findViewById(R.id.iv_call_menu).setOnClickListener(__ -> showCallMenuDialog());
-    }
-
-    private void showCallMenuDialog() {
-        CallMenuDialog.newInstance()
-                .show(getSupportFragmentManager(), "CallMenuDialog");
     }
 
     private void initSplitLayout() {
         final CallAdapter adapter = new CallAdapter();
         final SplitLayout splitLayout = findViewById(R.id.splitLayout);
         splitLayout.setAdapter(adapter);
+    }
+
+    public void showCallMenuDialog(View view) {
+        final CallMenuDialog dialog = new CallMenuDialog();
+        dialog.setOnInviteListener(user -> binding.getVm().invite(user.getId()));
+        dialog.show(getSupportFragmentManager(), "CallMenuDialog");
     }
 
     private void initViewModel() {
@@ -97,15 +91,13 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         });
     }
 
-    private void initCaller(@NonNull final Intent intent) {
+    private void initCaller(@NonNull final String calleeId) {
         final String callerId = TelManager.getTelNumber(getApplicationContext());
-        final String calleeId = intent.getStringExtra(EXTRA_CALLEE_ID);
         binding.getVm().initCaller(callerId, calleeId);
     }
 
-    private void initCallee(@NonNull final Intent intent) {
-        final String callerId = intent.getStringExtra(EXTRA_CALLER_ID);
-        binding.getVm().initCallee(callerId);
+    private void initCallee() {
+        binding.getVm().initCallee();
     }
 
     private void showToast(@Nullable final String msg) {
@@ -118,16 +110,12 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     public static Intent getCallerLaunchIntent(@NonNull final Context context,
                                                @NonNull final String calleeId) {
         return getLaunchIntent(context, CallActivity.class)
-                .putExtra(EXTRA_CALLEE_ID, calleeId)
-                .putExtra(EXTRA_IS_CALLER, true);
+                .putExtra(EXTRA_CALLEE_ID, calleeId);
     }
 
     @NonNull
-    public static Intent getCalleeLaunchIntent(@NonNull final Context context,
-                                               @NonNull final String callerId) {
-        return getLaunchIntent(context, CallActivity.class)
-                .putExtra(EXTRA_CALLER_ID, callerId)
-                .putExtra(EXTRA_IS_CALLER, false);
+    public static Intent getCalleeLaunchIntent(@NonNull final Context context) {
+        return getLaunchIntent(context, CallActivity.class);
     }
 
     @Override

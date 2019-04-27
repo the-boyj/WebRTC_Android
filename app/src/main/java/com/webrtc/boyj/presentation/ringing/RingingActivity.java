@@ -94,7 +94,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     }
 
     private void startCallActivity() {
-        startActivity(CallActivity.getCalleeLaunchIntent(this, callerId));
+        startActivity(CallActivity.getCalleeLaunchIntent(this));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
     }

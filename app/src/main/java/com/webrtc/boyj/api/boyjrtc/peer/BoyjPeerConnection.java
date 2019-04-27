@@ -19,7 +19,7 @@ import org.webrtc.SessionDescription;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class BoyjPeerConnection {
+class BoyjPeerConnection {
     @NonNull
     private final MediaConstraints constraints = new MediaConstraints();
     @NonNull
@@ -44,16 +44,11 @@ public class BoyjPeerConnection {
         if (connection == null) {
             throw new IllegalStateException("PeerConnection is not created");
         }
-
         connections.put(id, connection);
     }
 
     void createOffer(@NonNull final String id) {
         getConnectionById(id).createOffer(new OfferSdpObserver(id, callback), constraints);
-    }
-
-    void connectOffer(@NonNull final String id) {
-        // getConnectionById(id).setLocalDescription(new OfferSdpObserver(id), offerSdp);
     }
 
     void createAnswer(@NonNull final String id) {
@@ -65,8 +60,8 @@ public class BoyjPeerConnection {
         getConnectionById(id).addStream(localMediaStream);
     }
 
-    public void setLocalDescription(@NonNull final String id,
-                                    @NonNull SessionDescription sdp) {
+    public void setLocalSdp(@NonNull final String id,
+                            @NonNull SessionDescription sdp) {
         getConnectionById(id).setLocalDescription(new NoOpSdpObserver(id, callback), sdp);
     }
 
@@ -95,7 +90,7 @@ public class BoyjPeerConnection {
         }
     }
 
-    PeerConnection getConnectionById(@NonNull final String id) {
+    private PeerConnection getConnectionById(@NonNull final String id) {
         return connections.get(id);
     }
 }

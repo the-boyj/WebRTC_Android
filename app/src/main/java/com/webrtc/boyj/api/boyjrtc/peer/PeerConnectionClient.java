@@ -3,11 +3,14 @@ package com.webrtc.boyj.api.boyjrtc.peer;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.api.boyjrtc.PeerCallback;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.Participant;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
+
+import java.util.List;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class PeerConnectionClient {
@@ -22,30 +25,34 @@ public class PeerConnectionClient {
         this.boyjPeerConnection = new BoyjPeerConnection(callback);
     }
 
-    public void createPeerConnection(@NonNull final String targetId) {
-        boyjPeerConnection.createPeerConnection(targetId, peerConnectionFactory);
+    public void createOffers(@NonNull final List<Participant> participants,
+                             @NonNull final MediaStream localMediaStream) {
+        for (final Participant participant : participants) {
+            createOffer(participant.getUserId(), localMediaStream);
+        }
     }
 
-    public void createOffer(@NonNull final String targetId) {
+    private void createOffer(@NonNull final String targetId,
+                             @NonNull final MediaStream localMediaStream) {
+        initPeerConnection(targetId, localMediaStream);
         boyjPeerConnection.createOffer(targetId);
     }
 
-    public void connectOffer(@NonNull final String targetId) {
-        boyjPeerConnection.connectOffer(targetId);
-    }
-
-    public void createAnswer(@NonNull final String targetId) {
+    public void createAnswer(@NonNull final String targetId,
+                             @NonNull final MediaStream localMediaStream) {
+        initPeerConnection(targetId, localMediaStream);
         boyjPeerConnection.createAnswer(targetId);
     }
 
-    public void addLocalStream(@NonNull final String targetId,
-                               @NonNull final MediaStream localMediaStream) {
+    private void initPeerConnection(@NonNull final String targetId,
+                                    @NonNull final MediaStream localMediaStream) {
+        boyjPeerConnection.createPeerConnection(targetId, peerConnectionFactory);
         boyjPeerConnection.addLocalStream(targetId, localMediaStream);
     }
 
-    public void setLocalDescription(@NonNull final String id,
-                                    @NonNull SessionDescription sdp) {
-        boyjPeerConnection.setLocalDescription(id, sdp);
+    public void setLocalSdp(@NonNull final String targetId,
+                            @NonNull final SessionDescription sdp) {
+        boyjPeerConnection.setLocalSdp(targetId, sdp);
     }
 
     public void setRemoteSdp(@NonNull final String targetId,
@@ -56,10 +63,6 @@ public class PeerConnectionClient {
     public void addIceCandidate(@NonNull final String targetId,
                                 @NonNull final IceCandidate iceCandidate) {
         boyjPeerConnection.addIceCandidate(targetId, iceCandidate);
-    }
-
-    public boolean isConnectedById(@NonNull final String id) {
-        return boyjPeerConnection.getConnectionById(id) != null;
     }
 
     public void dispose(@NonNull final String targetId) {

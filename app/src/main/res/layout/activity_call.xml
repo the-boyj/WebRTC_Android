@@ -112,6 +112,7 @@
             android:layout_marginEnd="@dimen/space_small"
             android:layout_marginBottom="@dimen/space_small"
             android:src="@drawable/ic_more_vert"
+            android:onClick="showCallMenuDialog"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

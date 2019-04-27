@@ -8,6 +8,6 @@ public abstract class Payload {
     @NonNull
     @Override
     public String toString() {
-        return JSONUtil.toJson(getClass(), this);
+        return JSONUtil.toJson(this);
     }
 }

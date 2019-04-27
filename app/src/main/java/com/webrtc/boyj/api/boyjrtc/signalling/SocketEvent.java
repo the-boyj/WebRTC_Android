@@ -3,17 +3,22 @@ package com.webrtc.boyj.api.boyjrtc.signalling;
 import android.support.annotation.NonNull;
 
 public enum SocketEvent {
+    /* Caller */
     CREATE_ROOM("CREATE_ROOM"),
     DIAL("DIAL"),
-    ANSWER("ANSWER"),
     NOTIFY_REJECT("NOTIFY_REJECT"),
     RELAY_OFFER("RELAY_OFFER"),
+    ANSWER("ANSWER"),
 
+    /* Callee */
     AWAKEN("AWAKEN"),
-    ACCEPT("ACCEPT"),
     REJECT("REJECT"),
+    ACCEPT("ACCEPT"),
+    PARTICIPANTS("PARTICIPANTS"),
+    OFFER("OFFER"),
     RELAY_ANSWER("RELAY_ANSWER"),
 
+    /* Caller & Callee */
     SEND_ICE_CANDIDATE("SEND_ICE_CANDIDATE"),
     RELAY_ICE_CANDIDATE("RELAY_ICE_CANDIDATE"),
     END_OF_CALL("END_OF_CALL"),

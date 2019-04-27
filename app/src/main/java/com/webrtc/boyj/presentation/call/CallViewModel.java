@@ -94,7 +94,6 @@ public class CallViewModel extends BaseViewModel {
     private void subscribeOnEndOfCall() {
         addDisposable(boyjRTC.onEndOfCall()
                 .observeOn(AndroidSchedulers.mainThread())
-                .doFinally(boyjRTC::release)
                 .subscribe(() -> endOfCall.setValue(true)));
     }
 
@@ -119,13 +118,13 @@ public class CallViewModel extends BaseViewModel {
         boyjRTC.dial(payload);
     }
 
-    public void initCallee(@NonNull final String callerId) {
-        boyjRTC.accept(callerId);
+    public void initCallee() {
+        boyjRTC.accept();
     }
 
     public void hangUp() {
         boyjRTC.endOfCall();
-        boyjRTC.release();
+        endOfCall.setValue(true);
     }
 
     @NonNull

@@ -7,7 +7,6 @@ public class DialPayload extends Payload {
     private final String calleeId; // Caller가 전화 송신시 상대방 번호
 
     public DialPayload(@NonNull String calleeId) {
-
         this.calleeId = calleeId;
     }
 }

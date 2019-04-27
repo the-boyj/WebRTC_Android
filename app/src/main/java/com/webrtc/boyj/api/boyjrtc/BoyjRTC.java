@@ -12,12 +12,12 @@ import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.ParticipantsPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
-import org.webrtc.SessionDescription;
 
 import java.util.List;
 
@@ -36,16 +36,18 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     private boolean isInitialized = false;
 
     public void initRTC(@NonNull final Context context) {
-        PeerConnectionFactoryManager.initialize(context);
-        final PeerConnectionFactory factory =
-                PeerConnectionFactoryManager.createPeerConnectionFactory();
+        if (!isInitialized) {
+            PeerConnectionFactoryManager.initialize(context);
+            final PeerConnectionFactory factory =
+                    PeerConnectionFactoryManager.createPeerConnectionFactory();
 
-        userMediaManager = new UserMediaManager(context, factory);
-        peerConnectionClient = new PeerConnectionClient(factory, this);
-        signalingClient = new SignalingClient(this);
-        isInitialized = true;
+            userMediaManager = new UserMediaManager(context, factory);
+            peerConnectionClient = new PeerConnectionClient(factory, this);
+            signalingClient = new SignalingClient(this);
+            isInitialized = true;
 
-        startCapture();
+            startCapture();
+        }
     }
 
     public void startCapture() {
@@ -74,19 +76,9 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     }
 
     @Override
-    public void accept(@NonNull final String callerId) {
+    public void accept() {
         validateInitRTC();
-        createPeerConnection(callerId);
-        createOffer(callerId);
-    }
-
-    private void createPeerConnection(@NonNull final String targetId) {
-        peerConnectionClient.createPeerConnection(targetId);
-        peerConnectionClient.addLocalStream(targetId, userMediaManager.getLocalMediaStream());
-    }
-
-    private void createOffer(@NonNull final String targetId) {
-        peerConnectionClient.createOffer(targetId);
+        signalingClient.emitAccept();
     }
 
     @Override
@@ -95,19 +87,20 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
         disconnect();
     }
 
-    @Override
-    public void endOfCall() {
-        signalingClient.emitEndOfCall();
-    }
-
     private void disconnect() {
         signalingClient.disconnect();
     }
 
-    public void release() {
+    @Override
+    public void endOfCall() {
+        signalingClient.emitEndOfCall();
+        release();
+    }
+
+    private void release() {
         peerConnectionClient.disposeAll();
-        userMediaManager.stopCapture();
-        signalingClient.disconnect();
+        stopCapture();
+        disconnect();
     }
 
     private void validateInitRTC() {
@@ -118,14 +111,18 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
     @Override
     public void onOfferSdpPayloadFromPeer(@NonNull SdpPayload sdpPayload) {
-        peerConnectionClient.setLocalDescription(sdpPayload.getReceiver(), sdpPayload.getSdp());
-        signalingClient.emitAccept(sdpPayload);
+        setLocalDescription(sdpPayload);
+        signalingClient.emitOffer(sdpPayload);
     }
 
     @Override
     public void onAnswerSdpPayloadFromPeer(@NonNull SdpPayload sdpPayload) {
-        peerConnectionClient.setLocalDescription(sdpPayload.getReceiver(), sdpPayload.getSdp());
+        setLocalDescription(sdpPayload);
         signalingClient.emitAnswer(sdpPayload);
+    }
+
+    private void setLocalDescription(@NonNull final SdpPayload sdpPayload) {
+        peerConnectionClient.setLocalSdp(sdpPayload.getReceiver(), sdpPayload.getSdp());
     }
 
     @Override
@@ -140,51 +137,43 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
     }
 
     @Override
-    public void onOfferSdpPayloadFromSig(@NonNull SdpPayload sdpPayload) {
-        createPeerConnection(sdpPayload.getSender());
-        createAnswer(sdpPayload.getSender());
-        setRemoteSdp(sdpPayload.getSender(), sdpPayload.getSdp());
-    }
-
-    private void createAnswer(@NonNull final String targetId) {
-        peerConnectionClient.createAnswer(targetId);
-    }
-
-    private void setRemoteSdp(@NonNull final String targetId,
-                              @NonNull final SessionDescription sdp) {
-        peerConnectionClient.setRemoteSdp(targetId, sdp);
-    }
-
-    @Override
     public void onCallFinish() {
         publisher.completeEndOfCall();
+        release();
     }
 
     @Override
-    public void onAnswerSdpPayloadFromSig(@NonNull SdpPayload sdpPayload) {
-        if (!peerConnectionClient.isConnectedById(sdpPayload.getSender())) {
-            createPeerConnection(sdpPayload.getSender());
-            peerConnectionClient.connectOffer(sdpPayload.getSender());
-        }
-        setRemoteSdp(sdpPayload.getSender(), sdpPayload.getSdp());
+    public void onParticipantsPayloadFromSig(@NonNull ParticipantsPayload payload) {
+        peerConnectionClient.createOffers(payload.getParticipants(), localStream());
     }
 
     @Override
-    public void onIceCandidatePayloadFromSig(@NonNull IceCandidatePayload iceCandidatePayload) {
+    public void onOfferSdpPayloadFromSig(@NonNull SdpPayload payload) {
+        peerConnectionClient.createAnswer(payload.getSender(), localStream());
+        peerConnectionClient.setRemoteSdp(payload.getSender(), payload.getSdp());
+    }
+
+    @Override
+    public void onAnswerSdpPayloadFromSig(@NonNull SdpPayload payload) {
+        peerConnectionClient.setRemoteSdp(payload.getSender(), payload.getSdp());
+    }
+
+    @Override
+    public void onIceCandidatePayloadFromSig(@NonNull IceCandidatePayload payload) {
         peerConnectionClient.addIceCandidate(
-                iceCandidatePayload.getSender(),
-                iceCandidatePayload.getIceCandidate());
+                payload.getSender(),
+                payload.getIceCandidate());
     }
 
     @Override
-    public void onRejectPayloadFromSig(@NonNull RejectPayload rejectPayload) {
-        publisher.submitReject(rejectPayload.getSender());
+    public void onRejectPayloadFromSig(@NonNull RejectPayload payload) {
+        publisher.submitReject(payload.getSender());
     }
 
     @Override
-    public void onEndOfCallPayloadFromSig(@NonNull EndOfCallPayload endOfCallPayload) {
-        publisher.submitLeave(endOfCallPayload.getSender());
-        peerConnectionClient.dispose(endOfCallPayload.getSender());
+    public void onEndOfCallPayloadFromSig(@NonNull EndOfCallPayload payload) {
+        publisher.submitLeave(payload.getSender());
+        peerConnectionClient.dispose(payload.getSender());
     }
 
     @NonNull

@@ -25,10 +25,8 @@ public interface BoyjContract {
 
     /**
      * Callee 가 전화를 승인한 후 커넥션 생성 및 Accept 를 서버로 전송한다.
-     *
-     * @param callerId 전화가 걸려온 상대 아이디
      */
-    void accept(@NonNull final String callerId);
+    void accept();
 
     /**
      * 통화를 수신받은 사용자가 요청을 거부할 경우 응답 결과를 시그너링 서버로 전송한다.

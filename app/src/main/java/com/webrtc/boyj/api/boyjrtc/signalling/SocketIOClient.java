@@ -23,8 +23,7 @@ class SocketIOClient {
         try {
             socket = IO.socket(BuildConfig.SERVER_URL);
         } catch (URISyntaxException e) {
-            e.printStackTrace();
-            throw new RuntimeException("serverURL invalid." +
+            throw new IllegalStateException("serverURL invalid." +
                     " check build.gradle variable : SERVER_URL ");
         }
     }
@@ -44,8 +43,8 @@ class SocketIOClient {
 
     void emit(@NonNull SocketEvent event,
               @NonNull final Payload payload) {
-        Logger.i(payload.toString());
-        socket.emit(event.toString(), JSONUtil.toJSONObject(payload));
+        Logger.ii(event.toString(), payload.toString());
+        socket.emit(event.toString(), JSONUtil.toJsonObject(payload));
     }
 
     void emit(@NonNull SocketEvent event,

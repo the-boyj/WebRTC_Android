@@ -3,7 +3,7 @@ package com.webrtc.boyj.extension.custom;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.webrtc.boyj.api.peer.manager.EglBaseManager;
+import com.webrtc.boyj.api.boyjrtc.peer.manager.EglBaseManager;
 
 import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;

@@ -3,121 +3,120 @@ package com.webrtc.boyj.presentation.call;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.Toast;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.extension.custom.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
-import com.webrtc.boyj.utils.TelManager;
+import com.webrtc.boyj.utils.App;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
-    private static final String CALLER_ID = "CALLER_ID";
-    private static final String CALLEE_ID = "CALLEE_ID";
-    private static final String EXTRA_IS_CALLER = "EXTRA_IS_CALLER";
-
-    private CallViewModel vm;
-    private BoyjAdapter adapter;
+    private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final boolean isCaller = getIntent().getBooleanExtra(EXTRA_IS_CALLER, true);
+        final String calleeId = getIntent().getStringExtra(EXTRA_CALLEE_ID);
 
-        initViewModel();
         initViews();
+        initViewModel();
 
-        if (isCaller) {
-            final String callerId = TelManager.getTelNumber(getApplicationContext());
-            final String calleeId = getIntent().getStringExtra(CALLEE_ID);
-
-            vm.createRoom(callerId);
-            vm.dial(calleeId);
+        if (calleeId != null) {
+            final String callerId = IDManager.getSavedUserId(this);
+            initCaller(callerId, calleeId);
         } else {
-            final String callerId = getIntent().getStringExtra(CALLER_ID);
-            vm.accept(callerId);
+            initCallee();
         }
     }
 
+    private void initViews() {
+        initSplitLayout();
+    }
+
+    private void initSplitLayout() {
+        final CallAdapter adapter = new CallAdapter();
+        final SplitLayout splitLayout = findViewById(R.id.splitLayout);
+        splitLayout.setAdapter(adapter);
+    }
+
+    public void showCallMenuDialog(View view) {
+        final CallMenuDialog dialog = CallMenuDialog.newInstance();
+        dialog.setOnInviteListener(user -> binding.getVm().invite(user.getId()));
+        dialog.show(getSupportFragmentManager(), "CallMenuDialog");
+    }
+
     private void initViewModel() {
-        vm = ViewModelProviders.of(this).get(CallViewModel.class);
-        vm.init();
-        binding.setVm(vm);
+        final BoyjRTC boyjRTC = generateBoyjRTC();
+        final CallViewModelFactory factory = new CallViewModelFactory(boyjRTC);
+        final CallViewModel viewModel =
+                ViewModelProviders.of(this, factory).get(CallViewModel.class);
+        binding.setVm(viewModel);
         subscribeViewModel();
     }
 
+    private BoyjRTC generateBoyjRTC() {
+        final BoyjRTC boyjRTC = new BoyjRTC();
+        boyjRTC.initRTC(App.getContext());
+        return boyjRTC;
+    }
+
     private void subscribeViewModel() {
-        vm.getIsEnded().observe(this, isEnded -> {
+        subscribeRejected();
+        subscribeLeaved();
+        subscribeEndOfCall();
+    }
+
+    private void subscribeRejected() {
+        binding.getVm().getRejectedUserName().observe(this, userName ->
+                showToast(userName + "가 통화를 거절하였습니다."));
+    }
+
+    private void subscribeLeaved() {
+        binding.getVm().getLeavedUserName().observe(this, userName ->
+                showToast(userName + "가 통화를 종료하였습니다."));
+    }
+
+    private void subscribeEndOfCall() {
+        binding.getVm().getEndOfCall().observe(this, isEnded -> {
             if (Boolean.TRUE.equals(isEnded)) {
                 finish();
             }
         });
-
-        vm.getRemoteMediaStream().observe(this, mediaStream -> {
-            if (mediaStream != null) {
-                adapter.addMediaStream(mediaStream);
-            }
-        });
-
-        vm.getRejectedUserName().observe(this, name -> {
-            if (name != null) {
-                adapter.removeMediaStreamfromId(name);
-            }
-        });
-
-        vm.getByeUserName().observe(this, name -> {
-            if (name != null) {
-                adapter.removeMediaStreamfromId(name);
-            }
-        });
     }
 
-    private void initViews() {
-        initButton();
-        initSplitLayout();
+    private void initCaller(@NonNull final String callerId,
+                            @NonNull final String calleeId) {
+        binding.getVm().initCaller(callerId, calleeId);
     }
 
-    private void initButton() {
-        findViewById(R.id.fab_reject).setOnClickListener(__ -> vm.hangUp());
-        findViewById(R.id.iv_call_menu).setOnClickListener(__ ->
-                CallMenuDialog.newInstance()
-                        .show(getSupportFragmentManager(), "CallMenuDialog"));
+    private void initCallee() {
+        binding.getVm().initCallee();
     }
 
-    private void initSplitLayout() {
-        final SplitLayout splitLayout = findViewById(R.id.splitLayout);
-        adapter = new BoyjAdapter(vm::endOfCall);
-        splitLayout.setAdapter(adapter);
-    }
-
-    private void turnOnSpeaker() {
-        AudioManager manager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        if (!manager.isSpeakerphoneOn()) {
-            manager.setSpeakerphoneOn(true);
+    private void showToast(@Nullable final String msg) {
+        if (msg != null) {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         }
     }
 
-    /**
-     * @param calleeId 상대방의 전화번호
-     */
     @NonNull
     public static Intent getCallerLaunchIntent(@NonNull final Context context,
                                                @NonNull final String calleeId) {
         return getLaunchIntent(context, CallActivity.class)
-                .putExtra(CALLEE_ID, calleeId)
-                .putExtra(EXTRA_IS_CALLER, true);
+                .putExtra(EXTRA_CALLEE_ID, calleeId);
     }
 
     @NonNull
-    public static Intent getCalleeLaunchIntent(@NonNull final Context context,
-                                               @NonNull final String callerId) {
-        return getLaunchIntent(context, CallActivity.class)
-                .putExtra(CALLER_ID, callerId)
-                .putExtra(EXTRA_IS_CALLER, false);
+    public static Intent getCalleeLaunchIntent(@NonNull final Context context) {
+        return getLaunchIntent(context, CallActivity.class);
     }
 
     @Override

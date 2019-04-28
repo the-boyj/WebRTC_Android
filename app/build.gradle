@@ -24,15 +24,12 @@ android {
         }
         debug {
             buildConfigField "String", "SERVER_URL", "\"http://13.124.244.130:3000\""
-
         }
     }
-
 
     dataBinding {
         enabled true
     }
-
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -64,7 +61,6 @@ dependencies {
     testImplementation 'org.powermock:powermock-core:1.7.0'
     testImplementation 'org.powermock:powermock-module-junit4-rule:1.7.0'
 
-
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
@@ -82,7 +78,6 @@ dependencies {
     //Firebase
     implementation 'com.google.firebase:firebase-core:16.0.6'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    implementation 'com.google.firebase:firebase-firestore:17.1.5'
 
     implementation 'com.android.support:multidex:1.0.3'
     implementation("io.socket:socket.io-client:$socket_version") {
@@ -91,14 +86,12 @@ dependencies {
 
     // TedPermission
     implementation "gun0912.ted:tedpermission:$tedpermission_version"
-
     // Lottie
     implementation "com.airbnb.android:lottie:$lottie_version"
-
     //WebRtc
     implementation "org.webrtc:google-webrtc:$webrtc_version"
-
     //gson
     implementation "com.google.code.gson:gson:$gson_version"
+    testImplementation "com.google.code.gson:gson:$gson_version"
 }
 apply plugin: 'com.google.gms.google-services'

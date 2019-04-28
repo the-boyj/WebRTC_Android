@@ -38,7 +38,7 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<UserResponse> getUser(@NonNull String id) {
+    public Single<UserResponse> getProfile(@NonNull String id) {
         return null;
     }
 
@@ -72,7 +72,7 @@ public class UserRemoteDataSource implements UserDataSource {
 
     /**
      * id에 해당하는 유저 정보의 이름을 변경 및 서버에 갱신한다.
-     * 새로고침을 하기 위해서는 해당 API 호출 이후 getUser()를 사용하거나,
+     * 새로고침을 하기 위해서는 해당 API 호출 이후 getProfile()를 사용하거나,
      * 로컬 상에서 변경 후 핸들링하는 방법이 있다.
      */
     @NonNull

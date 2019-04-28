@@ -8,7 +8,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class UserRepositoryImpl implements UserRepository {
@@ -43,9 +42,8 @@ public class UserRepositoryImpl implements UserRepository {
      */
     @NonNull
     @Override
-    public Single<User> getUser(@NonNull String id) {
-        return remoteDataSource.getUser(id)
-                .subscribeOn(Schedulers.io())
+    public Single<User> getProfile(@NonNull String id) {
+        return remoteDataSource.getProfile(id)
                 .flatMap(response -> {
                     // Todo : response의 Return 타입을 보고 정보가 있는지 식별
                     if (true) {
@@ -67,7 +65,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     /**
-     * getUser()를 호출 후 유저 정보가 없는 경우 등록 진행
+     * getProfile()를 호출 후 유저 정보가 없는 경우 등록 진행
      * User.createFromId(id)를 통해 새로운 유저를 생성하고, 이를 서버에 등록한다.
      * 서버에 등록이 끝난 이후 생성된 정보를 발행한다.
      */
@@ -82,7 +80,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     /**
      * id 유저의 Device Token 업데이트 이후 결과 반환
-     * getUser() 이후에 호출
+     * getProfile() 이후에 호출
      * tokenDataSource의 isNoewToken을 통해 토큰을 새로 등록할지 여부를 확인한다.
      */
     @NonNull

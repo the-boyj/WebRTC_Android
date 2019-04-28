@@ -13,6 +13,7 @@ import com.webrtc.boyj.presentation.BaseViewModel;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class InviteViewModel extends BaseViewModel {
     private final UserRepository repository;
@@ -23,7 +24,12 @@ public class InviteViewModel extends BaseViewModel {
     }
 
     public void init(@NonNull final String id) {
+        subscribeOtherUserList(id);
+    }
+
+    private void subscribeOtherUserList(@NonNull final String id) {
         addDisposable(repository.getOtherUserList(id)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this.otherUserList::setValue)
         );

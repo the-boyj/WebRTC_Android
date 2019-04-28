@@ -14,6 +14,7 @@ import android.widget.Toast;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
 import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
@@ -21,16 +22,14 @@ import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
-import com.webrtc.boyj.utils.TelManager;
 
 import java.util.List;
 
 import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.READ_PHONE_STATE;
 import static android.Manifest.permission.RECORD_AUDIO;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
-    private String tel;
+    private String id;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,11 +48,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void checkPermission() {
         TedPermission.with(getApplicationContext())
-                .setPermissions(READ_PHONE_STATE, RECORD_AUDIO, CAMERA)
+                .setPermissions(RECORD_AUDIO, CAMERA)
                 .setPermissionListener(new PermissionListener() {
                     @Override
                     public void onPermissionGranted() {
-                        tel = TelManager.getTelNumber(getApplicationContext());
                         init();
                     }
 
@@ -65,6 +63,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void init() {
+        id = IDManager.getSavedUserId(this);
         initViewModel();
         initRecyclerView();
         subscribeViewModel();
@@ -77,7 +76,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                         UserRemoteDataSource.getInstance(),
                         TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
-        vm.init(tel);
+        vm.init(id);
         binding.setVm(vm);
     }
 
@@ -87,24 +86,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         binding.rvUser.setAdapter(adapter);
     }
 
+    private void startCallActivity(@NonNull final User user) {
+        startActivity(CallActivity.getCallerLaunchIntent(this, user.getId()));
+        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+    }
+
     private void subscribeViewModel() {
         binding.getVm().getError().observe(this,
                 e -> showToast(getString(R.string.ERROR_DEFAULT)));
     }
 
-    private void showDialog() {
-        final NameDialog dialog = new NameDialog(this);
-        dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
-        dialog.show();
-    }
-
     private void showToast(@NonNull final String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    private void startCallActivity(@NonNull final User user) {
-        startActivity(CallActivity.getCallerLaunchIntent(this, user.getTel()));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     @Override
@@ -119,6 +112,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             showDialog();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDialog() {
+        final NameDialog dialog = new NameDialog(this);
+        dialog.setPositiveButton(name -> binding.getVm().updateUserName(id, name));
+        dialog.show();
     }
 
     @Override

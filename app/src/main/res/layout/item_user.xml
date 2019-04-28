@@ -22,7 +22,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tv_name"
+                android:id="@+id/tv_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/space_x_small"
@@ -34,15 +34,15 @@
                 tools:text="장OO" />
 
             <TextView
-                android:id="@+id/tv_tel"
+                android:id="@+id/tv_user_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/space_x_small"
                 android:textSize="@dimen/text_median"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_name"
-                app:phoneNumber="@{user.tel}"
+                app:layout_constraintTop_toBottomOf="@id/tv_user_name"
+                app:phoneNumber="@{user.id}"
                 tools:text="010-9999-4444" />
 
             <android.support.design.widget.FloatingActionButton

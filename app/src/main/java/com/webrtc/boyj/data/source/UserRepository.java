@@ -12,7 +12,7 @@ import io.reactivex.Single;
 public interface UserRepository {
 
     @NonNull
-    Single<User> getUser(@NonNull final String id);
+    Single<User> getProfile(@NonNull final String id);
 
     @NonNull
     Single<List<User>> getOtherUserList(@NonNull final String id);
@@ -24,6 +24,5 @@ public interface UserRepository {
     Completable updateDeviceToken(@NonNull final String id);
 
     @NonNull
-    Completable updateUserName(@NonNull final String id,
-                               @NonNull final String name);
+    Completable updateUserName(@NonNull final String id, @NonNull final String name);
 }

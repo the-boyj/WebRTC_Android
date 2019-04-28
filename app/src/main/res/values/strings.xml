@@ -5,6 +5,9 @@
     <!-- Splash -->
     <string name="app_description">광운대학교 산학연계 프로젝트</string>
 
+    <!-- Sign -->
+    <string name="sign_login_hint">아이디</string>
+
     <!-- Menu -->
     <string name="menu_update_profile">이름 변경</string>
     <!-- Name change dialog -->

@@ -37,7 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="@{vm.user.name, default=BOYJ}"
+                    android:text="@{vm.profile.name, default=BOYJ}"
                     android:textColor="@color/colorWhite"
                     android:textSize="@dimen/text_large" />
 
@@ -45,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/text_median"
-                    app:phoneNumber="@{vm.user.tel}"
+                    app:phoneNumber="@{vm.profile.id}"
                     tools:text="010-0000-0000" />
             </LinearLayout>
         </android.support.v7.widget.Toolbar>

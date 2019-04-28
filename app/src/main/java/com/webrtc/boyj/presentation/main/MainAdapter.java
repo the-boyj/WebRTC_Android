@@ -47,7 +47,7 @@ public class MainAdapter extends ListAdapter<User, MainViewHolder> {
             new DiffUtil.ItemCallback<User>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-                    return oldItem.getTel().equals(newItem.getTel());
+                    return oldItem.getId().equals(newItem.getId());
                 }
 
                 @Override

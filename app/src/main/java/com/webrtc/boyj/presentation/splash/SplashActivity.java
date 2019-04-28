@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivitySplashBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
-import com.webrtc.boyj.presentation.main.MainActivity;
+import com.webrtc.boyj.presentation.sign.SignActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,25 +20,20 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        disposable = Single.timer(SPLASH_TIME, TimeUnit.SECONDS)
-                .subscribe(__ -> startMainActivity());
+        disposable = Single.timer(SPLASH_TIME, TimeUnit.SECONDS).
+                subscribe(__ -> {
+                    startSignInActivity();
+                    disposable.dispose();
+                });
     }
 
-    private void startMainActivity() {
-        startActivity(MainActivity.getLaunchIntent(this, MainActivity.class));
+    private void startSignInActivity() {
+        startActivity(SignActivity.getLaunchIntent(this));
         finish();
     }
 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_splash;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (!disposable.isDisposed()) {
-            disposable.dispose();
-        }
     }
 }

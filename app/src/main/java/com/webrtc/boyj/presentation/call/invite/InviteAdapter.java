@@ -42,7 +42,7 @@ public class InviteAdapter extends ListAdapter<User, InviteViewHolder> {
             new DiffUtil.ItemCallback<User>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-                    return oldItem.getTel().equals(newItem.getTel());
+                    return oldItem.getId().equals(newItem.getId());
                 }
 
                 @Override

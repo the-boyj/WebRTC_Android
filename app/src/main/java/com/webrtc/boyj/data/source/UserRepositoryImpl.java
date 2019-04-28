@@ -3,6 +3,8 @@ package com.webrtc.boyj.data.source;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
+import com.webrtc.boyj.data.source.remote.response.StatusCode;
+import com.webrtc.boyj.data.source.remote.response.UserItem;
 
 import java.util.List;
 
@@ -45,12 +47,12 @@ public class UserRepositoryImpl implements UserRepository {
     public Single<User> getProfile(@NonNull String id) {
         return remoteDataSource.getProfile(id)
                 .flatMap(response -> {
-                    // Todo : response의 Return 타입을 보고 정보가 있는지 식별
-                    if (true) {
-                        return registerUser(id);
+                    if (response.getCode() == StatusCode.OK) {
+                        final UserItem item = response.getItem();
+                        final User user = new User(item.getUserId(), item.getUserName());
+                        return Single.just(user);
                     } else {
-                        // Todo : Mapper를 통해 Response를 User로 변환
-                        return null;
+                        return registerUser(id);
                     }
                 });
     }
@@ -73,9 +75,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Single<User> registerUser(@NonNull final String id) {
         final User user = User.createFromId(id);
-
-        return remoteDataSource.registerUser(user)
-                .andThen(Single.just(user));
+        return remoteDataSource.registerUser(user);
     }
 
     /**
@@ -88,7 +88,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Completable updateDeviceToken(@NonNull String id) {
         if (tokenDataSource.isNewToken()) {
             tokenDataSource.unsetNewToken();
-            return remoteDataSource.updateDeviceToken(id, tokenDataSource.getToken());
+            return remoteDataSource.updateDeviceToken(id, tokenDataSource.getToken()).ignoreElement();
         } else {
             return Completable.complete();
         }
@@ -99,8 +99,8 @@ public class UserRepositoryImpl implements UserRepository {
      */
     @NonNull
     @Override
-    public Completable updateUserName(@NonNull final String id,
-                                      @NonNull final String name) {
+    public Single<User> updateUserName(@NonNull final String id,
+                                       @NonNull final String name) {
         return remoteDataSource.updateUserName(id, name);
     }
 }

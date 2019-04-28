@@ -11,7 +11,6 @@ import com.webrtc.boyj.presentation.BaseViewModel;
 
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -41,13 +40,8 @@ public class MainViewModel extends BaseViewModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(this.profile::setValue)
-                .flatMapCompletable(__ -> updateDeviceToken(id))
-                .subscribe(() -> { /* doNothing */ }, this.error::setValue)
-        );
-    }
-
-    private Completable updateDeviceToken(@NonNull final String id) {
-        return repository.updateDeviceToken(id).subscribeOn(Schedulers.io());
+                .flatMapCompletable(__ -> repository.updateDeviceToken(id))
+                .subscribe(() -> { /* doNothing */ }, this.error::setValue));
     }
 
     private void loadOtherUserList(@NonNull final String id) {
@@ -56,18 +50,14 @@ public class MainViewModel extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(__ -> showLoading())
                 .doFinally(this::hideLoading)
-                .subscribe(this.otherUserList::setValue, this.error::setValue)
-        );
+                .subscribe(this.otherUserList::setValue, this.error::setValue));
     }
 
     public void updateUserName(@NonNull final String id, @NonNull final String name) {
         addDisposable(repository.updateUserName(id, name)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        () -> this.profile.setValue(new User(id, name)), // onComplete
-                        this.error::setValue) // onError
-        );
+                .subscribe(this.profile::setValue, this.error::setValue));
     }
 
     private void showLoading() {

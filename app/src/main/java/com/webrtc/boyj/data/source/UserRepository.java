@@ -24,5 +24,5 @@ public interface UserRepository {
     Completable updateDeviceToken(@NonNull final String id);
 
     @NonNull
-    Completable updateUserName(@NonNull final String id, @NonNull final String name);
+    Single<User> updateUserName(@NonNull final String id, @NonNull final String name);
 }

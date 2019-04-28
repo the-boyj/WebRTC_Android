@@ -14,9 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.webrtc.boyj.R;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
 import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
@@ -52,12 +54,13 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
 
     private void initViewModel() {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-
+        final String id = IDManager.getSavedUserId(App.getContext());
         final InviteViewModel.Factory factory = new InviteViewModel.Factory(
                 UserRepositoryImpl.getInstance(
-                        UserRemoteDataSource.getInstance(),
+                        UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final InviteViewModel vm = ViewModelProviders.of(this, factory).get(InviteViewModel.class);
+        vm.init(id);
         binding.setInviteViewModel(vm);
     }
 

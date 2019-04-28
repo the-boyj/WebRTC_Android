@@ -3,8 +3,6 @@ package com.webrtc.boyj.data.source;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.source.remote.response.StatusCode;
-import com.webrtc.boyj.data.source.remote.response.UserItem;
 
 import java.util.List;
 
@@ -40,21 +38,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     /**
      * id 유저 정보를 발행한다.
-     * 만약 유저 정보가 없다면 registerUser() 호출 후 해당 정보 발행한다.
      */
     @NonNull
     @Override
     public Single<User> getProfile(@NonNull String id) {
-        return remoteDataSource.getProfile(id)
-                .flatMap(response -> {
-                    if (response.getCode() == StatusCode.OK) {
-                        final UserItem item = response.getItem();
-                        final User user = new User(item.getUserId(), item.getUserName());
-                        return Single.just(user);
-                    } else {
-                        return registerUser(id);
-                    }
-                });
+        return remoteDataSource.getProfile(id);
     }
 
     /**
@@ -62,8 +50,14 @@ public class UserRepositoryImpl implements UserRepository {
      */
     @NonNull
     @Override
-    public Single<List<User>> getOtherUserList(@NonNull String id) {
-        return remoteDataSource.getOtherUserList(id);
+    public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
+        return remoteDataSource.getOtherUserListExceptId(id);
+    }
+
+    @NonNull
+    @Override
+    public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
+        return null;
     }
 
     /**
@@ -73,8 +67,7 @@ public class UserRepositoryImpl implements UserRepository {
      */
     @NonNull
     @Override
-    public Single<User> registerUser(@NonNull final String id) {
-        final User user = User.createFromId(id);
+    public Single<User> registerUser(@NonNull final User user) {
         return remoteDataSource.registerUser(user);
     }
 

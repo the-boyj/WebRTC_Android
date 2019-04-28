@@ -28,7 +28,7 @@ public class InviteViewModel extends BaseViewModel {
     }
 
     private void subscribeOtherUserList(@NonNull final String id) {
-        addDisposable(repository.getOtherUserList(id)
+        addDisposable(repository.getOtherUserListExceptId(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this.otherUserList::setValue)

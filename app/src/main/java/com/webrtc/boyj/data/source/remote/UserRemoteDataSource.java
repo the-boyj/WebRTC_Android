@@ -6,9 +6,8 @@ import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserDataSource;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
-import com.webrtc.boyj.data.source.remote.response.UserItem;
+import com.webrtc.boyj.data.source.remote.response.StatusCode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -40,8 +39,15 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<Response<UserItem>> getProfile(@NonNull String id) {
-        return boyjApi.getProfile(id).subscribeOn(Schedulers.io());
+    public Single<User> getProfile(@NonNull String id) {
+        return boyjApi.getProfile(id)
+                .flatMap(response -> {
+                    if (response.getCode() == StatusCode.OK) {
+                        return Single.just(response.getItem());
+                    } else {
+                        return Single.just(new User(null, null));
+                    }
+                }).subscribeOn(Schedulers.io());
     }
 
     /**
@@ -49,16 +55,16 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<List<User>> getOtherUserList(@NonNull String id) {
+    public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
         return boyjApi.getOthers(id)
                 .map(ListResponse::getItems)
-                .map(items -> {
-                    final List<User> userList = new ArrayList<>();
-                    for (UserItem item : items) {
-                        userList.add(new User(item.getUserId(), item.getUserName()));
-                    }
-                    return userList;
-                }).subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.io());
+    }
+
+    @NonNull
+    @Override
+    public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -69,7 +75,6 @@ public class UserRemoteDataSource implements UserDataSource {
     public Single<User> registerUser(@NonNull User user) {
         return boyjApi.registerUser(user)
                 .map(Response::getItem)
-                .map(item -> new User(item.getUserId(), item.getUserName()))
                 .subscribeOn(Schedulers.io());
     }
 
@@ -82,7 +87,6 @@ public class UserRemoteDataSource implements UserDataSource {
                                           @NonNull String token) {
         return boyjApi.updateDeviceToken(id, token)
                 .map(Response::getItem)
-                .map(item -> new User(item.getUserId(), item.getUserName()))
                 .subscribeOn(Schedulers.io());
     }
 
@@ -95,7 +99,6 @@ public class UserRemoteDataSource implements UserDataSource {
                                        @NonNull String name) {
         return boyjApi.updateUserName(id, name)
                 .map(Response::getItem)
-                .map(item -> new User(item.getUserId(), item.getUserName()))
                 .subscribeOn(Schedulers.io());
     }
 }

@@ -3,7 +3,6 @@ package com.webrtc.boyj;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.remote.BoyjApi;
 import com.webrtc.boyj.data.source.remote.BoyjApiClient;
-import com.webrtc.boyj.data.source.remote.response.UserItem;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
 

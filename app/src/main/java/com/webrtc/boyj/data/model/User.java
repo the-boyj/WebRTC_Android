@@ -3,22 +3,23 @@ package com.webrtc.boyj.data.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Objects;
 
 public class User {
-    private String id;
-    private String name;
+    @SerializedName("userId")
+    @Expose
+    private final String id;
 
-    public User() {
-    }
+    @Expose
+    @SerializedName("userName")
+    private final String name;
 
     public User(String id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    public static User createFromId(@NonNull final String id) {
-        return new User(id, id);
     }
 
     public String getId() {
@@ -27,6 +28,10 @@ public class User {
 
     public String getName() {
         return name;
+    }
+
+    public static User createFromId(@NonNull final String id) {
+        return new User(id, id);
     }
 
     @Override

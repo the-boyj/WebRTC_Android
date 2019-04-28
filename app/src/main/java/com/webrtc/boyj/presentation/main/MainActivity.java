@@ -77,7 +77,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                         UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
-        vm.init(id);
+        vm.loadProfile(id);
+        vm.loadOtherUserList(id);
         binding.setVm(vm);
     }
 

@@ -10,23 +10,23 @@ import com.webrtc.boyj.data.source.local.room.entity.UserEntity;
 
 import java.util.List;
 
-import io.reactivex.Completable;
-import io.reactivex.Single;
-
 @Dao
 public interface UserDao {
     @Query("SELECT * from users WHERE id=:id")
-    Single<UserEntity> selectById(final String id);
+    UserEntity selectById(final String id);
 
     @Query("SELECT * from users WHERE id<>:id")
-    Single<List<UserEntity>> selectExceptId(final String id);
+    List<UserEntity> selectExceptId(final String id);
 
     @Query("SELECT * from users WHERE id NOT IN(:ids)")
-    Single<List<UserEntity>> selectExceptIds(final List<String> ids);
+    List<UserEntity> selectExceptIds(final List<String> ids);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insert(final UserEntity user);
+    void insert(final UserEntity user);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(final List<UserEntity> userList);
 
     @Update
-    Completable update(final UserEntity entity);
+    void update(final UserEntity entity);
 }

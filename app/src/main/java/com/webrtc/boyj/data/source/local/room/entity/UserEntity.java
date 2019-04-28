@@ -16,7 +16,6 @@ public class UserEntity {
     @ColumnInfo(name = "name")
     private final String name;
 
-
     public UserEntity(@NonNull String id, @NonNull String name) {
         this.id = id;
         this.name = name;

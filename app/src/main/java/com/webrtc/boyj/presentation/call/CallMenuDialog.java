@@ -18,6 +18,8 @@ import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
 import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.local.room.AppDatabase;
+import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
 import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
@@ -57,6 +59,7 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
         final String id = IDManager.getSavedUserId(App.getContext());
         final InviteViewModel.Factory factory = new InviteViewModel.Factory(
                 UserRepositoryImpl.getInstance(
+                        UserLocalDataSource.getInstance(AppDatabase.getInstance(getContext()).userDao()),
                         UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final InviteViewModel vm = ViewModelProviders.of(this, factory).get(InviteViewModel.class);

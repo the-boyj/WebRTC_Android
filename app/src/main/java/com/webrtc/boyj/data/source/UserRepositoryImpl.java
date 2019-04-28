@@ -12,26 +12,34 @@ import io.reactivex.Single;
 @SuppressWarnings("SpellCheckingInspection")
 public class UserRepositoryImpl implements UserRepository {
     @NonNull
+    private final UserDataSource localDataSource;
+    @NonNull
     private final UserDataSource remoteDataSource;
     @NonNull
     private final TokenDataSource tokenDataSource;
 
     private static volatile UserRepositoryImpl INSTANCE;
 
-    public static UserRepository getInstance(@NonNull final UserDataSource remoteDataSource,
+    public static UserRepository getInstance(@NonNull final UserDataSource localDataSource,
+                                             @NonNull final UserDataSource remoteDataSource,
                                              @NonNull TokenDataSource tokenDataSource) {
         if (INSTANCE == null) {
             synchronized (UserRepositoryImpl.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UserRepositoryImpl(remoteDataSource, tokenDataSource);
+                    INSTANCE = new UserRepositoryImpl(
+                            localDataSource,
+                            remoteDataSource,
+                            tokenDataSource);
                 }
             }
         }
         return INSTANCE;
     }
 
-    private UserRepositoryImpl(@NonNull UserDataSource remoteDataSource,
+    private UserRepositoryImpl(@NonNull UserDataSource localDataSource,
+                               @NonNull UserDataSource remoteDataSource,
                                @NonNull TokenDataSource tokenDataSource) {
+        this.localDataSource = localDataSource;
         this.remoteDataSource = remoteDataSource;
         this.tokenDataSource = tokenDataSource;
     }

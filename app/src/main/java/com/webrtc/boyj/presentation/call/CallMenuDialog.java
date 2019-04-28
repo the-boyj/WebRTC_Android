@@ -17,7 +17,7 @@ import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
 import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;

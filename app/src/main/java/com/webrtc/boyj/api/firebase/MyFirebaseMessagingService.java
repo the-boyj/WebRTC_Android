@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.webrtc.boyj.data.source.TokenDataSource;
-import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
 import com.webrtc.boyj.presentation.ringing.RingingActivity;
 
 import java.util.Objects;

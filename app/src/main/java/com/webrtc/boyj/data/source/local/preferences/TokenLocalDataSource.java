@@ -1,4 +1,4 @@
-package com.webrtc.boyj.data.source.preferences;
+package com.webrtc.boyj.data.source.local.preferences;
 
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;

@@ -8,34 +8,40 @@ import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
 import com.webrtc.boyj.data.source.remote.response.UserItem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 public class UserRemoteDataSource implements UserDataSource {
     private static volatile UserRemoteDataSource INSTANCE;
 
-    public static UserDataSource getInstance() {
+    @NonNull
+    private final BoyjApi boyjApi;
+
+    private UserRemoteDataSource(@NonNull final BoyjApi boyjApi) {
+        this.boyjApi = boyjApi;
+    }
+
+    public static UserDataSource getInstance(@NonNull final BoyjApi boyjApi) {
         if (INSTANCE == null) {
             synchronized (UserRemoteDataSource.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new UserRemoteDataSource();
+                    INSTANCE = new UserRemoteDataSource(boyjApi);
                 }
             }
         }
         return INSTANCE;
     }
 
-    private UserRemoteDataSource() {
-
-    }
-
     /**
      * id 정보에 해당하는 유저 정보를 서버로부터 받아온다.
-     * 정보가 없는 경우 새로운 유저를 생성하여 등록한다.
      */
     @NonNull
     @Override
     public Single<Response<UserItem>> getProfile(@NonNull String id) {
-        return null;
+        return boyjApi.getProfile(id).subscribeOn(Schedulers.io());
     }
 
     /**
@@ -43,17 +49,28 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<ListResponse<UserItem>> getOtherUserList(@NonNull String id) {
-        return null;
+    public Single<List<User>> getOtherUserList(@NonNull String id) {
+        return boyjApi.getOthers(id)
+                .map(ListResponse::getItems)
+                .map(items -> {
+                    final List<User> userList = new ArrayList<>();
+                    for (UserItem item : items) {
+                        userList.add(new User(item.getUserId(), item.getUserName()));
+                    }
+                    return userList;
+                }).subscribeOn(Schedulers.io());
     }
 
     /**
-     * 자신의 id에 해당하는 유저 정보가 서버에 없다면, 새로운 유저 정보를 등록한다.
+     * 새로운 유저를 등록하고 그 값을 가져온다.
      */
     @NonNull
     @Override
-    public Single<Response<UserItem>> registerUser(@NonNull User user) {
-        return null;
+    public Single<User> registerUser(@NonNull User user) {
+        return boyjApi.registerUser(user)
+                .map(Response::getItem)
+                .map(item -> new User(item.getUserId(), item.getUserName()))
+                .subscribeOn(Schedulers.io());
     }
 
     /**
@@ -61,20 +78,24 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<Response<UserItem>> updateDeviceToken(@NonNull String id,
-                                                        @NonNull String token) {
-        return null;
+    public Single<User> updateDeviceToken(@NonNull String id,
+                                          @NonNull String token) {
+        return boyjApi.updateDeviceToken(id, token)
+                .map(Response::getItem)
+                .map(item -> new User(item.getUserId(), item.getUserName()))
+                .subscribeOn(Schedulers.io());
     }
 
     /**
      * id에 해당하는 유저 정보의 이름을 변경 및 서버에 갱신한다.
-     * 새로고침을 하기 위해서는 해당 API 호출 이후 getProfile()를 사용하거나,
-     * 로컬 상에서 변경 후 핸들링하는 방법이 있다.
      */
     @NonNull
     @Override
-    public Single<Response<UserItem>> updateUserName(@NonNull String id,
-                                                     @NonNull String name) {
-        return null;
+    public Single<User> updateUserName(@NonNull String id,
+                                       @NonNull String name) {
+        return boyjApi.updateUserName(id, name)
+                .map(Response::getItem)
+                .map(item -> new User(item.getUserId(), item.getUserName()))
+                .subscribeOn(Schedulers.io());
     }
 }

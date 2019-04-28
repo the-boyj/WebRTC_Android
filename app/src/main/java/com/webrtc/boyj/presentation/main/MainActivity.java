@@ -18,6 +18,7 @@ import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
 import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
@@ -73,7 +74,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final MainViewModelFactory factory = new MainViewModelFactory(
                 UserRepositoryImpl.getInstance(
-                        UserRemoteDataSource.getInstance(),
+                        UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
         vm.init(id);

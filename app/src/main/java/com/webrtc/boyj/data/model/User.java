@@ -18,7 +18,7 @@ public class User {
     }
 
     public static User createFromId(@NonNull final String id) {
-        return new User(id, "UNKNOWN");
+        return new User(id, id);
     }
 
     public String getId() {

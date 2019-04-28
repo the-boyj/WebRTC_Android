@@ -1,8 +1,9 @@
 package com.webrtc.boyj.data.source.remote;
 
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.source.remote.response.UserListResponse;
-import com.webrtc.boyj.data.source.remote.response.UserResponse;
+import com.webrtc.boyj.data.source.remote.response.ListResponse;
+import com.webrtc.boyj.data.source.remote.response.Response;
+import com.webrtc.boyj.data.source.remote.response.UserItem;
 
 import io.reactivex.Single;
 import retrofit2.http.Body;
@@ -12,21 +13,21 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface BoyjApi {
-    @GET("/users/{id}")
-    Single<UserResponse> getProfile(@Path("id") final String userId);
+    @GET("/api/v1/users/{id}")
+    Single<Response<UserItem>> getProfile(@Path("id") final String userId);
 
-    @GET("/users")
-    Single<UserListResponse> getOthers(@Query("except") final String userId);
+    @GET("/api/v1/users")
+    Single<ListResponse<UserItem>> getOthers(@Query("except") final String userId);
 
-    @POST("/users")
-    Single<UserResponse> registerUser(@Body User user);
+    @POST("/api/v1/users")
+    Single<Response<UserItem>> registerUser(@Body final User user);
 
-    @POST("/users/{id}")
-    Single<UserResponse> updateDeviceToken(@Path("id") final String userId,
-                                           @Query("token") final String token);
+    @POST("/api/v1/users/{id}")
+    Single<Response<UserItem>> updateDeviceToken(@Path("id") final String userId,
+                                                 @Query("token") final String token);
 
-    @POST("/users/{id}")
-    Single<UserResponse> updateUserName(@Path("id") final String userId,
-                                        @Query("name") final String userName);
+    @POST("/api/v1/users/{id}")
+    Single<Response<UserItem>> updateUserName(@Path("id") final String userId,
+                                              @Query("name") final String userName);
 
 }

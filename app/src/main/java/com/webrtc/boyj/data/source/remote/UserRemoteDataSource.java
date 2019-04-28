@@ -4,18 +4,14 @@ import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserDataSource;
-import com.webrtc.boyj.data.source.remote.response.UserResponse;
+import com.webrtc.boyj.data.source.remote.response.ListResponse;
+import com.webrtc.boyj.data.source.remote.response.Response;
+import com.webrtc.boyj.data.source.remote.response.UserItem;
 
-import java.util.List;
-
-import io.reactivex.Completable;
 import io.reactivex.Single;
 
-@SuppressWarnings("SpellCheckingInspection")
 public class UserRemoteDataSource implements UserDataSource {
     private static volatile UserRemoteDataSource INSTANCE;
-
-    // Todo : 서버 DB 구현 이후 클라이언트 추가 필요
 
     public static UserDataSource getInstance() {
         if (INSTANCE == null) {
@@ -38,7 +34,7 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<UserResponse> getProfile(@NonNull String id) {
+    public Single<Response<UserItem>> getProfile(@NonNull String id) {
         return null;
     }
 
@@ -47,7 +43,7 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Single<List<User>> getOtherUserList(@NonNull String id) {
+    public Single<ListResponse<UserItem>> getOtherUserList(@NonNull String id) {
         return null;
     }
 
@@ -56,7 +52,7 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Completable registerUser(@NonNull final User user) {
+    public Single<Response<UserItem>> registerUser(@NonNull User user) {
         return null;
     }
 
@@ -65,8 +61,8 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Completable updateDeviceToken(@NonNull String id,
-                                         @NonNull String token) {
+    public Single<Response<UserItem>> updateDeviceToken(@NonNull String id,
+                                                        @NonNull String token) {
         return null;
     }
 
@@ -77,8 +73,8 @@ public class UserRemoteDataSource implements UserDataSource {
      */
     @NonNull
     @Override
-    public Completable updateUserName(@NonNull final String id,
-                                      @NonNull final String name) {
+    public Single<Response<UserItem>> updateUserName(@NonNull String id,
+                                                     @NonNull String name) {
         return null;
     }
 }

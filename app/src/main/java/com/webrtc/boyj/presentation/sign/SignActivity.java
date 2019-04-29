@@ -50,7 +50,7 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     @NonNull
     public static Intent getLaunchIntent(@NonNull final Context context) {
         return getLaunchIntent(context, SignActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
     }
 
     @Override

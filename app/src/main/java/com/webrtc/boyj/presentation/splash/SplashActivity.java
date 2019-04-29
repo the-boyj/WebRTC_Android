@@ -5,7 +5,7 @@ import android.os.Bundle;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivitySplashBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
-import com.webrtc.boyj.presentation.sign.SignActivity;
+import com.webrtc.boyj.presentation.permission.PermissionActivity;
 
 import java.util.concurrent.TimeUnit;
 
@@ -22,13 +22,14 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
 
         disposable = Single.timer(SPLASH_TIME, TimeUnit.SECONDS).
                 subscribe(__ -> {
-                    startSignInActivity();
+                    startPermissionActivity();
                     disposable.dispose();
                 });
     }
 
-    private void startSignInActivity() {
-        startActivity(SignActivity.getLaunchIntent(this));
+    private void startPermissionActivity() {
+        startActivity(PermissionActivity.getLaunchIntent(this));
+        overridePendingTransition(0, 0);
         finish();
     }
 

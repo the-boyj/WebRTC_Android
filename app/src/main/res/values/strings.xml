@@ -10,6 +10,7 @@
 
     <!-- Menu -->
     <string name="menu_update_profile">이름 변경</string>
+    <string name="menu_refresh_user_list">새로 고침</string>
     <!-- Name change dialog -->
     <string name="dialog_positive_button">확인</string>
     <string name="dialog_negative_button">취소</string>

@@ -25,7 +25,6 @@ import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
-import com.webrtc.boyj.utils.Logger;
 
 import java.util.List;
 
@@ -38,16 +37,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initToolbar();
         checkPermission();
-    }
-
-    private void initToolbar() {
-        setSupportActionBar(binding.toolbar);
-        final ActionBar toolbar = getSupportActionBar();
-        if (toolbar != null) {
-            toolbar.setDisplayShowTitleEnabled(false);
-        }
     }
 
     private void checkPermission() {
@@ -68,9 +58,18 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void init() {
         id = IDManager.getSavedUserId(this);
+        initToolbar();
         initViewModel();
         initRecyclerView();
         subscribeViewModel();
+    }
+
+    private void initToolbar() {
+        setSupportActionBar(binding.toolbar);
+        final ActionBar toolbar = getSupportActionBar();
+        if (toolbar != null) {
+            toolbar.setDisplayShowTitleEnabled(false);
+        }
     }
 
     private void initViewModel() {
@@ -81,7 +80,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                         UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
-        // vm.loadProfile(id);
+        vm.loadProfile(id);
         vm.loadOtherUserList(id);
         binding.setVm(vm);
     }
@@ -101,7 +100,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         binding.getVm().getError().observe(this,
                 e -> {
                     showToast(getString(R.string.ERROR_DEFAULT));
-                    Logger.d(e.toString());
+                    e.printStackTrace();
                 });
     }
 
@@ -119,6 +118,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_update_profile) {
             showDialog();
+        } else if (item.getItemId() == R.id.menu_refresh_user_list) {
+            binding.getVm().loadNewUserList(id);
         }
         return super.onOptionsItemSelected(item);
     }

@@ -43,6 +43,14 @@ public class MainViewModel extends BaseViewModel {
                 }).subscribe(() -> { /* doNothing */ }, this.error::setValue));
     }
 
+    public void loadNewUserList(@NonNull final String id) {
+        addDisposable(repository.loadNewUserListExceptId(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(__ -> hideLoading())
+                .doFinally(this::hideLoading)
+                .subscribe(this.otherUserList::setValue, this.error::setValue));
+    }
+
     public void loadOtherUserList(@NonNull final String id) {
         addDisposable(repository.getOtherUserListExceptId(id)
                 .observeOn(AndroidSchedulers.mainThread())

@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
 import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
@@ -26,6 +25,8 @@ import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
 import com.webrtc.boyj.presentation.call.invite.InviteViewModel;
 import com.webrtc.boyj.utils.App;
+
+import java.util.List;
 
 public class CallMenuDialog extends BottomSheetDialogFragment {
     private DialogCallMenuBinding binding;
@@ -56,14 +57,12 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
 
     private void initViewModel() {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-        final String id = IDManager.getSavedUserId(App.getContext());
         final InviteViewModel.Factory factory = new InviteViewModel.Factory(
                 UserRepositoryImpl.getInstance(
                         UserLocalDataSource.getInstance(AppDatabase.getInstance(getContext()).userDao()),
                         UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final InviteViewModel vm = ViewModelProviders.of(this, factory).get(InviteViewModel.class);
-        vm.init(id);
         binding.setInviteViewModel(vm);
     }
 
@@ -77,17 +76,12 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
         binding.rvInviteUser.setLayoutManager(
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         final InviteAdapter adapter = new InviteAdapter();
-
         adapter.setOnDialListener(user -> onInviteListener.onInvite(user));
-
         binding.rvInviteUser.setAdapter(adapter);
-        binding.getInviteViewModel()
-                .getOtherUserList()
-                .observe(this, userList -> {
-                    if (userList != null) {
-                        adapter.submitList(userList);
-                    }
-                });
+    }
+
+    public void loadUserList(@NonNull final List<String> ids) {
+        binding.getInviteViewModel().loadOtherUserList(ids);
     }
 
     private void initListener() {

@@ -6,14 +6,15 @@ import android.databinding.ObservableBoolean;
 import android.databinding.ObservableInt;
 import android.support.annotation.NonNull;
 
+import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
-import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
 import org.webrtc.MediaStream;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -150,6 +151,18 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     public LiveData<List<BoyjMediaStream>> getRemoteMediaStreams() {
         return remoteMediaStreams;
+    }
+
+    public List<String> getUserListInRoomIncludingMe(@NonNull final String id) {
+        final List<BoyjMediaStream> mediaStreams = remoteMediaStreams.getValue();
+        final List<String> users = new ArrayList<>();
+        if (mediaStreams != null) {
+            for (BoyjMediaStream s : mediaStreams) {
+                users.add(s.getId());
+            }
+        }
+        users.add(id);
+        return users;
     }
 
     @NonNull

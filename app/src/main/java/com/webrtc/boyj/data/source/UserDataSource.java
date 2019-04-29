@@ -14,6 +14,9 @@ public interface UserDataSource {
     Single<User> getProfile(@NonNull final String id);
 
     @NonNull
+    Single<List<User>> insertUserList(@NonNull final List<User> userList);
+
+    @NonNull
     Single<List<User>> getOtherUserListExceptId(@NonNull final String id);
 
     @NonNull

@@ -15,6 +15,9 @@ public interface UserRepository {
     Single<User> getProfile(@NonNull final String id);
 
     @NonNull
+    Single<List<User>> loadNewUserListExceptId(@NonNull final String id);
+
+    @NonNull
     Single<List<User>> getOtherUserListExceptId(@NonNull final String id);
 
     @NonNull

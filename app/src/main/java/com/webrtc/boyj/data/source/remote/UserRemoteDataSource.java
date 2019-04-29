@@ -50,6 +50,12 @@ public class UserRemoteDataSource implements UserDataSource {
                 }).subscribeOn(Schedulers.io());
     }
 
+    @NonNull
+    @Override
+    public Single<List<User>> insertUserList(@NonNull List<User> userList) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * id 정보에 해당하는 유저를 제외한 나머지 유저들의 목록을 서버로부터 받아온다.
      */

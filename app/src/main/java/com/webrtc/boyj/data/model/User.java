@@ -34,6 +34,14 @@ public class User {
         return new User(id, id);
     }
 
+    public boolean isEmpty() {
+        return id == null && name == null;
+    }
+
+    public static User emptyUser() {
+        return new User(null, null);
+    }
+
     @Override
     public boolean equals(@Nullable Object o) {
         if (this == o) return true;

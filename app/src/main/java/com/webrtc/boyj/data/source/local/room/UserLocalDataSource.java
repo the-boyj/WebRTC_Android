@@ -7,6 +7,7 @@ import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserDataSource;
 import com.webrtc.boyj.data.source.local.room.dao.UserDao;
 import com.webrtc.boyj.data.source.local.room.entity.UserEntity;
+import com.webrtc.boyj.data.source.local.room.entity.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +39,20 @@ public class UserLocalDataSource implements UserDataSource {
     @NonNull
     @Override
     public Single<User> getProfile(@NonNull String id) {
-        return Single.fromCallable(() -> userDao.selectById(id))
-                .map(entity -> new User(entity.getId(), entity.getName()))
-                .subscribeOn(Schedulers.io());
+        return Single.fromCallable(() -> {
+            final UserEntity entity = userDao.selectById(id);
+            if (entity == null) {
+                return User.emptyUser();
+            } else {
+                return UserMapper.toUserFromEntity(entity);
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
+    @NonNull
+    @Override
+    public Single<List<User>> insertUserList(@NonNull List<User> userList) {
+        return null;
     }
 
     @NonNull
@@ -50,7 +62,7 @@ public class UserLocalDataSource implements UserDataSource {
                 .map(entities -> {
                     final List<User> userList = new ArrayList<>();
                     for (UserEntity entity : entities) {
-                        userList.add(new User(entity.getId(), entity.getName()));
+                        userList.add(UserMapper.toUserFromEntity(entity));
                     }
                     return userList;
                 }).subscribeOn(Schedulers.io());
@@ -63,7 +75,7 @@ public class UserLocalDataSource implements UserDataSource {
                 .map(entities -> {
                     final List<User> userList = new ArrayList<>();
                     for (UserEntity entity : entities) {
-                        userList.add(new User(entity.getId(), entity.getName()));
+                        userList.add(UserMapper.toUserFromEntity(entity));
                     }
                     return userList;
                 }).subscribeOn(Schedulers.io());
@@ -72,7 +84,7 @@ public class UserLocalDataSource implements UserDataSource {
     @NonNull
     @Override
     public Single<User> registerUser(@NonNull User user) {
-        final UserEntity entity = new UserEntity(user.getId(), user.getName());
+        final UserEntity entity = UserMapper.toEntityFromUser(user);
         return Single.fromCallable(() -> {
             userDao.insert(entity);
             return user;

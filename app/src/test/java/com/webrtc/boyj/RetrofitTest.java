@@ -49,32 +49,25 @@ public class RetrofitTest {
     @Ignore
     public void updateUserNameTest() {
         final String userId = "test";
-        final Response<UserItem> response = boyjApi.getProfile(userId).blockingGet();
-        final User oldUser = toUser(response);
+        final Response<User> response = boyjApi.getProfile(userId).blockingGet();
 
-        final Response<UserItem> updateResponse =
+        final Response<User> updateResponse =
                 boyjApi.updateUserName(userId, "변경 후").blockingGet();
-    }
-
-    private User toUser(Response<UserItem> response) {
-        final UserItem item = response.getItem();
-        return new User(item.getUserId(), item.getUserName());
     }
 
     @Test
     public void userResponseTest() {
-        final Response response = new Response<>(200,
-                new UserItem("userId", "userName"));
+        final Response<User> response = new Response<>(200, new User("userId", "userName"));
         System.out.println(response);
     }
 
     @Test
     public void userListResponseTest() {
-        final ListResponse response = new ListResponse<>(200,
+        final ListResponse<User> response = new ListResponse<>(200,
                 Arrays.asList(
-                        new UserItem("user1", "오석현"),
-                        new UserItem("user2", "윤영직"),
-                        new UserItem("user3", "변현우")
+                        new User("user1", "오석현"),
+                        new User("user2", "윤영직"),
+                        new User("user3", "변현우")
                 ));
         System.out.println(response);
     }

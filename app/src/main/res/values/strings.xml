@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">BOYJ</string>
     <string name="app_full_name">THE BOYJ</string>
+    <string name="git_hub_url">https://github.com/the-boyj/WebRTC_Android</string>
 
     <!-- Splash -->
     <string name="app_description">광운대학교 산학연계 프로젝트</string>
@@ -27,4 +28,24 @@
 
     <!-- Invite -->
     <string name="text_invite_user">초대</string>
+    <string name="text_notice_description">
+        안내사항 \n\n
+        모든 소스코드는 이곳에서 확인 가능합니다.
+        \n\n
+        The BOYJ 앱을 이용하기 위해 다음 권한이 필요합니다.
+        \n\n
+        1. 마이크
+        \n
+        &#160;&#160; 영상 통화에 사용되는 오디오 전송
+        \n\n
+        2. 카메라\n
+        &#160;&#160; 영상 통화에 사용되는 카메라 전송
+        \n\n
+        3. 전화\n
+        &#160;&#160; 스피커 폰 통화 제어
+        \n\n
+        4. 인터넷
+        \n\n
+        5. 진동 제어\n
+    </string>
 </resources>

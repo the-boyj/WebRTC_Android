@@ -88,8 +88,6 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 
-    // TedPermission
-    implementation "gun0912.ted:tedpermission:$tedpermission_version"
     // Lottie
     implementation "com.airbnb.android:lottie:$lottie_version"
     // WebRtc

@@ -11,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
@@ -26,34 +24,13 @@ import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
 
-import java.util.List;
-
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.RECORD_AUDIO;
-
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private String id;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkPermission();
-    }
-
-    private void checkPermission() {
-        TedPermission.with(getApplicationContext())
-                .setPermissions(RECORD_AUDIO, CAMERA)
-                .setPermissionListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted() {
-                        init();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(List<String> deniedPermissions) {
-                        showToast(getString(R.string.ERROR_PERMISSION_DENIED));
-                    }
-                }).check();
+        init();
     }
 
     private void init() {

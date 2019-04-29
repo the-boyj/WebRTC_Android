@@ -19,8 +19,7 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViewModel();
-        final String id = IDManager.getSavedUserId(this);
-        binding.getVm().setId(id);
+        loadMyId();
     }
 
     private void initViewModel() {
@@ -42,6 +41,10 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     private void startMainActivity() {
         startActivity(MainActivity.getLaunchIntent(this, MainActivity.class));
         finish();
+    }
+
+    private void loadMyId() {
+        binding.getVm().setId(IDManager.getSavedUserId(this));
     }
 
     @NonNull

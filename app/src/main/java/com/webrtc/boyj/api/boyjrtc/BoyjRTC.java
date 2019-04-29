@@ -35,6 +35,10 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
     private boolean isInitialized = false;
 
+    public BoyjRTC() {
+        signalingClient = new SignalingClient(this);
+    }
+
     public void initRTC(@NonNull final Context context) {
         if (!isInitialized) {
             PeerConnectionFactoryManager.initialize(context);
@@ -43,7 +47,6 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
 
             userMediaManager = new UserMediaManager(context, factory);
             peerConnectionClient = new PeerConnectionClient(factory, this);
-            signalingClient = new SignalingClient(this);
             isInitialized = true;
 
             startCapture();

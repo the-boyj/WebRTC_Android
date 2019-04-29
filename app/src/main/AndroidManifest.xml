@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup, GoogleAppIndexingWarning">
-        <activity android:name=".presentation.sign.SignActivity"></activity>
+        <activity android:name=".PermissionActivity" />
+        <activity android:name=".presentation.sign.SignActivity" />
         <activity android:name=".presentation.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

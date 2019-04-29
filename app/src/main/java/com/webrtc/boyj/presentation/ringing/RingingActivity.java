@@ -1,95 +1,58 @@
 package com.webrtc.boyj.presentation.ringing;
 
-import android.annotation.TargetApi;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
+import com.webrtc.boyj.data.source.UserRepository;
+import com.webrtc.boyj.data.source.UserRepositoryImpl;
+import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.local.room.AppDatabase;
+import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
+import com.webrtc.boyj.data.source.remote.BoyjApiClient;
+import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.utils.RingtoneLoader;
 
 public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private static final String EXTRA_ROOM = "room";
     private static final String EXTRA_CALLER_ID = "callerId";
-
-    private Ringtone ringTone = null;
-    private Vibrator vibrator = null;
     private String callerId;
 
-    @TargetApi(Build.VERSION_CODES.O)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        turnOnRingTone();
-
-        final String room = getIntent().getStringExtra(EXTRA_ROOM);
-        final String calleeId = IDManager.getSavedUserId(this);
-        callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
-
+        RingtoneLoader.ring(this);
         initViews();
         initViewModel();
-
-        binding.getVm().awaken(room, callerId, calleeId);
+        awaken();
     }
 
     private void initViews() {
-        findViewById(R.id.fab_accept).setOnClickListener(__ -> {
-            turnOffRingTone();
-            startCallActivity();
-
-        });
+        findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
         findViewById(R.id.fab_reject).setOnClickListener(__ -> {
-            turnOffRingTone();
             binding.getVm().reject(callerId);
             finish();
         });
     }
 
-    private void turnOnRingTone() {
-        AudioManager am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        if (am.getRingerMode() == AudioManager.RINGER_MODE_NORMAL) {
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-            Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-            ringTone = RingtoneManager.getRingtone(getApplicationContext(), uri);
-            ringTone.play();
-        } else if (am.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
-            vibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createWaveform(new long[]{500, 1000}, 1));
-            } else {
-                vibrator.vibrate(new long[]{500, 1000}, 1);
-            }
-        }
-    }
-
-    private void turnOffRingTone() {
-        if (ringTone != null) {
-            ringTone.stop();
-            ringTone = null;
-        }
-
-        if (vibrator != null) {
-            vibrator.cancel();
-            vibrator = null;
-        }
-    }
-
     private void initViewModel() {
-        final RingingViewModel vm = ViewModelProviders.of(this).get(RingingViewModel.class);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        final UserRepository repository = UserRepositoryImpl.getInstance(
+                UserLocalDataSource.getInstance(AppDatabase.getInstance(this).userDao()),
+                UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
+                TokenLocalDataSource.getInstance(pref));
+        final RingingViewModel.Factory factory = new RingingViewModel.Factory(repository);
+        final RingingViewModel vm = ViewModelProviders.of(this, factory).get(RingingViewModel.class);
         binding.setVm(vm);
     }
 
@@ -97,6 +60,16 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
         startActivity(CallActivity.getCalleeLaunchIntent(this));
         overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
+    }
+
+    private void awaken() {
+        final String room = getIntent().getStringExtra(EXTRA_ROOM);
+        final String calleeId = IDManager.getSavedUserId(this);
+        assert calleeId != null;
+
+        callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
+        binding.getVm().loadCallerProfile(callerId);
+        binding.getVm().awaken(room, callerId, calleeId);
     }
 
     public static Intent getLaunchIntent(@NonNull final Context context,
@@ -120,7 +93,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
     @Override
     protected void onDestroy() {
+        RingtoneLoader.unRing();
         super.onDestroy();
-        turnOffRingTone();
     }
 }

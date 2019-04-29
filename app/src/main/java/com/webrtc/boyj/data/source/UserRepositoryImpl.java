@@ -9,7 +9,6 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
-@SuppressWarnings("SpellCheckingInspection")
 public class UserRepositoryImpl implements UserRepository {
     @NonNull
     private final UserDataSource localDataSource;
@@ -44,46 +43,76 @@ public class UserRepositoryImpl implements UserRepository {
         this.tokenDataSource = tokenDataSource;
     }
 
-    /**
-     * id 유저 정보를 발행한다.
-     */
     @NonNull
     @Override
     public Single<User> getProfile(@NonNull String id) {
-        return remoteDataSource.getProfile(id);
+        return localDataSource.getProfile(id)
+                .flatMap(user -> {
+                    if (user.isEmpty()) {
+                        return getAndSaveRemoteProfile(id);
+                    } else {
+                        return Single.just(user);
+                    }
+                });
     }
 
-    /**
-     * id를 제외한 유저 리스트를 발행한다.
-     */
+    @NonNull
+    private Single<User> getAndSaveRemoteProfile(@NonNull final String id) {
+        return remoteDataSource.getProfile(id)
+                .flatMap(user -> {
+                    if (user.isEmpty()) {
+                        return localDataSource.registerUser(user);
+                    } else {
+                        return Single.just(user);
+                    }
+                });
+    }
+
+    @NonNull
+    @Override
+    public Single<List<User>> loadNewUserListExceptId(@NonNull String id) {
+        return remoteDataSource.getOtherUserListExceptId(id)
+                .flatMap(localDataSource::insertUserList);
+    }
+
     @NonNull
     @Override
     public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
-        return remoteDataSource.getOtherUserListExceptId(id);
+        return localDataSource.getOtherUserListExceptId(id)
+                .flatMap(users -> {
+                    if (users.isEmpty()) {
+                        return getAndSaveRemoteUserListExceptId(id);
+                    } else {
+                        return Single.just(users);
+                    }
+                });
     }
 
     @NonNull
     @Override
     public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
-        return null;
+        return localDataSource.getOtherUserListExceptIds(ids);
     }
 
-    /**
-     * getProfile()를 호출 후 유저 정보가 없는 경우 등록 진행
-     * User.createFromId(id)를 통해 새로운 유저를 생성하고, 이를 서버에 등록한다.
-     * 서버에 등록이 끝난 이후 생성된 정보를 발행한다.
-     */
+    @NonNull
+    private Single<List<User>> getAndSaveRemoteUserListExceptId(@NonNull final String id) {
+        return remoteDataSource.getOtherUserListExceptId(id)
+                .flatMap(users -> {
+                    if (!users.isEmpty()) {
+                        return localDataSource.insertUserList(users);
+                    } else {
+                        return Single.just(users);
+                    }
+                });
+    }
+
     @NonNull
     @Override
     public Single<User> registerUser(@NonNull final User user) {
-        return remoteDataSource.registerUser(user);
+        return Single.zip(localDataSource.registerUser(user), remoteDataSource.registerUser(user),
+                (local, remote) -> local);
     }
 
-    /**
-     * id 유저의 Device Token 업데이트 이후 결과 반환
-     * getProfile() 이후에 호출
-     * tokenDataSource의 isNoewToken을 통해 토큰을 새로 등록할지 여부를 확인한다.
-     */
     @NonNull
     @Override
     public Completable updateDeviceToken(@NonNull String id) {
@@ -95,13 +124,13 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    /**
-     * id 유저의 이름을 name 으로 변경 및 서버에 등록
-     */
     @NonNull
     @Override
     public Single<User> updateUserName(@NonNull final String id,
                                        @NonNull final String name) {
-        return remoteDataSource.updateUserName(id, name);
+        return Single.zip(
+                localDataSource.updateUserName(id, name),
+                remoteDataSource.updateUserName(id, name),
+                (local, remote) -> local);
     }
 }

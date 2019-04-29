@@ -32,14 +32,12 @@ public class MainViewModel extends BaseViewModel {
     public void loadProfile(@NonNull final String id) {
         addDisposable(repository.getProfile(id)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSuccess(this.profile::setValue)
                 .flatMapCompletable(user -> {
-                    if (user.getId() == null) {
-                        final User newUser = User.createFromId(id);
-                        this.profile.setValue(newUser);
-                        return repository.registerUser(newUser)
+                    if (user.isEmpty()) {
+                        return repository.registerUser(User.createFromId(id))
                                 .flatMapCompletable(__ -> repository.updateDeviceToken(id));
                     } else {
-                        this.profile.setValue(user);
                         return repository.updateDeviceToken(id);
                     }
                 }).subscribe(() -> { /* doNothing */ }, this.error::setValue));

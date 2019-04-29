@@ -25,6 +25,7 @@ import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.utils.Logger;
 
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                         UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
-        vm.loadProfile(id);
+        // vm.loadProfile(id);
         vm.loadOtherUserList(id);
         binding.setVm(vm);
     }
@@ -98,7 +99,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void subscribeViewModel() {
         binding.getVm().getError().observe(this,
-                e -> showToast(getString(R.string.ERROR_DEFAULT)));
+                e -> {
+                    showToast(getString(R.string.ERROR_DEFAULT));
+                    Logger.d(e.toString());
+                });
     }
 
     private void showToast(@NonNull final String msg) {

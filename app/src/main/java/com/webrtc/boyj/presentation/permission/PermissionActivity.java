@@ -29,18 +29,14 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (areAllPermissionsGrantedAlready()) {
+        if (areAllPermissionsGrantedAlready(RECORD_AUDIO, CAMERA, CALL_PHONE)) {
             startSignActivity();
         } else {
             initViews();
         }
     }
 
-    private boolean areAllPermissionsGrantedAlready() {
-        return isPermissionGranted(RECORD_AUDIO, CAMERA, CALL_PHONE);
-    }
-
-    private boolean isPermissionGranted(final String... permissions) {
+    private boolean areAllPermissionsGrantedAlready(final String... permissions) {
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(this, permission) != PERMISSION_GRANTED) {
                 return false;

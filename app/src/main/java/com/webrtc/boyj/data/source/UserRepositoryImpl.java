@@ -48,7 +48,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Single<User> getProfile(@NonNull String id) {
         return localDataSource.getProfile(id)
                 .flatMap(user -> {
-                    if (user.isEmpty()) {
+                    if (user.isEmpty()) { // Local에 없는 경우
                         return getAndSaveRemoteProfile(id);
                     } else {
                         return Single.just(user);
@@ -60,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
     private Single<User> getAndSaveRemoteProfile(@NonNull final String id) {
         return remoteDataSource.getProfile(id)
                 .flatMap(user -> {
-                    if (user.isEmpty()) {
+                    if (!user.isEmpty()) { // Remote에 있고 Local에 없는 경우
                         return localDataSource.registerUser(user);
                     } else {
                         return Single.just(user);

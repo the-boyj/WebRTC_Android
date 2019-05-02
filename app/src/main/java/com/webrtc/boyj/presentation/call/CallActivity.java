@@ -15,7 +15,7 @@ import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.extension.custom.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
-import com.webrtc.boyj.utils.App;
+import com.webrtc.boyj.App;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";

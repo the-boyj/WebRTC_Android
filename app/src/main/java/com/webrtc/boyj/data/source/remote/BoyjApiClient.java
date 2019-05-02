@@ -1,5 +1,6 @@
 package com.webrtc.boyj.data.source.remote;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.webrtc.boyj.BuildConfig;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
@@ -40,8 +41,10 @@ public class BoyjApiClient implements BoyjApi {
         final OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
 
         if (BuildConfig.DEBUG) {
-            okHttpClientBuilder.addInterceptor(new HttpLoggingInterceptor()
-                    .setLevel(HttpLoggingInterceptor.Level.BODY)).build();
+            okHttpClientBuilder
+                    .addNetworkInterceptor(new StethoInterceptor())
+                    .addInterceptor(new HttpLoggingInterceptor()
+                            .setLevel(HttpLoggingInterceptor.Level.BODY)).build();
         }
         return okHttpClientBuilder.build();
     }

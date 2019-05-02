@@ -12,7 +12,6 @@ import com.webrtc.boyj.presentation.BaseViewModel;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class MainViewModel extends BaseViewModel {
     @NonNull
@@ -30,23 +29,30 @@ public class MainViewModel extends BaseViewModel {
         this.repository = repository;
     }
 
-    public void init(@NonNull final String id) {
-        loadProfile(id);
-        loadOtherUserList(id);
-    }
-
-    private void loadProfile(@NonNull final String id) {
+    public void loadProfile(@NonNull final String id) {
         addDisposable(repository.getProfile(id)
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSuccess(this.profile::setValue)
-                .flatMapCompletable(__ -> repository.updateDeviceToken(id))
-                .subscribe(() -> { /* doNothing */ }, this.error::setValue));
+                .flatMapCompletable(user -> {
+                    if (user.isEmpty()) {
+                        return repository.registerUser(User.createFromId(id))
+                                .flatMapCompletable(__ -> repository.updateDeviceToken(id));
+                    } else {
+                        return repository.updateDeviceToken(id);
+                    }
+                }).subscribe(() -> { /* doNothing */ }, this.error::setValue));
     }
 
-    private void loadOtherUserList(@NonNull final String id) {
-        addDisposable(repository.getOtherUserList(id)
-                .subscribeOn(Schedulers.io())
+    public void loadNewUserList(@NonNull final String id) {
+        addDisposable(repository.loadNewUserListExceptId(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(__ -> hideLoading())
+                .doFinally(this::hideLoading)
+                .subscribe(this.otherUserList::setValue, this.error::setValue));
+    }
+
+    public void loadOtherUserList(@NonNull final String id) {
+        addDisposable(repository.getOtherUserListExceptId(id)
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(__ -> showLoading())
                 .doFinally(this::hideLoading)
@@ -55,7 +61,6 @@ public class MainViewModel extends BaseViewModel {
 
     public void updateUserName(@NonNull final String id, @NonNull final String name) {
         addDisposable(repository.updateUserName(id, name)
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this.profile::setValue, this.error::setValue));
     }

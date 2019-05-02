@@ -16,19 +16,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class InviteViewModel extends BaseViewModel {
+    @NonNull
     private final UserRepository repository;
+    @NonNull
     private final MutableLiveData<List<User>> otherUserList = new MutableLiveData<>();
 
     private InviteViewModel(@NonNull final UserRepository repository) {
         this.repository = repository;
     }
 
-    public void init(@NonNull final String id) {
-        subscribeOtherUserList(id);
-    }
-
-    private void subscribeOtherUserList(@NonNull final String id) {
-        addDisposable(repository.getOtherUserList(id)
+    public void loadOtherUserList(@NonNull final List<String> ids) {
+        addDisposable(repository.getOtherUserListExceptIds(ids)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this.otherUserList::setValue)

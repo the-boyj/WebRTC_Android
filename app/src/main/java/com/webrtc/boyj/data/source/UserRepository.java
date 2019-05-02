@@ -15,10 +15,16 @@ public interface UserRepository {
     Single<User> getProfile(@NonNull final String id);
 
     @NonNull
-    Single<List<User>> getOtherUserList(@NonNull final String id);
+    Single<List<User>> loadNewUserListExceptId(@NonNull final String id);
 
     @NonNull
-    Single<User> registerUser(@NonNull final String id);
+    Single<List<User>> getOtherUserListExceptId(@NonNull final String id);
+
+    @NonNull
+    Single<List<User>> getOtherUserListExceptIds(@NonNull final List<String> ids);
+
+    @NonNull
+    Single<User> registerUser(@NonNull final User user);
 
     @NonNull
     Completable updateDeviceToken(@NonNull final String id);

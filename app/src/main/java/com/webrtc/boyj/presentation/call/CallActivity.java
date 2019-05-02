@@ -19,20 +19,21 @@ import com.webrtc.boyj.utils.App;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
+    private String id;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final String calleeId = getIntent().getStringExtra(EXTRA_CALLEE_ID);
+        id = IDManager.getSavedUserId(this);
 
         initViews();
         initViewModel();
 
-        if (calleeId != null) {
-            final String callerId = IDManager.getSavedUserId(this);
-            initCaller(callerId, calleeId);
-        } else {
+        if (calleeId != null) { // Caller
+            initCaller(id, calleeId);
+        } else { // Callee
             initCallee();
         }
     }
@@ -51,6 +52,7 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         final CallMenuDialog dialog = CallMenuDialog.newInstance();
         dialog.setOnInviteListener(user -> binding.getVm().invite(user.getId()));
         dialog.show(getSupportFragmentManager(), "CallMenuDialog");
+        dialog.loadUserList(binding.getVm().getUserListInRoomIncludingMe(id));
     }
 
     private void initViewModel() {

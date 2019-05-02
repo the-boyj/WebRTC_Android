@@ -38,11 +38,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/space_x_small"
+                android:text="@{user.id}"
                 android:textSize="@dimen/text_median"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_user_name"
-                app:phoneNumber="@{user.id}"
                 tools:text="010-9999-4444" />
 
             <android.support.design.widget.FloatingActionButton

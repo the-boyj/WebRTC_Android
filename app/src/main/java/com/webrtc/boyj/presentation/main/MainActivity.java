@@ -11,23 +11,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
+import com.webrtc.boyj.data.source.local.room.AppDatabase;
+import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
 import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
-
-import java.util.List;
-
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.RECORD_AUDIO;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private String id;
@@ -35,8 +30,15 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        init();
+    }
+
+    private void init() {
+        id = IDManager.getSavedUserId(this);
         initToolbar();
-        checkPermission();
+        initViewModel();
+        initRecyclerView();
+        subscribeViewModel();
     }
 
     private void initToolbar() {
@@ -47,37 +49,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         }
     }
 
-    private void checkPermission() {
-        TedPermission.with(getApplicationContext())
-                .setPermissions(RECORD_AUDIO, CAMERA)
-                .setPermissionListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted() {
-                        init();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(List<String> deniedPermissions) {
-                        showToast(getString(R.string.ERROR_PERMISSION_DENIED));
-                    }
-                }).check();
-    }
-
-    private void init() {
-        id = IDManager.getSavedUserId(this);
-        initViewModel();
-        initRecyclerView();
-        subscribeViewModel();
-    }
-
     private void initViewModel() {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         final MainViewModelFactory factory = new MainViewModelFactory(
                 UserRepositoryImpl.getInstance(
+                        UserLocalDataSource.getInstance(AppDatabase.getInstance(this).userDao()),
                         UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                         TokenLocalDataSource.getInstance(pref)));
         final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
-        vm.init(id);
+        vm.loadProfile(id);
+        vm.loadOtherUserList(id);
         binding.setVm(vm);
     }
 
@@ -94,7 +75,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void subscribeViewModel() {
         binding.getVm().getError().observe(this,
-                e -> showToast(getString(R.string.ERROR_DEFAULT)));
+                e -> {
+                    showToast(getString(R.string.ERROR_DEFAULT));
+                    e.printStackTrace();
+                });
     }
 
     private void showToast(@NonNull final String msg) {
@@ -111,6 +95,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_update_profile) {
             showDialog();
+        } else if (item.getItemId() == R.id.menu_refresh_user_list) {
+            binding.getVm().loadNewUserList(id);
         }
         return super.onOptionsItemSelected(item);
     }

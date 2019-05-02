@@ -4,18 +4,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public class IDManager {
     private static final String KEY_USER_ID = "KEY_USER_ID";
 
-    @NonNull
+    @Nullable
     public static String getSavedUserId(@NonNull final Context context) {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        final String userId = pref.getString(KEY_USER_ID, null);
-        if (userId == null) {
-            throw new IllegalStateException("User ID is not allocated");
-        }
-        return userId;
+        return pref.getString(KEY_USER_ID, null);
     }
 
     public static void saveUserId(@NonNull final Context context,

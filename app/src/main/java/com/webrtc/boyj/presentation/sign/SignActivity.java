@@ -19,6 +19,7 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initViewModel();
+        loadMyId();
     }
 
     private void initViewModel() {
@@ -42,10 +43,14 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
         finish();
     }
 
+    private void loadMyId() {
+        binding.getVm().setId(IDManager.getSavedUserId(this));
+    }
+
     @NonNull
     public static Intent getLaunchIntent(@NonNull final Context context) {
         return getLaunchIntent(context, SignActivity.class)
-                .setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.databinding.ObservableField;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.webrtc.boyj.presentation.BaseViewModel;
 
@@ -12,6 +13,12 @@ public class SignViewModel extends BaseViewModel {
     private ObservableField<String> id = new ObservableField<>();
     @NonNull
     private MutableLiveData<String> signIn = new MutableLiveData<>();
+
+    public void setId(@Nullable final String id) {
+        if (id != null) {
+            this.id.set(id);
+        }
+    }
 
     public void signInClicked() {
         final String id = this.id.get();

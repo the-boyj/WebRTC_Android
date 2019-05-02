@@ -35,15 +35,6 @@ public class BindingAdapters {
         }
     }
 
-    @BindingAdapter({"phoneNumber"})
-    public static void setPhoneNumber(@NonNull final TextView textView,
-                                      @Nullable final String tel) {
-        if (tel != null) {
-            final String replaceStr = tel.replaceFirst("(^02|[0-9]{3})([0-9]{3,4})([0-9]{4})$", "$1-$2-$3");
-            textView.setText(replaceStr);
-        }
-    }
-
     @SuppressLint("DefaultLocale")
     @BindingAdapter({"callTime"})
     public static void setCallTime(@NonNull final TextView textView, final int time) {

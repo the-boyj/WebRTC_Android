@@ -4,7 +4,6 @@ import com.webrtc.boyj.BuildConfig;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
-import com.webrtc.boyj.data.source.remote.response.UserItem;
 
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
@@ -52,27 +51,27 @@ public class BoyjApiClient implements BoyjApi {
     }
 
     @Override
-    public Single<Response<UserItem>> getProfile(String userId) {
+    public Single<Response<User>> getProfile(String userId) {
         return getClient().getProfile(userId);
     }
 
     @Override
-    public Single<ListResponse<UserItem>> getOthers(String userId) {
+    public Single<ListResponse<User>> getOthers(String userId) {
         return getClient().getOthers(userId);
     }
 
     @Override
-    public Single<Response<UserItem>> registerUser(User user) {
+    public Single<Response<User>> registerUser(User user) {
         return getClient().registerUser(user);
     }
 
     @Override
-    public Single<Response<UserItem>> updateDeviceToken(String userId, String token) {
+    public Single<Response<User>> updateDeviceToken(String userId, String token) {
         return getClient().updateDeviceToken(userId, token);
     }
 
     @Override
-    public Single<Response<UserItem>> updateUserName(String userId, String userName) {
+    public Single<Response<User>> updateUserName(String userId, String userName) {
         return getClient().updateUserName(userId, userName);
     }
 }

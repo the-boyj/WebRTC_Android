@@ -3,8 +3,6 @@ package com.webrtc.boyj.data.source;
 import android.support.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.source.remote.response.Response;
-import com.webrtc.boyj.data.source.remote.response.UserItem;
 
 import java.util.List;
 
@@ -13,10 +11,16 @@ import io.reactivex.Single;
 public interface UserDataSource {
 
     @NonNull
-    Single<Response<UserItem>> getProfile(@NonNull final String id);
+    Single<User> getProfile(@NonNull final String id);
 
     @NonNull
-    Single<List<User>> getOtherUserList(@NonNull final String id);
+    Single<List<User>> insertUserList(@NonNull final List<User> userList);
+
+    @NonNull
+    Single<List<User>> getOtherUserListExceptId(@NonNull final String id);
+
+    @NonNull
+    Single<List<User>> getOtherUserListExceptIds(@NonNull final List<String> ids);
 
     @NonNull
     Single<User> registerUser(@NonNull final User user);

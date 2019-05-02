@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+
     defaultConfig {
         applicationId "com.webrtc.boyj"
         minSdkVersion 21
@@ -10,13 +11,12 @@ android {
         versionName "2.0-SNAPSHOT"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        dataBinding {
-            enabled true
-        }
     }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -28,7 +28,7 @@ android {
     }
 
     dataBinding {
-        enabled true
+        enabled = true
     }
 
     compileOptions {
@@ -55,16 +55,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
-    // Mockito
-    testImplementation 'org.mockito:mockito-core:2.8.0'
-
-    // Power mockito
-    testImplementation 'org.powermock:powermock-api-mockito2:1.7.0RC2'
-    testImplementation 'org.powermock:powermock-module-junit4:1.7.0'
-    testImplementation 'org.powermock:powermock-core:1.7.0'
-    testImplementation 'org.powermock:powermock-module-junit4-rule:1.7.0'
-
 
     implementation "com.android.support:design:$design_version"
     // RecyclerView
@@ -101,6 +91,8 @@ dependencies {
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
     // OkHttp
     implementation 'com.squareup.okhttp3:logging-interceptor:3.14.1'
-
+    // Stetho
+    implementation 'com.facebook.stetho:stetho:1.5.1'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.1'
 }
 apply plugin: 'com.google.gms.google-services'

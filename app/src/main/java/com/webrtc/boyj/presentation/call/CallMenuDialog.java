@@ -24,7 +24,7 @@ import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
 import com.webrtc.boyj.presentation.call.invite.InviteViewModel;
-import com.webrtc.boyj.utils.App;
+import com.webrtc.boyj.App;
 
 import java.util.List;
 

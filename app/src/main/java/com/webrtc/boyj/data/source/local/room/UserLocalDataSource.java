@@ -9,7 +9,6 @@ import com.webrtc.boyj.data.source.local.room.dao.UserDao;
 import com.webrtc.boyj.data.source.local.room.entity.UserEntity;
 import com.webrtc.boyj.data.source.local.room.entity.UserMapper;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,11 +48,8 @@ public class UserLocalDataSource implements UserDataSource {
     @NonNull
     @Override
     public Completable insertUserList(@NonNull List<User> userList) {
-        final List<UserEntity> entities = new ArrayList<>();
-        for (final User user : userList) {
-            entities.add(UserMapper.toEntityFromUser(user));
-        }
-        return userDao.insertAll(entities).subscribeOn(Schedulers.io());
+        return userDao.insertAll(UserMapper.toEntitiesFromUserList(userList))
+                .subscribeOn(Schedulers.io());
     }
 
     @NonNull
@@ -62,13 +58,7 @@ public class UserLocalDataSource implements UserDataSource {
         return userDao.selectExceptId(id)
                 .subscribeOn(Schedulers.io())
                 .onErrorReturnItem(Collections.emptyList())
-                .map(entities -> {
-                    final List<User> userList = new ArrayList<>();
-                    for (UserEntity entity : entities) {
-                        userList.add(UserMapper.toUserFromEntity(entity));
-                    }
-                    return userList;
-                });
+                .map(UserMapper::toUserListFromEntities);
     }
 
     @NonNull
@@ -77,13 +67,7 @@ public class UserLocalDataSource implements UserDataSource {
         return userDao.selectExceptIds(ids)
                 .subscribeOn(Schedulers.io())
                 .onErrorReturnItem(Collections.emptyList())
-                .map(entities -> {
-                    final List<User> userList = new ArrayList<>();
-                    for (UserEntity entity : entities) {
-                        userList.add(UserMapper.toUserFromEntity(entity));
-                    }
-                    return userList;
-                });
+                .map(UserMapper::toUserListFromEntities);
     }
 
     @NonNull

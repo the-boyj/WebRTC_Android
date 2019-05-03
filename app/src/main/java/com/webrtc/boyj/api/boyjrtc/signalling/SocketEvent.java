@@ -1,6 +1,6 @@
 package com.webrtc.boyj.api.boyjrtc.signalling;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public enum SocketEvent {
     /* Caller */

@@ -3,8 +3,10 @@ package com.webrtc.boyj.presentation.main;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputEditText;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.material.textfield.TextInputEditText;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.widget.Toast;

@@ -2,12 +2,13 @@ package com.webrtc.boyj.extension.databinding;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
-import android.databinding.BindingAdapter;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.recyclerview.extensions.ListAdapter;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.databinding.BindingAdapter;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.TextView;

@@ -1,6 +1,6 @@
 package com.webrtc.boyj.api.boyjrtc;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;

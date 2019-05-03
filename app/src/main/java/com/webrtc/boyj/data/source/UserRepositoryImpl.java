@@ -1,6 +1,6 @@
 package com.webrtc.boyj.data.source;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
 

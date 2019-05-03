@@ -1,9 +1,9 @@
 package com.webrtc.boyj.presentation.main;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.databinding.ObservableBoolean;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.databinding.ObservableBoolean;
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepository;

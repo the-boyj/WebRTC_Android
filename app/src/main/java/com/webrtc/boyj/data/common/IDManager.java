@@ -3,8 +3,9 @@ package com.webrtc.boyj.data.common;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class IDManager {
     private static final String KEY_USER_ID = "KEY_USER_ID";

@@ -8,7 +8,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 public class RingtoneLoader {
     private static Ringtone ringtone;

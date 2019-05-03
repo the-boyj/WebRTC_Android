@@ -56,8 +56,10 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 
+    androidTestImplementation 'androidx.test:core:1.1.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
+
     testImplementation 'org.mockito:mockito-core:2.7.22'
-    testImplementation 'com.jraska.livedata:testing:0.2.1'
     testImplementation 'androidx.arch.core:core-testing:2.0.1'
 
     implementation 'com.google.android.material:material:1.0.0'
@@ -66,9 +68,9 @@ dependencies {
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     // Room
-    implementation 'androidx.room:room-runtime:2.0.0'
-    annotationProcessor 'androidx.room:room-compiler:2.0.0'
-    implementation 'androidx.room:room-rxjava2:2.0.0'
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
     // RxJava
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"

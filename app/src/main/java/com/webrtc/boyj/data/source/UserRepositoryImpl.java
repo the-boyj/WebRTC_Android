@@ -47,6 +47,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Single<User> getProfile(@NonNull String id) {
         return localDataSource.getProfile(id)
+                .onErrorReturnItem(User.emptyUser())
                 .flatMap(user -> user.isEmpty() ?
                         getAndSaveRemoteProfile(id) :
                         Single.just(user));

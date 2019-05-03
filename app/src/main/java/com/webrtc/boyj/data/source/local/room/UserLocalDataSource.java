@@ -10,6 +10,7 @@ import com.webrtc.boyj.data.source.local.room.entity.UserEntity;
 import com.webrtc.boyj.data.source.local.room.entity.UserMapper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -40,14 +41,9 @@ public class UserLocalDataSource implements UserDataSource {
     @NonNull
     @Override
     public Single<User> getProfile(@NonNull String id) {
-        return Single.fromCallable(() -> {
-            final UserEntity entity = userDao.selectById(id);
-            if (entity == null) {
-                return User.emptyUser();
-            } else {
-                return UserMapper.toUserFromEntity(entity);
-            }
-        }).subscribeOn(Schedulers.io());
+        return userDao.selectById(id)
+                .subscribeOn(Schedulers.io())
+                .map(UserMapper::toUserFromEntity);
     }
 
     @NonNull
@@ -57,42 +53,44 @@ public class UserLocalDataSource implements UserDataSource {
         for (final User user : userList) {
             entities.add(UserMapper.toEntityFromUser(user));
         }
-        return Completable.fromAction(() -> userDao.insertAll(entities))
-                .subscribeOn(Schedulers.io());
+        return userDao.insertAll(entities).subscribeOn(Schedulers.io());
     }
 
     @NonNull
     @Override
     public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
-        return Single.fromCallable(() -> userDao.selectExceptId(id))
+        return userDao.selectExceptId(id)
+                .subscribeOn(Schedulers.io())
+                .onErrorReturnItem(Collections.emptyList())
                 .map(entities -> {
                     final List<User> userList = new ArrayList<>();
                     for (UserEntity entity : entities) {
                         userList.add(UserMapper.toUserFromEntity(entity));
                     }
                     return userList;
-                }).subscribeOn(Schedulers.io());
+                });
     }
 
     @NonNull
     @Override
     public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
-        return Single.fromCallable(() -> userDao.selectExceptIds(ids))
+        return userDao.selectExceptIds(ids)
+                .subscribeOn(Schedulers.io())
+                .onErrorReturnItem(Collections.emptyList())
                 .map(entities -> {
                     final List<User> userList = new ArrayList<>();
                     for (UserEntity entity : entities) {
                         userList.add(UserMapper.toUserFromEntity(entity));
                     }
                     return userList;
-                }).subscribeOn(Schedulers.io());
+                });
     }
 
     @NonNull
     @Override
     public Completable registerUser(@NonNull User user) {
         final UserEntity entity = UserMapper.toEntityFromUser(user);
-        return Completable.fromAction(() ->
-                userDao.insert(entity)).subscribeOn(Schedulers.io());
+        return userDao.insert(entity).subscribeOn(Schedulers.io());
     }
 
     @NonNull
@@ -105,7 +103,6 @@ public class UserLocalDataSource implements UserDataSource {
     @Override
     public Completable updateUserName(@NonNull String id, @NonNull String name) {
         final UserEntity entity = new UserEntity(id, name);
-        return Completable.fromAction(() -> userDao.insert(entity))
-                .subscribeOn(Schedulers.io());
+        return userDao.update(entity).subscribeOn(Schedulers.io());
     }
 }

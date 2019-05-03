@@ -12,7 +12,6 @@ import org.webrtc.SessionDescription;
 
 import java.util.List;
 
-@SuppressWarnings("SpellCheckingInspection")
 public class PeerConnectionClient {
     @NonNull
     private final PeerConnectionFactory peerConnectionFactory;

@@ -14,7 +14,7 @@ public class User {
     private final String id;
 
     @Expose
-    @SerializedName("userName")
+    @SerializedName("name")
     private final String name;
 
     public User(String id, String name) {

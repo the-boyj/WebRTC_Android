@@ -56,6 +56,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
+    testImplementation 'org.mockito:mockito-core:2.22.0'
+
     implementation "com.android.support:design:$design_version"
     // RecyclerView
     implementation "com.android.support:recyclerview-v7:$recyclerview_version"

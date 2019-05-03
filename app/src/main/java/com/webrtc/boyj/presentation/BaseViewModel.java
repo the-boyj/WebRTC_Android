@@ -1,7 +1,7 @@
 package com.webrtc.boyj.presentation;
 
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.annotation.NonNull;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;

@@ -1,6 +1,6 @@
 package com.webrtc.boyj.api.boyjrtc.peer.manager;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.webrtc.EglBase;
 

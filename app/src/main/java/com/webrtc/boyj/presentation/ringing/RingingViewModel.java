@@ -1,10 +1,10 @@
 package com.webrtc.boyj.presentation.ringing;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;

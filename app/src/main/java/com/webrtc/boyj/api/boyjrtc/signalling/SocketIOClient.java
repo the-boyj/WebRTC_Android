@@ -1,8 +1,8 @@
 package com.webrtc.boyj.api.boyjrtc.signalling;
 
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.webrtc.boyj.BuildConfig;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.Payload;

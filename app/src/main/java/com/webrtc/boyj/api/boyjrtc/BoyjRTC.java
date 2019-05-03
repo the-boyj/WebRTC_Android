@@ -1,7 +1,8 @@
 package com.webrtc.boyj.api.boyjrtc;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.api.boyjrtc.peer.PeerConnectionClient;
 import com.webrtc.boyj.api.boyjrtc.peer.manager.PeerConnectionFactoryManager;

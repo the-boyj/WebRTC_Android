@@ -1,7 +1,8 @@
 package com.webrtc.boyj.data.source.local.preferences;
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.source.TokenDataSource;
 

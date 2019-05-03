@@ -32,11 +32,12 @@ public class MainViewModel extends BaseViewModel {
     public void loadProfile(@NonNull final String id) {
         addDisposable(repository.getProfile(id)
                 .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturnItem(User.emptyUser())
                 .doOnSuccess(this.profile::setValue)
                 .flatMapCompletable(user -> {
                     if (user.isEmpty()) {
                         return repository.registerUser(User.createFromId(id))
-                                .flatMapCompletable(__ -> repository.updateDeviceToken(id));
+                                .concatWith(__ -> repository.updateDeviceToken(id));
                     } else {
                         return repository.updateDeviceToken(id);
                     }
@@ -46,7 +47,7 @@ public class MainViewModel extends BaseViewModel {
     public void loadNewUserList(@NonNull final String id) {
         addDisposable(repository.loadNewUserListExceptId(id)
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(__ -> hideLoading())
+                .doOnSubscribe(__ -> showLoading())
                 .doFinally(this::hideLoading)
                 .subscribe(this.otherUserList::setValue, this.error::setValue));
     }
@@ -62,7 +63,9 @@ public class MainViewModel extends BaseViewModel {
     public void updateUserName(@NonNull final String id, @NonNull final String name) {
         addDisposable(repository.updateUserName(id, name)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this.profile::setValue, this.error::setValue));
+                .subscribe(
+                        () -> this.profile.setValue(new User(id, name)),
+                        this.error::setValue));
     }
 
     private void showLoading() {

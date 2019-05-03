@@ -6,6 +6,7 @@ import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import okhttp3.OkHttpClient;
@@ -64,17 +65,17 @@ public class BoyjApiClient implements BoyjApi {
     }
 
     @Override
-    public Single<Response<User>> registerUser(User user) {
+    public Completable registerUser(User user) {
         return getClient().registerUser(user);
     }
 
     @Override
-    public Single<Response<User>> updateDeviceToken(String userId, String token) {
+    public Completable updateDeviceToken(String userId, String token) {
         return getClient().updateDeviceToken(userId, token);
     }
 
     @Override
-    public Single<Response<User>> updateUserName(String userId, String userName) {
-        return getClient().updateUserName(userId, userName);
+    public Completable updateUserName(String userId, String name) {
+        return getClient().updateUserName(userId, name);
     }
 }

@@ -47,45 +47,39 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Single<User> getProfile(@NonNull String id) {
         return localDataSource.getProfile(id)
-                .flatMap(user -> {
-                    if (user.isEmpty()) { // Local에 없는 경우
-                        return getAndSaveRemoteProfile(id);
-                    } else {
-                        return Single.just(user);
-                    }
-                });
+                .flatMap(user -> user.isEmpty() ?
+                        getAndSaveRemoteProfile(id) :
+                        Single.just(user));
     }
 
     @NonNull
     private Single<User> getAndSaveRemoteProfile(@NonNull final String id) {
         return remoteDataSource.getProfile(id)
-                .flatMap(user -> {
-                    if (!user.isEmpty()) { // Remote에 있고 Local에 없는 경우
-                        return localDataSource.registerUser(user);
-                    } else {
-                        return Single.just(user);
-                    }
-                });
+                .flatMap(user -> localDataSource.registerUser(user).toSingleDefault(user));
     }
 
     @NonNull
     @Override
     public Single<List<User>> loadNewUserListExceptId(@NonNull String id) {
         return remoteDataSource.getOtherUserListExceptId(id)
-                .flatMap(localDataSource::insertUserList);
+                .flatMap(users -> localDataSource.insertUserList(users).toSingleDefault(users));
     }
 
     @NonNull
     @Override
     public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
         return localDataSource.getOtherUserListExceptId(id)
-                .flatMap(users -> {
-                    if (users.isEmpty()) {
-                        return getAndSaveRemoteUserListExceptId(id);
-                    } else {
-                        return Single.just(users);
-                    }
-                });
+                .flatMap(users -> users.isEmpty() ?
+                        getAndSaveRemoteUserListExceptId(id) :
+                        Single.just(users));
+    }
+
+    @NonNull
+    private Single<List<User>> getAndSaveRemoteUserListExceptId(@NonNull final String id) {
+        return remoteDataSource.getOtherUserListExceptId(id)
+                .flatMap(users -> !users.isEmpty() ?
+                        localDataSource.insertUserList(users).toSingleDefault(users) :
+                        Single.just(users));
     }
 
     @NonNull
@@ -95,22 +89,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @NonNull
-    private Single<List<User>> getAndSaveRemoteUserListExceptId(@NonNull final String id) {
-        return remoteDataSource.getOtherUserListExceptId(id)
-                .flatMap(users -> {
-                    if (!users.isEmpty()) {
-                        return localDataSource.insertUserList(users);
-                    } else {
-                        return Single.just(users);
-                    }
-                });
-    }
-
-    @NonNull
     @Override
-    public Single<User> registerUser(@NonNull final User user) {
-        return Single.zip(localDataSource.registerUser(user), remoteDataSource.registerUser(user),
-                (local, remote) -> local);
+    public Completable registerUser(@NonNull final User user) {
+        return localDataSource.registerUser(user)
+                .concatWith(remoteDataSource.registerUser(user));
     }
 
     @NonNull
@@ -118,7 +100,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Completable updateDeviceToken(@NonNull String id) {
         if (tokenDataSource.isNewToken()) {
             tokenDataSource.unsetNewToken();
-            return remoteDataSource.updateDeviceToken(id, tokenDataSource.getToken()).ignoreElement();
+            return remoteDataSource.updateDeviceToken(id, tokenDataSource.getToken());
         } else {
             return Completable.complete();
         }
@@ -126,11 +108,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @NonNull
     @Override
-    public Single<User> updateUserName(@NonNull final String id,
-                                       @NonNull final String name) {
-        return Single.zip(
-                localDataSource.updateUserName(id, name),
-                remoteDataSource.updateUserName(id, name),
-                (local, remote) -> local);
+    public Completable updateUserName(@NonNull final String id,
+                                      @NonNull final String name) {
+        return localDataSource.updateUserName(id, name)
+                .concatWith(remoteDataSource.updateDeviceToken(id, name));
     }
 }

@@ -12,6 +12,7 @@ import com.webrtc.boyj.data.source.local.room.entity.UserMapper;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 
@@ -51,8 +52,13 @@ public class UserLocalDataSource implements UserDataSource {
 
     @NonNull
     @Override
-    public Single<List<User>> insertUserList(@NonNull List<User> userList) {
-        return null;
+    public Completable insertUserList(@NonNull List<User> userList) {
+        final List<UserEntity> entities = new ArrayList<>();
+        for (final User user : userList) {
+            entities.add(UserMapper.toEntityFromUser(user));
+        }
+        return Completable.fromAction(() -> userDao.insertAll(entities))
+                .subscribeOn(Schedulers.io());
     }
 
     @NonNull
@@ -83,27 +89,23 @@ public class UserLocalDataSource implements UserDataSource {
 
     @NonNull
     @Override
-    public Single<User> registerUser(@NonNull User user) {
+    public Completable registerUser(@NonNull User user) {
         final UserEntity entity = UserMapper.toEntityFromUser(user);
-        return Single.fromCallable(() -> {
-            userDao.insert(entity);
-            return user;
-        }).subscribeOn(Schedulers.io());
+        return Completable.fromAction(() ->
+                userDao.insert(entity)).subscribeOn(Schedulers.io());
     }
 
     @NonNull
     @Override
-    public Single<User> updateDeviceToken(@NonNull String id, @NonNull String token) {
+    public Completable updateDeviceToken(@NonNull String id, @NonNull String token) {
         throw new UnsupportedOperationException();
     }
 
     @NonNull
     @Override
-    public Single<User> updateUserName(@NonNull String id, @NonNull String name) {
+    public Completable updateUserName(@NonNull String id, @NonNull String name) {
         final UserEntity entity = new UserEntity(id, name);
-        return Single.fromCallable(() -> {
-            userDao.insert(entity);
-            return new User(id, name);
-        }).subscribeOn(Schedulers.io());
+        return Completable.fromAction(() -> userDao.insert(entity))
+                .subscribeOn(Schedulers.io());
     }
 }

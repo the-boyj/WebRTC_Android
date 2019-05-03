@@ -4,8 +4,10 @@ import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -19,14 +21,14 @@ public interface BoyjApi {
     Single<ListResponse<User>> getOthers(@Query("except") final String userId);
 
     @POST("/api/v1/users")
-    Single<Response<User>> registerUser(@Body final User user);
+    Completable registerUser(@Body final User user);
 
     @POST("/api/v1/users/{id}")
-    Single<Response<User>> updateDeviceToken(@Path("id") final String userId,
-                                             @Query("token") final String token);
+    Completable updateDeviceToken(@Path("id") final String userId,
+                                  @Field("token") final String token);
 
     @POST("/api/v1/users/{id}")
-    Single<Response<User>> updateUserName(@Path("id") final String userId,
-                                          @Query("name") final String userName);
+    Completable updateUserName(@Path("id") final String userId,
+                               @Field("name") final String name);
 
 }

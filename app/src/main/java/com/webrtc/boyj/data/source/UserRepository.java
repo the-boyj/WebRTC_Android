@@ -24,11 +24,11 @@ public interface UserRepository {
     Single<List<User>> getOtherUserListExceptIds(@NonNull final List<String> ids);
 
     @NonNull
-    Single<User> registerUser(@NonNull final User user);
+    Completable registerUser(@NonNull final User user);
 
     @NonNull
     Completable updateDeviceToken(@NonNull final String id);
 
     @NonNull
-    Single<User> updateUserName(@NonNull final String id, @NonNull final String name);
+    Completable updateUserName(@NonNull final String id, @NonNull final String name);
 }

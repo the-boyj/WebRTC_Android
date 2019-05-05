@@ -1,10 +1,10 @@
 package com.webrtc.boyj.presentation.ringing;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
@@ -24,8 +24,8 @@ public class RingingViewModel extends BaseViewModel {
     private BoyjRTC boyjRTC;
 
     public RingingViewModel(@NonNull final UserRepository repository) {
-        this.boyjRTC = new BoyjRTC();
         this.repository = repository;
+        this.boyjRTC = new BoyjRTC();
     }
 
     public void loadCallerProfile(@NonNull final String callerId) {

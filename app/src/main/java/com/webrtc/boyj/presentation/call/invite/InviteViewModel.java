@@ -1,19 +1,19 @@
 package com.webrtc.boyj.presentation.call.invite;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepository;
 import com.webrtc.boyj.presentation.BaseViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class InviteViewModel extends BaseViewModel {
     @NonNull
@@ -27,9 +27,11 @@ public class InviteViewModel extends BaseViewModel {
 
     public void loadOtherUserList(@NonNull final List<String> ids) {
         addDisposable(repository.getOtherUserListExceptIds(ids)
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this.otherUserList::setValue)
+                .subscribe(users -> {
+                    final List<User> userList = new ArrayList<>(users);
+                    this.otherUserList.setValue(userList);
+                }, Throwable::printStackTrace)
         );
     }
 

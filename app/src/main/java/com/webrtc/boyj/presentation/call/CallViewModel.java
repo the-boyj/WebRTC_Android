@@ -1,10 +1,12 @@
 package com.webrtc.boyj.presentation.call;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableInt;
-import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
@@ -14,8 +16,6 @@ import com.webrtc.boyj.presentation.BaseViewModel;
 
 import org.webrtc.MediaStream;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -25,77 +25,78 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     private final ObservableInt callTime = new ObservableInt(0);
     @NonNull
-    private ObservableBoolean isCalling = new ObservableBoolean();
+    private final ObservableBoolean isCalling = new ObservableBoolean();
     @NonNull
-    private MutableLiveData<String> rejectedUserName = new MutableLiveData<>();
+    private final MutableLiveData<MediaStream> localStream = new MutableLiveData<>();
     @NonNull
-    private MutableLiveData<MediaStream> localMediaStream = new MutableLiveData<>();
+    private final MutableLiveData<BoyjMediaStream> remoteStream = new MutableLiveData<>();
     @NonNull
-    private MutableLiveData<List<BoyjMediaStream>> remoteMediaStreams = new MutableLiveData<>();
+    private final MutableLiveData<String> rejectedUserName = new MutableLiveData<>();
     @NonNull
-    private MutableLiveData<String> leavedUserName = new MutableLiveData<>();
+    private final MutableLiveData<String> leavedUserName = new MutableLiveData<>();
     @NonNull
-    private MutableLiveData<Boolean> endOfCall = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> endOfCall = new MutableLiveData<>();
     @NonNull
     private final BoyjRTC boyjRTC;
 
-    public CallViewModel(@NonNull BoyjRTC boyjRTC) {
+    public CallViewModel(@NonNull final BoyjRTC boyjRTC) {
         this.boyjRTC = boyjRTC;
-
-        bindLocalStream();
         subscribeBoyjRTC();
     }
 
-    private void bindLocalStream() {
-        final MediaStream stream = boyjRTC.localStream();
-        this.localMediaStream.setValue(stream);
+    public void initLocalStream() {
+        boyjRTC.startCapture();
+        final MediaStream mediaStream = boyjRTC.localStream();
+        this.localStream.setValue(mediaStream);
     }
 
     private void subscribeBoyjRTC() {
-        subscribeOnCall();
         subscribeOnReject();
-        subscribeRemoteStreams();
+        subscribeRemoteStream();
         subscribeLeave();
-        subscribeOnEndOfCall();
-    }
-
-    private void subscribeOnCall() {
-        addDisposable(boyjRTC.onCalled()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::call));
-    }
-
-    private void call() {
-        isCalling.set(true);
-
-        addDisposable(Observable.interval(1, TimeUnit.SECONDS)
-                .map(Long::intValue)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(callTime::set));
+        subscribeOnCallFinish();
     }
 
     private void subscribeOnReject() {
         addDisposable(boyjRTC.onRejected()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this.rejectedUserName::setValue));
+                .subscribe(this.rejectedUserName::setValue,
+                        Throwable::printStackTrace));
     }
 
-    private void subscribeRemoteStreams() {
-        addDisposable(boyjRTC.remoteStreams()
+    private void subscribeRemoteStream() {
+        addDisposable(boyjRTC.remoteStream()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this.remoteMediaStreams::setValue));
+                .subscribe(stream -> {
+                    call();
+                    remoteStream.setValue(stream);
+                }, Throwable::printStackTrace));
+    }
+
+    public void call() {
+        if (!isCalling.get()) {
+            isCalling.set(true);
+            addDisposable(Observable.interval(1, TimeUnit.SECONDS)
+                    .map(Long::intValue)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(callTime::set, Throwable::printStackTrace));
+        }
     }
 
     private void subscribeLeave() {
         addDisposable(boyjRTC.onLeaved()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userName -> this.leavedUserName.setValue(userName)));
+                .subscribe(name -> Log.d("BOYJ", name), Throwable::printStackTrace));
     }
 
-    private void subscribeOnEndOfCall() {
-        addDisposable(boyjRTC.onEndOfCall()
+    private void subscribeOnCallFinish() {
+        addDisposable(boyjRTC.onCallFinish()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> endOfCall.setValue(true)));
+                .subscribe(() -> {
+                            boyjRTC.release();
+                            this.endOfCall.setValue(true);
+                        },
+                        Throwable::printStackTrace));
     }
 
     public void initCaller(@NonNull final String callerId,
@@ -144,25 +145,13 @@ public class CallViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public LiveData<MediaStream> getLocalMediaStream() {
-        return localMediaStream;
+    public LiveData<MediaStream> getLocalStream() {
+        return localStream;
     }
 
     @NonNull
-    public LiveData<List<BoyjMediaStream>> getRemoteMediaStreams() {
-        return remoteMediaStreams;
-    }
-
-    public List<String> getUserListInRoomIncludingMe(@NonNull final String id) {
-        final List<BoyjMediaStream> mediaStreams = remoteMediaStreams.getValue();
-        final List<String> users = new ArrayList<>();
-        if (mediaStreams != null) {
-            for (BoyjMediaStream s : mediaStreams) {
-                users.add(s.getId());
-            }
-        }
-        users.add(id);
-        return users;
+    public LiveData<BoyjMediaStream> getRemoteStream() {
+        return remoteStream;
     }
 
     @NonNull

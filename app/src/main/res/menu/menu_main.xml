@@ -8,4 +8,7 @@
     <item
         android:id="@+id/menu_refresh_user_list"
         android:title="@string/menu_refresh_user_list" />
+    <item
+        android:id="@+id/menu_settings"
+        android:title="설정" />
 </menu>

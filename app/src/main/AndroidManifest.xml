@@ -25,6 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
+        <activity android:name=".presentation.settings.SettingsActivity"
+            android:theme="@style/DefaultTheme"></activity>
         <activity android:name=".presentation.permission.PermissionActivity" />
         <activity android:name=".presentation.sign.SignActivity" />
         <activity android:name=".presentation.splash.SplashActivity">

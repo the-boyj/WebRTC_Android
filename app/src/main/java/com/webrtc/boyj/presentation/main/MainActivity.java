@@ -1,6 +1,7 @@
 package com.webrtc.boyj.presentation.main;
 
 import androidx.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,6 +24,7 @@ import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.settings.SettingsActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
@@ -98,6 +100,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             showDialog();
         } else if (item.getItemId() == R.id.menu_refresh_user_list) {
             binding.getVm().loadNewUserList(id);
+        } else if (item.getItemId() == R.id.menu_settings) {
+            startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

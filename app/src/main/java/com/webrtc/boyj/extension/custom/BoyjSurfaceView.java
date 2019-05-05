@@ -24,6 +24,5 @@ public class BoyjSurfaceView extends SurfaceViewRenderer {
         setMirror(true);
         setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
         setEnableHardwareScaler(true);
-        setZOrderMediaOverlay(true);
     }
 }

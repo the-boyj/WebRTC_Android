@@ -25,7 +25,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:remoteStreams="@{vm.remoteMediaStreams}" />
+            app:remoteStream="@{vm.remoteStream}"
+            app:leaveStream="@{vm.leavedUserName}" />
 
         <com.webrtc.boyj.extension.custom.BoyjSurfaceView
             android:id="@+id/local_boyj_surface_view"
@@ -36,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:localStream="@{vm.localMediaStream}" />
+            app:localStream="@{vm.localStream}" />
 
         <TextView
             android:id="@+id/tv_timer"

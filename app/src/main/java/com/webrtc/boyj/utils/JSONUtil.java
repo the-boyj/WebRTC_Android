@@ -1,21 +1,25 @@
 package com.webrtc.boyj.utils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.Payload;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JSONUtil {
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    @NonNull
-    public static JsonObject toJsonObject(@NonNull final Object object) {
-        return new JsonParser().parse(toJson(object)).getAsJsonObject();
+    @Nullable
+    public static JSONObject toJSONObject(@NonNull final Object object) {
+        try {
+            return new JSONObject(gson.toJson(object));
+        } catch (JSONException e) {
+            return null;
+        }
     }
 
     @NonNull

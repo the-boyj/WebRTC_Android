@@ -2,16 +2,17 @@ package com.webrtc.boyj.extension.databinding;
 
 import android.annotation.SuppressLint;
 import android.content.res.Resources;
-
-import androidx.databinding.BindingAdapter;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.RecyclerView;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.databinding.BindingAdapter;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.extension.custom.BoyjSurfaceView;
@@ -39,9 +40,10 @@ public class BindingAdapters {
     @SuppressLint("DefaultLocale")
     @BindingAdapter({"callTime"})
     public static void setCallTime(@NonNull final TextView textView, final int time) {
-        if (time >= 0) {
+        if (time > 0) {
             int min = time / 60;
             int sec = time % 60;
+            textView.setVisibility(View.VISIBLE);
             textView.setText(String.format("%02d:%02d", min, sec));
         }
     }
@@ -51,19 +53,26 @@ public class BindingAdapters {
                                        @Nullable final MediaStream mediaStream) {
         if (mediaStream != null) {
             final VideoTrack track = mediaStream.videoTracks.get(0);
+            surfaceView.setZOrderMediaOverlay(true);
             track.addSink(surfaceView);
         }
     }
 
-    @BindingAdapter({"remoteStreams"})
-    public static void bindMediaStreams(@NonNull final SplitLayout splitLayout,
-                                        @Nullable final List<BoyjMediaStream> mediaStreams) {
+    @BindingAdapter({"remoteStream"})
+    public static void bindMediaStream(@NonNull final SplitLayout splitLayout,
+                                       @Nullable final BoyjMediaStream mediaStream) {
         final CallAdapter adapter = (CallAdapter) splitLayout.getAdapter();
-        if (adapter != null) {
-            adapter.submitMediaStreams(
-                    mediaStreams == null ?
-                            new ArrayList<>() :
-                            new ArrayList<>(mediaStreams));
+        if (adapter != null && mediaStream != null) {
+            adapter.addMediaStream(mediaStream);
+        }
+    }
+
+    @BindingAdapter({"leaveStream"})
+    public static void unbindMediaStream(@NonNull final SplitLayout splitLayout,
+                                         @Nullable final String leavedUserName) {
+        final CallAdapter adapter = (CallAdapter) splitLayout.getAdapter();
+        if (adapter != null && leavedUserName != null) {
+            adapter.removeStreamById(leavedUserName);
         }
     }
 

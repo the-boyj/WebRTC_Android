@@ -1,9 +1,9 @@
 package com.webrtc.boyj.presentation.main;
 
+import androidx.annotation.NonNull;
+import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.databinding.ObservableBoolean;
-import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepository;
@@ -33,12 +33,13 @@ public class MainViewModel extends BaseViewModel {
         addDisposable(repository.getProfile(id)
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturnItem(User.emptyUser())
-                .doOnSuccess(this.profile::setValue)
                 .flatMapCompletable(user -> {
                     if (user.isEmpty()) {
-                        return repository.registerUser(User.createFromId(id))
-                                .concatWith(__ -> repository.updateDeviceToken(id));
+                        final User newUser = User.createFromId(id);
+                        this.profile.setValue(newUser);
+                        return repository.registerUser(newUser);
                     } else {
+                        this.profile.setValue(user);
                         return repository.updateDeviceToken(id);
                     }
                 }).subscribe(() -> { /* doNothing */ }, this.error::setValue));

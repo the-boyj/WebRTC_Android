@@ -8,6 +8,7 @@ import com.webrtc.boyj.data.source.UserDataSource;
 import com.webrtc.boyj.data.source.local.room.dao.UserDao;
 import com.webrtc.boyj.data.source.local.room.entity.UserEntity;
 import com.webrtc.boyj.data.source.local.room.entity.UserMapper;
+import com.webrtc.boyj.utils.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,7 @@ public class UserLocalDataSource implements UserDataSource {
     @Override
     public Single<User> getProfile(@NonNull String id) {
         return userDao.selectById(id)
+                .doOnSuccess(entity -> Logger.ii(entity.getId(), entity.getName()))
                 .subscribeOn(Schedulers.io())
                 .map(UserMapper::toUserFromEntity);
     }
@@ -57,6 +59,7 @@ public class UserLocalDataSource implements UserDataSource {
     public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
         return userDao.selectExceptId(id)
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(entities -> Logger.i(entities.toString()))
                 .onErrorReturnItem(Collections.emptyList())
                 .map(UserMapper::toUserListFromEntities);
     }
@@ -66,13 +69,14 @@ public class UserLocalDataSource implements UserDataSource {
     public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
         return userDao.selectExceptIds(ids)
                 .subscribeOn(Schedulers.io())
+                .doOnSuccess(entities -> Logger.i(entities.toString()))
                 .onErrorReturnItem(Collections.emptyList())
                 .map(UserMapper::toUserListFromEntities);
     }
 
     @NonNull
     @Override
-    public Completable registerUser(@NonNull User user) {
+    public Completable registerUser(@NonNull User user, @Nullable String deviceToken) {
         final UserEntity entity = UserMapper.toEntityFromUser(user);
         return userDao.insert(entity).subscribeOn(Schedulers.io());
     }

@@ -2,7 +2,6 @@ package com.webrtc.boyj.api.boyjrtc.signalling;
 
 import androidx.annotation.NonNull;
 
-import com.webrtc.boyj.api.boyjrtc.SignalingCallback;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
@@ -14,21 +13,46 @@ import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 import com.webrtc.boyj.utils.JSONUtil;
 import com.webrtc.boyj.utils.Logger;
 
-import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.*;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.ACCEPT;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.ANSWER;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.AWAKEN;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.CREATE_ROOM;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.DIAL;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.END_OF_CALL;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.NOTIFY_END_OF_CALL;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.NOTIFY_REJECT;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.OFFER;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.PARTICIPANTS;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.REJECT;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.RELAY_ANSWER;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.RELAY_ICE_CANDIDATE;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.RELAY_OFFER;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.SEND_ICE_CANDIDATE;
 
 public class SignalingClient {
     @NonNull
-    private static SocketIOClient socketIOClient = new SocketIOClient();
+    private static SocketIO socketIO = SocketIO.create();
     @NonNull
-    private final SignalingCallback callback;
+    private PublishSubject<RejectPayload> rejectSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<ParticipantsPayload> participantsSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<SdpPayload> offerSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<SdpPayload> answerSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<IceCandidatePayload> iceCandidateSubject = PublishSubject.create();
+    @NonNull
+    private PublishSubject<EndOfCallPayload> endOfCallSubject = PublishSubject.create();
 
-    public SignalingClient(@NonNull SignalingCallback callback) {
-        this.callback = callback;
-        listenSocket();
-        socketIOClient.connect();
+    public SignalingClient() {
+        socketIO.connect();
     }
 
-    private void listenSocket() {
+    public void listenSocket() {
         listenReject();
         listenParticipants();
         listenOffer();
@@ -38,90 +62,129 @@ public class SignalingClient {
     }
 
     private void listenReject() {
-        socketIOClient.on(NOTIFY_REJECT, args -> {
+        socketIO.on(NOTIFY_REJECT, args -> {
             final RejectPayload payload = JSONUtil.fromJson(args[0], RejectPayload.class);
             Logger.ii(NOTIFY_REJECT.toString(), payload.toString());
-            callback.onRejectPayloadFromSig(payload);
+            rejectSubject.onNext(payload);
         });
+    }
+
+    @NonNull
+    public Observable<RejectPayload> reject() {
+        return rejectSubject.hide();
     }
 
     private void listenParticipants() {
-        socketIOClient.on(PARTICIPANTS, args -> {
+        socketIO.on(PARTICIPANTS, args -> {
             final ParticipantsPayload payload = JSONUtil.fromJson(args[0], ParticipantsPayload.class);
             Logger.ii(PARTICIPANTS.toString(), payload.toString());
-            callback.onParticipantsPayloadFromSig(payload);
+            participantsSubject.onNext(payload);
         });
+    }
+
+    @NonNull
+    public Observable<ParticipantsPayload> participants() {
+        return participantsSubject.hide();
     }
 
     private void listenOffer() {
-        socketIOClient.on(RELAY_OFFER, args -> {
+        socketIO.on(RELAY_OFFER, args -> {
             final SdpPayload payload = JSONUtil.fromJson(args[0], SdpPayload.class);
             Logger.ii(RELAY_OFFER.toString(), payload.toString());
-            callback.onOfferSdpPayloadFromSig(payload);
+            offerSubject.onNext(payload);
         });
+    }
+
+    @NonNull
+    public Observable<SdpPayload> offer() {
+        return offerSubject.hide();
     }
 
     private void listenAnswer() {
-        socketIOClient.on(RELAY_ANSWER, args -> {
+        socketIO.on(RELAY_ANSWER, args -> {
             final SdpPayload payload = JSONUtil.fromJson(args[0], SdpPayload.class);
             Logger.ii(RELAY_ANSWER.toString(), payload.toString());
-            callback.onAnswerSdpPayloadFromSig(payload);
+            answerSubject.onNext(payload);
         });
+    }
+
+    @NonNull
+    public Observable<SdpPayload> answer() {
+        return answerSubject.hide();
     }
 
     private void listenIceCandidate() {
-        socketIOClient.on(RELAY_ICE_CANDIDATE, args -> {
+        socketIO.on(RELAY_ICE_CANDIDATE, args -> {
             final IceCandidatePayload payload = JSONUtil.fromJson(args[0], IceCandidatePayload.class);
             Logger.ii(RELAY_ICE_CANDIDATE.toString(), payload.toString());
-            callback.onIceCandidatePayloadFromSig(payload);
+            iceCandidateSubject.onNext(payload);
         });
+    }
+
+    @NonNull
+    public Observable<IceCandidatePayload> iceCandidate() {
+        return iceCandidateSubject.hide();
     }
 
     private void listenEndOfCall() {
-        socketIOClient.on(NOTIFY_END_OF_CALL, args -> {
+        socketIO.on(NOTIFY_END_OF_CALL, args -> {
             final EndOfCallPayload payload = JSONUtil.fromJson(args[0], EndOfCallPayload.class);
             Logger.ii(NOTIFY_END_OF_CALL.toString(), payload.toString());
-            callback.onEndOfCallPayloadFromSig(payload);
+            endOfCallSubject.onNext(payload);
         });
     }
 
+    @NonNull
+    public Observable<EndOfCallPayload> endOfCall() {
+        return endOfCallSubject.hide();
+    }
+
     public void emitCreateRoom(@NonNull final CreateRoomPayload payload) {
-        socketIOClient.emit(CREATE_ROOM, payload);
+        Logger.ii(CREATE_ROOM.toString(), payload.toString());
+        socketIO.emit(CREATE_ROOM, payload);
     }
 
     public void emitDial(@NonNull final DialPayload payload) {
-        socketIOClient.emit(DIAL, payload);
+        Logger.ii(DIAL.toString(), payload.toString());
+        socketIO.emit(DIAL, payload);
     }
 
     public void emitAwaken(@NonNull final AwakenPayload payload) {
-        socketIOClient.emit(AWAKEN, payload);
+        Logger.ii(AWAKEN.toString(), payload.toString());
+        socketIO.emit(AWAKEN, payload);
     }
 
     public void emitAccept() {
-        socketIOClient.emit(ACCEPT);
+        Logger.i(ACCEPT.toString());
+        socketIO.emit(ACCEPT);
     }
 
     public void emitOffer(@NonNull final SdpPayload payload) {
-        socketIOClient.emit(OFFER, payload);
+        Logger.ii(OFFER.toString(), payload.toString());
+        socketIO.emit(OFFER, payload);
     }
 
     public void emitAnswer(@NonNull final SdpPayload payload) {
-        socketIOClient.emit(ANSWER, payload);
+        Logger.ii(ANSWER.toString(), payload.toString());
+        socketIO.emit(ANSWER, payload);
     }
 
     public void emitIceCandidate(@NonNull final IceCandidatePayload payload) {
-        socketIOClient.emit(SEND_ICE_CANDIDATE, payload);
+        Logger.ii(SEND_ICE_CANDIDATE.toString(), payload.toString());
+        socketIO.emit(SEND_ICE_CANDIDATE, payload);
     }
 
     public void emitReject(@NonNull final RejectPayload payload) {
-        socketIOClient.emit(REJECT, payload);
+        Logger.ii(REJECT.toString(), payload.toString());
+        socketIO.emit(REJECT, payload);
     }
 
     public void emitEndOfCall() {
-        socketIOClient.emit(END_OF_CALL);
+        Logger.i(END_OF_CALL.toString());
+        socketIO.emit(END_OF_CALL);
     }
 
     public void disconnect() {
-        socketIOClient.disconnect();
+        socketIO.disconnect();
     }
 }

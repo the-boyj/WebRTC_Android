@@ -1,7 +1,5 @@
 package com.webrtc.boyj.api.boyjrtc;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.api.boyjrtc.peer.PeerConnectionClient;
@@ -12,10 +10,8 @@ import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.EndOfCallPayload;
-import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
-import com.webrtc.boyj.api.boyjrtc.signalling.payload.ParticipantsPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.Participant;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
-import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
@@ -24,33 +20,41 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 
-public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
+public class BoyjRTC implements BoyjContract {
     private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
 
-    private UserMediaManager userMediaManager;
-    private PeerConnectionClient peerConnectionClient;
-    private SignalingClient signalingClient;
     @NonNull
-    private final BoyjPublisher publisher = new BoyjPublisher();
+    private static UserMediaManager userMediaManager;
+    @NonNull
+    private static final PeerConnectionFactory factory;
+
+    private PeerConnectionClient peerClient;
+    private SignalingClient sigClient;
+
+    @NonNull
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     private boolean isInitialized = false;
 
-    public BoyjRTC() {
-        signalingClient = new SignalingClient(this);
+    static {
+        PeerConnectionFactoryManager.initialize();
+        factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
+        userMediaManager = new UserMediaManager(factory);
     }
 
-    public void initRTC(@NonNull final Context context) {
+    public BoyjRTC() {
+        sigClient = new SignalingClient();
+    }
+
+    public void initRTC() {
         if (!isInitialized) {
-            PeerConnectionFactoryManager.initialize(context);
-            final PeerConnectionFactory factory =
-                    PeerConnectionFactoryManager.createPeerConnectionFactory();
-
-            userMediaManager = new UserMediaManager(context, factory);
-            peerConnectionClient = new PeerConnectionClient(factory, this);
             isInitialized = true;
-
-            startCapture();
+            peerClient = PeerConnectionClient.of(factory);
+            sigClient.listenSocket();
+            subscribeSignaling();
+            subscribePeer();
         }
     }
 
@@ -64,45 +68,180 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
         userMediaManager.stopCapture();
     }
 
+    private void subscribeSignaling() {
+        subscribeParticipantsFromSig();
+        subscribeOfferFromSig();
+        subscribeAnswerFromSig();
+        subscribeIceCandidateFromSig();
+        subscribeEndOfCallFromSig();
+    }
+
+    /**
+     * ON EVENT : PARTICIPANTS
+     * Offer 생성 순서 확인
+     * 1. createPeerConnection
+     * 2. addLocalStream
+     * 3. createOffer
+     */
+    private void subscribeParticipantsFromSig() {
+        disposables.add(sigClient.participants()
+                .subscribe(payload -> {
+                            final List<Participant> participants = payload.getParticipants();
+                            for (Participant participant : participants) {
+                                peerClient.createPeerConnection(participant.getUserId());
+                                peerClient.addLocalStream(participant.getUserId(), localStream());
+                                peerClient.createOffer(participant.getUserId());
+                            }
+                        },
+                        Throwable::printStackTrace));
+    }
+
+    /**
+     * ON EVENT : RELAY_OFFER
+     * Answer 생성 순서 확인
+     * 1. createPeerConnection
+     * 2. setLocalStream
+     * 3. setRemoteSessionDescription
+     * 4. createAnswer
+     */
+    private void subscribeOfferFromSig() {
+        disposables.add(sigClient.offer()
+                .subscribe(payload -> {
+                    peerClient.createPeerConnection(payload.getSender());
+                    peerClient.addLocalStream(payload.getSender(), localStream());
+                    peerClient.setRemoteSdp(payload.getSender(), payload.getSdp());
+                    peerClient.createAnswer(payload.getSender());
+                }, Throwable::printStackTrace));
+    }
+
+    /**
+     * ON EVENT : RELAY_ANSWER
+     * Answer 를 받으면 아직 추가하지 않은 remoteSessionDescription 추가
+     */
+    private void subscribeAnswerFromSig() {
+        disposables.add(sigClient.answer()
+                .subscribe(payload ->
+                                peerClient.setRemoteSdp(payload.getSender(), payload.getSdp()),
+                        Throwable::printStackTrace));
+    }
+
+    /**
+     * ON EVENT : RELAY_ICE_CANDIDATE
+     */
+    private void subscribeIceCandidateFromSig() {
+        disposables.add(sigClient.iceCandidate()
+                .subscribe(payload -> peerClient.addIceCandidate(
+                        payload.getSender(),
+                        payload.getIceCandidate()),
+                        Throwable::printStackTrace));
+    }
+
+    /**
+     * ON EVENT : NOTIFY_END_OF_CALL
+     */
+    private void subscribeEndOfCallFromSig() {
+        disposables.add(sigClient.endOfCall()
+                .subscribe(payload -> peerClient.dispose(payload.getSender()),
+                        Throwable::printStackTrace));
+    }
+
+    private void subscribePeer() {
+        subscribeOfferSdpFromPeer();
+        subscribeAnswerSdpFromPeer();
+        subscribeIceCandidateFromPeer();
+    }
+
+    /**
+     * Callback in Offer session description observer
+     * EMIT EVENT : OFFER
+     */
+    private void subscribeOfferSdpFromPeer() {
+        disposables.add(peerClient.offer()
+                .subscribe(payload -> {
+                    peerClient.setLocalSdp(payload.getReceiver(), payload.getSdp());
+                    sigClient.emitOffer(payload);
+                }, Throwable::printStackTrace));
+    }
+
+    /**
+     * Callback in Answer session description observer
+     * EMIT EVENT : ANSWER
+     */
+    private void subscribeAnswerSdpFromPeer() {
+        disposables.add(peerClient.answer()
+                .subscribe(payload -> {
+                    peerClient.setLocalSdp(payload.getReceiver(), payload.getSdp());
+                    sigClient.emitAnswer(payload);
+                }, Throwable::printStackTrace));
+    }
+
+    /**
+     * Callback in peerconnection observer
+     * EMIT EVENT : SEND_ICE_CANDIDATE
+     */
+    private void subscribeIceCandidateFromPeer() {
+        disposables.add(peerClient.iceCandidate()
+                .subscribe(payload -> sigClient.emitIceCandidate(payload), Throwable::printStackTrace));
+    }
+
+    /**
+     * EMIT EVENT : CREATE_ROOM
+     */
     @Override
     public void createRoom(@NonNull final CreateRoomPayload payload) {
-        signalingClient.emitCreateRoom(payload);
+        sigClient.emitCreateRoom(payload);
     }
 
+    /**
+     * EMIT EVENT : DIAL
+     */
     @Override
     public void dial(@NonNull final DialPayload payload) {
-        signalingClient.emitDial(payload);
+        sigClient.emitDial(payload);
     }
 
+    /**
+     * EMIT_EVENT : AWAKEN
+     */
     @Override
     public void awaken(@NonNull final AwakenPayload payload) {
-        signalingClient.emitAwaken(payload);
+        sigClient.emitAwaken(payload);
     }
 
+    /**
+     * EMIT_EVENT : ACCEPT
+     */
     @Override
     public void accept() {
         validateInitRTC();
-        signalingClient.emitAccept();
+        sigClient.emitAccept();
     }
 
+    /**
+     * EMIT EVENT : REJECT
+     */
     @Override
     public void reject(@NonNull final RejectPayload payload) {
-        signalingClient.emitReject(payload);
+        sigClient.emitReject(payload);
         disconnect();
     }
 
     private void disconnect() {
-        signalingClient.disconnect();
+        sigClient.disconnect();
     }
 
+    /**
+     * EMIt_EVENT : END_OF_CALL
+     */
     @Override
     public void endOfCall() {
-        signalingClient.emitEndOfCall();
+        sigClient.emitEndOfCall();
         release();
     }
 
-    private void release() {
-        peerConnectionClient.disposeAll();
+    public void release() {
+        disposables.dispose();
+        peerClient.disposeAll();
         stopCapture();
         disconnect();
     }
@@ -113,106 +252,43 @@ public class BoyjRTC implements BoyjContract, PeerCallback, SignalingCallback {
         }
     }
 
-    @Override
-    public void onOfferSdpPayloadFromPeer(@NonNull SdpPayload sdpPayload) {
-        setLocalDescription(sdpPayload);
-        signalingClient.emitOffer(sdpPayload);
-    }
-
-    @Override
-    public void onAnswerSdpPayloadFromPeer(@NonNull SdpPayload sdpPayload) {
-        setLocalDescription(sdpPayload);
-        signalingClient.emitAnswer(sdpPayload);
-    }
-
-    private void setLocalDescription(@NonNull final SdpPayload sdpPayload) {
-        peerConnectionClient.setLocalSdp(sdpPayload.getReceiver(), sdpPayload.getSdp());
-    }
-
-    @Override
-    public void onIceCandidatePayloadFromPeer(@NonNull IceCandidatePayload iceCandidatePayload) {
-        signalingClient.emitIceCandidate(iceCandidatePayload);
-    }
-
-    @Override
-    public void onRemoteStreamFromPeer(@NonNull BoyjMediaStream mediaStream) {
-        publisher.completeCall();
-        publisher.submitRemoteStream(mediaStream);
-    }
-
-    @Override
-    public void onCallFinish() {
-        publisher.completeEndOfCall();
-        release();
-    }
-
-    @Override
-    public void onParticipantsPayloadFromSig(@NonNull ParticipantsPayload payload) {
-        peerConnectionClient.createOffers(payload.getParticipants(), localStream());
-    }
-
-    @Override
-    public void onOfferSdpPayloadFromSig(@NonNull SdpPayload payload) {
-        peerConnectionClient.createPeerConnection(payload.getSender());
-        peerConnectionClient.setRemoteSdp(payload.getSender(), payload.getSdp());
-        peerConnectionClient.createAnswer(payload.getSender());
-    }
-
-    @Override
-    public void onAnswerSdpPayloadFromSig(@NonNull SdpPayload payload) {
-        peerConnectionClient.setRemoteSdp(payload.getSender(), payload.getSdp());
-    }
-
-    @Override
-    public void onIceCandidatePayloadFromSig(@NonNull IceCandidatePayload payload) {
-        peerConnectionClient.addIceCandidate(
-                payload.getSender(),
-                payload.getIceCandidate());
-    }
-
-    @Override
-    public void onRejectPayloadFromSig(@NonNull RejectPayload payload) {
-        publisher.submitReject(payload.getSender());
-    }
-
-    @Override
-    public void onEndOfCallPayloadFromSig(@NonNull EndOfCallPayload payload) {
-        publisher.submitLeave(payload.getSender());
-        peerConnectionClient.dispose(payload.getSender());
-    }
-
+    /**
+     * ON EVENT : NOTIFY_REJECT
+     */
     @NonNull
     public Observable<String> onRejected() {
-        return publisher.getRejectSubject().hide();
+        return sigClient.reject()
+                .map(RejectPayload::getSender);
     }
 
-    @NonNull
-    public Completable onCalled() {
-        validateInitRTC();
-        return publisher.getCallSubject().hide();
-    }
-
+    /**
+     * ON EVENT : NOTIFY_END_OF_CALL
+     */
     @NonNull
     public Observable<String> onLeaved() {
         validateInitRTC();
-        return publisher.getLeaveSubject().hide();
-    }
-
-    @NonNull
-    public Completable onEndOfCall() {
-        validateInitRTC();
-        return publisher.getEndOfCallSubject().hide();
+        return sigClient.endOfCall()
+                .map(EndOfCallPayload::getSender);
     }
 
     @NonNull
     public MediaStream localStream() {
-        validateInitRTC();
-        return userMediaManager.getLocalMediaStream();
+        return userMediaManager.mediaStream();
     }
 
+    /**
+     * Stream that the other's remote stream
+     */
     @NonNull
-    public Observable<List<BoyjMediaStream>> remoteStreams() {
-        validateInitRTC();
-        return publisher.getRemoteStreamSubject().hide();
+    public Observable<BoyjMediaStream> remoteStream() {
+        return peerClient.remoteMediaStream();
+    }
+
+    /**
+     * Callback in all stream disposed
+     */
+    @NonNull
+    public Completable onCallFinish() {
+        return peerClient.callFinish();
     }
 }

@@ -3,6 +3,7 @@ package com.webrtc.boyj.data.source.remote;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.webrtc.boyj.BuildConfig;
 import com.webrtc.boyj.data.model.User;
+import com.webrtc.boyj.data.source.remote.request.UserRequest;
 import com.webrtc.boyj.data.source.remote.response.ListResponse;
 import com.webrtc.boyj.data.source.remote.response.Response;
 
@@ -65,13 +66,13 @@ public class BoyjApiClient implements BoyjApi {
     }
 
     @Override
-    public Completable registerUser(User user) {
-        return getClient().registerUser(user);
+    public Completable registerUser(UserRequest request) {
+        return getClient().registerUser(request);
     }
 
     @Override
-    public Completable updateDeviceToken(String userId, String token) {
-        return getClient().updateDeviceToken(userId, token);
+    public Completable updateDeviceToken(String userId, String deviceToken) {
+        return getClient().updateDeviceToken(userId, deviceToken);
     }
 
     @Override

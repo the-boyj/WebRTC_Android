@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import com.webrtc.boyj.BuildConfig;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.Payload;
 import com.webrtc.boyj.utils.JSONUtil;
-import com.webrtc.boyj.utils.Logger;
 
 import java.net.URISyntaxException;
 
@@ -15,11 +14,10 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-class SocketIOClient {
-    @NonNull
-    private static final Socket socket;
+class SocketIO {
+    private static Socket socket;
 
-    static {
+    private SocketIO() {
         try {
             socket = IO.socket(BuildConfig.SERVER_URL);
         } catch (URISyntaxException e) {
@@ -28,8 +26,8 @@ class SocketIOClient {
         }
     }
 
-    SocketIOClient() {
-
+    public static SocketIO create() {
+        return new SocketIO();
     }
 
     void connect() {
@@ -43,13 +41,11 @@ class SocketIOClient {
 
     void emit(@NonNull SocketEvent event,
               @NonNull final Payload payload) {
-        Logger.ii(event.toString(), payload.toString());
-        socket.emit(event.toString(), JSONUtil.toJsonObject(payload));
+        socket.emit(event.toString(), JSONUtil.toJSONObject(payload));
     }
 
     void emit(@NonNull SocketEvent event,
               @Nullable final Object... args) {
-        Logger.i(event.toString());
         socket.emit(event.toString(), args);
     }
 

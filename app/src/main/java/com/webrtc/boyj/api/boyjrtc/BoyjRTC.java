@@ -21,27 +21,32 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.CompletableSubject;
 
 public class BoyjRTC implements BoyjContract {
     private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
 
-    @NonNull
-    private static UserMediaManager userMediaManager;
+
     @NonNull
     private static final PeerConnectionFactory factory;
 
+
+    private UserMediaManager userMediaManager;
     private PeerConnectionClient peerClient;
     private SignalingClient sigClient;
 
     @NonNull
     private CompositeDisposable disposables = new CompositeDisposable();
 
+    @NonNull
+    private final CompletableSubject onCallFinishSubject = CompletableSubject.create();
+
     private boolean isInitialized = false;
 
     static {
         PeerConnectionFactoryManager.initialize();
         factory = PeerConnectionFactoryManager.createPeerConnectionFactory();
-        userMediaManager = new UserMediaManager(factory);
+
     }
 
     public BoyjRTC() {
@@ -51,6 +56,7 @@ public class BoyjRTC implements BoyjContract {
     public void initRTC() {
         if (!isInitialized) {
             isInitialized = true;
+            userMediaManager = new UserMediaManager(factory);
             peerClient = PeerConnectionClient.of(factory);
             sigClient.listenSocket();
             subscribeSignaling();
@@ -74,6 +80,7 @@ public class BoyjRTC implements BoyjContract {
         subscribeAnswerFromSig();
         subscribeIceCandidateFromSig();
         subscribeEndOfCallFromSig();
+        subscribeRejectFromSig();
     }
 
     /**
@@ -141,8 +148,25 @@ public class BoyjRTC implements BoyjContract {
      */
     private void subscribeEndOfCallFromSig() {
         disposables.add(sigClient.endOfCall()
-                .subscribe(payload -> peerClient.dispose(payload.getSender()),
-                        Throwable::printStackTrace));
+                .subscribe(
+                        endOfCallPayload -> {
+                            peerClient.dispose(endOfCallPayload.getSender());
+                            if (peerClient.getConnectionCount() == 0) {
+                                callFinish();
+                            }
+                        }
+                ));
+
+    }
+
+    private void subscribeRejectFromSig() {
+        disposables.add(sigClient.reject()
+                .subscribe(rejectPayload -> {
+                    if (peerClient.getConnectionCount() == 0) {
+                        onCallFinishSubject.onComplete();
+                        callFinish();
+                    }
+                }));
     }
 
     private void subscribePeer() {
@@ -184,6 +208,7 @@ public class BoyjRTC implements BoyjContract {
                 .subscribe(payload -> sigClient.emitIceCandidate(payload), Throwable::printStackTrace));
     }
 
+
     /**
      * EMIT EVENT : CREATE_ROOM
      */
@@ -224,6 +249,7 @@ public class BoyjRTC implements BoyjContract {
     public void reject(@NonNull final RejectPayload payload) {
         sigClient.emitReject(payload);
         disconnect();
+
     }
 
     private void disconnect() {
@@ -236,10 +262,15 @@ public class BoyjRTC implements BoyjContract {
     @Override
     public void endOfCall() {
         sigClient.emitEndOfCall();
+        callFinish();
+    }
+
+    private void callFinish() {
+        onCallFinishSubject.onComplete();
         release();
     }
 
-    public void release() {
+    private void release() {
         disposables.dispose();
         peerClient.disposeAll();
         stopCapture();
@@ -289,6 +320,7 @@ public class BoyjRTC implements BoyjContract {
      */
     @NonNull
     public Completable onCallFinish() {
-        return peerClient.callFinish();
+        return this.onCallFinishSubject.hide();
+
     }
 }

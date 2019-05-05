@@ -86,14 +86,16 @@ public class CallViewModel extends BaseViewModel {
     private void subscribeLeave() {
         addDisposable(boyjRTC.onLeaved()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(name -> Log.d("BOYJ", name), Throwable::printStackTrace));
+                .subscribe(name -> {
+                    leavedUserName.setValue(name);
+                    Log.d("BOYJ", name);
+                }, Throwable::printStackTrace));
     }
 
     private void subscribeOnCallFinish() {
         addDisposable(boyjRTC.onCallFinish()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
-                            boyjRTC.release();
                             this.endOfCall.setValue(true);
                         },
                         Throwable::printStackTrace));
@@ -126,7 +128,6 @@ public class CallViewModel extends BaseViewModel {
 
     public void hangUp() {
         boyjRTC.endOfCall();
-        endOfCall.setValue(true);
     }
 
     @NonNull

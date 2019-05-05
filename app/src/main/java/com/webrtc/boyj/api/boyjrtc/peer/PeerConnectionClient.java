@@ -89,8 +89,7 @@ public class PeerConnectionClient {
         return boyjPeerConnection.answer();
     }
 
-    @NonNull
-    public Completable callFinish() {
-        return boyjPeerConnection.callFinish();
+    public int getConnectionCount() {
+        return boyjPeerConnection.getConnectionCount();
     }
 }

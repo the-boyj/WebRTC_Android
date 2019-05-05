@@ -10,5 +10,8 @@ public interface TokenDataSource {
 
     String getToken();
 
+    void setNewToken();
+
     void unsetNewToken();
+
 }

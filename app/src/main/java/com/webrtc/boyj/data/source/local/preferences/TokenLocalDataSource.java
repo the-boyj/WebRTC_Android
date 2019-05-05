@@ -56,6 +56,13 @@ public class TokenLocalDataSource implements TokenDataSource {
         return pref.getString(KEY_DEVICE_TOKEN, null);
     }
 
+    @Override
+    public void setNewToken() {
+        pref.edit()
+                .putBoolean(KEY_IS_NEW_TOKEN, true)
+                .apply();
+    }
+
     /**
      * Token 을 서버에 등록한 이후 newToken 상태 해제
      */

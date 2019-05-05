@@ -2,15 +2,17 @@ package com.webrtc.boyj.api.boyjrtc.peer;
 
 import androidx.annotation.NonNull;
 
-import com.webrtc.boyj.api.boyjrtc.PeerCallback;
-import com.webrtc.boyj.api.boyjrtc.signalling.payload.Participant;
+import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
-import java.util.List;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
 
 public class PeerConnectionClient {
     @NonNull
@@ -18,26 +20,20 @@ public class PeerConnectionClient {
     @NonNull
     private final BoyjPeerConnection boyjPeerConnection;
 
-    public PeerConnectionClient(@NonNull final PeerConnectionFactory peerConnectionFactory,
-                                @NonNull final PeerCallback callback) {
-        this.peerConnectionFactory = peerConnectionFactory;
-        this.boyjPeerConnection = new BoyjPeerConnection(callback);
+    public static PeerConnectionClient of(@NonNull final PeerConnectionFactory factory) {
+        return new PeerConnectionClient(factory);
     }
 
-    public void createOffers(@NonNull final List<Participant> participants,
-                             @NonNull final MediaStream localMediaStream) {
-        for (final Participant participant : participants) {
-            createPeerConnection(participant.getUserId());
-            createOffer(participant.getUserId());
-            addLocalStream(participant.getUserId(), localMediaStream);
-        }
+    private PeerConnectionClient(@NonNull final PeerConnectionFactory peerConnectionFactory) {
+        this.peerConnectionFactory = peerConnectionFactory;
+        this.boyjPeerConnection = new BoyjPeerConnection();
     }
 
     public void createPeerConnection(@NonNull final String targetId) {
         boyjPeerConnection.createPeerConnection(targetId, peerConnectionFactory);
     }
 
-    private void createOffer(@NonNull final String targetId) {
+    public void createOffer(@NonNull final String targetId) {
         boyjPeerConnection.createOffer(targetId);
     }
 
@@ -45,8 +41,8 @@ public class PeerConnectionClient {
         boyjPeerConnection.createAnswer(targetId);
     }
 
-    private void addLocalStream(@NonNull final String targetId,
-                                @NonNull final MediaStream localStream) {
+    public void addLocalStream(@NonNull final String targetId,
+                               @NonNull final MediaStream localStream) {
         boyjPeerConnection.addLocalStream(targetId, localStream);
     }
 
@@ -71,5 +67,30 @@ public class PeerConnectionClient {
 
     public void disposeAll() {
         boyjPeerConnection.disposeAll();
+    }
+
+    @NonNull
+    public Observable<IceCandidatePayload> iceCandidate() {
+        return boyjPeerConnection.iceCandidate();
+    }
+
+    @NonNull
+    public Observable<BoyjMediaStream> remoteMediaStream() {
+        return boyjPeerConnection.remoteMediaStream();
+    }
+
+    @NonNull
+    public Observable<SdpPayload> offer() {
+        return boyjPeerConnection.offer();
+    }
+
+    @NonNull
+    public Observable<SdpPayload> answer() {
+        return boyjPeerConnection.answer();
+    }
+
+    @NonNull
+    public Completable callFinish() {
+        return boyjPeerConnection.callFinish();
     }
 }

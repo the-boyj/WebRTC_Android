@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <ListPreference
+        android:defaultValue="ALL"
+        android:entries="@array/IceTransportsType"
+        android:entryValues="@array/IceTransportsType"
+        android:key="IceTransportsType"
+        android:title="IceTransportsType" />
+    <ListPreference
+        android:defaultValue="BALANCED"
+        android:entries="@array/BundlePolicy"
+        android:entryValues="@array/BundlePolicy"
+        android:key="BundlePolicy"
+        android:title="BundlePolicy" />
+
+    <ListPreference
+        android:defaultValue="REQUIRE"
+        android:entries="@array/RtcpMuxPolicy"
+        android:entryValues="@array/RtcpMuxPolicy"
+        android:key="RtcpMuxPolicy"
+        android:title="RtcpMuxPolicy" />
+
+    <ListPreference
+        android:defaultValue="ENABLED"
+        android:entries="@array/TcpCandidatePolicy"
+        android:entryValues="@array/TcpCandidatePolicy"
+        android:key="TcpCandidatePolicy"
+        android:title="TcpCandidatePolicy" />
+    <ListPreference
+        android:defaultValue="ALL"
+        android:entries="@array/CandidateNetworkPolicy"
+        android:entryValues="@array/CandidateNetworkPolicy"
+        android:key="CandidateNetworkPolicy"
+        android:title="CandidateNetworkPolicy" />
+
+
+    <EditTextPreference
+        android:defaultValue="50"
+        android:key="AudioJitterBufferMaxPackets"
+        android:numeric="integer"
+        android:summary="integer only"
+        android:title="AudioJitterBufferMaxPackets" />
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="AudioJitterBufferFastAccelerate"
+        android:title="AudioJitterBufferFastAccelerate" />
+
+
+    <EditTextPreference
+        android:defaultValue="-1"
+        android:key="IceConnectionReceivingTimeout"
+        android:numeric="integer"
+        android:summary="integer only"
+        android:title="IceConnectionReceivingTimeout" />
+
+    <EditTextPreference
+        android:defaultValue="-1"
+        android:key="IceBackupCandidatePairPingInterval"
+        android:numeric="integer"
+        android:summary="integer only"
+        android:title="IceBackupCandidatePairPingInterval" />
+
+    <ListPreference
+        android:defaultValue="ECDSA"
+        android:entries="@array/KeyType"
+        android:entryValues="@array/KeyType"
+        android:key="KeyType"
+        android:title="KeyType" />
+
+
+    <ListPreference
+        android:defaultValue="GATHER_ONCE"
+        android:entries="@array/ContinualGatheringPolicy"
+        android:entryValues="@array/ContinualGatheringPolicy"
+        android:key="ContinualGatheringPolicy"
+        android:title="ContinualGatheringPolicy" />
+
+    <EditTextPreference
+        android:defaultValue="0"
+        android:key="IceCandidatePoolSize"
+        android:numeric="integer"
+        android:summary="integer only"
+        android:title="IceCandidatePoolSize" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="PruneTurnPorts"
+        android:title="PruneTurnPorts" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="PresumeWritableWhenFullyRelayed"
+        android:title="PresumeWritableWhenFullyRelayed" />
+
+
+    <ListPreference
+        android:defaultValue="null"
+        android:entries="@array/nullable_boolean"
+        android:entryValues="@array/nullable_boolean_values"
+        android:key="CombinedAudioVideoBwe"
+        android:title="CombinedAudioVideoBwe" />
+
+
+    <ListPreference
+        android:defaultValue="null"
+        android:entries="@array/nullable_boolean"
+        android:entryValues="@array/nullable_boolean_values"
+        android:key="EnableDtlsSrtp"
+        android:title="EnableDtlsSrtp" />
+
+
+    <EditTextPreference
+        android:defaultValue="5"
+        android:key="MaxIPv6Networks"
+        android:numeric="integer"
+        android:summary="integer only"
+        android:title="MaxIPv6Networks" />
+
+
+    <ListPreference
+        android:defaultValue="UNKNOWN"
+        android:entries="@array/AdapterType"
+        android:entryValues="@array/AdapterType"
+        android:key="AdapterType"
+        android:title="AdapterType" />
+
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/SdpSemantics"
+        android:entryValues="@array/SdpSemantics"
+        android:key="SdpSemantics"
+        android:title="SdpSemantics" />
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="ActiveResetSrtpParams"
+        android:title="ActiveResetSrtpParams" />
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="UseMediaTransport"
+        android:title="UseMediaTransport" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="UseMediaTransportForDataChannels"
+        android:title="UseMediaTransportForDataChannels" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="DisableIpv6"
+        android:title="DisableIpv6" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="EnableDscp"
+        android:title="EnableDscp" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="EnableCpuOveruseDetection"
+        android:title="EnableCpuOveruseDetection" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="EnableRtpDataChannel"
+        android:title="EnableRtpDataChannel" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="SuspendBelowMinBitrate"
+        android:title="SuspendBelowMinBitrate" />
+
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="DisableIPv6OnWifi"
+        android:title="DisableIPv6OnWifi" />
+
+
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="IceCheckIntervalStrongConnectivityMs"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="IceCheckIntervalStrongConnectivityMs" />
+
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="IceCheckIntervalWeakConnectivityMs"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="IceCheckIntervalWeakConnectivityMs" />
+
+
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="IceCheckMinInterval"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="IceCheckMinInterval" />
+
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="IceUnwritableTimeMs"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="IceUnwritableTimeMs" />
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="IceUnwritableMinChecks"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="IceUnwritableMinChecks" />
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="StunCandidateKeepaliveIntervalMs"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="StunCandidateKeepaliveIntervalMs" />
+    <EditTextPreference
+        android:defaultValue="null"
+        android:key="ScreencastMinBitrate"
+        android:numeric="integer"
+        android:summary="null or integer"
+        android:title="ScreencastMinBitrate" />
+
+
+</PreferenceScreen>

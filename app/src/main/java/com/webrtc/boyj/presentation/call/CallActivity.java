@@ -16,6 +16,7 @@ import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
 import com.webrtc.boyj.extension.custom.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.utils.SpeakerLoader;
 
 import java.util.List;
 
@@ -34,6 +35,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         initViews();
         initViewModel();
         initRTC();
+
+        SpeakerLoader.turnOn(this);
 
         if (calleeId != null) {
             initCaller(id, calleeId);
@@ -56,7 +59,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     public void showCallMenuDialog(View view) {
         final List<String> ids = adapter.getUserListInRoomIncludingMe(id);
         final CallMenuDialog dialog = CallMenuDialog.newInstance(ids);
-        dialog.setOnInviteListener(user -> binding.getVm().invite(user.getId()));
+        dialog.setOnInviteListener(user -> {
+            showToast(user.getName() + " 에게 통화를 요청하였습니다.");
+            binding.getVm().invite(user.getId());
+            dialog.dismiss();
+        });
         dialog.show(getSupportFragmentManager(), "CallMenuDialog");
     }
 
@@ -128,5 +135,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     @Override
     public void onBackPressed() {
         // disabled back press
+    }
+
+    @Override
+    protected void onDestroy() {
+        SpeakerLoader.turnOff(this);
+        super.onDestroy();
     }
 }

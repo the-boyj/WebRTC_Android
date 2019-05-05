@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="IceTransportsType">
+        <item>NONE</item>
+        <item>RELAY</item>
+        <item>NOHOST</item>
+        <item>ALL</item>
+    </string-array>
+
+    <string-array name="BundlePolicy">
+        <item>BALANCED</item>
+        <item>MAXBUNDLE</item>
+        <item>MAXCOMPAT</item>
+    </string-array>
+
+    <string-array name="RtcpMuxPolicy">
+        <item>NEGOTIATE</item>
+        <item>REQUIRE</item>
+    </string-array>
+
+
+    <string-array name="TcpCandidatePolicy">
+        <item>ENABLED</item>
+        <item>DISABLED</item>
+    </string-array>
+
+    <string-array name="CandidateNetworkPolicy">
+        <item>ALL</item>
+        <item>LOW_COST</item>
+    </string-array>
+
+
+    <string-array name="KeyType">
+        <item>RSA</item>
+        <item>ECDSA</item>
+    </string-array>
+
+    <string-array name="ContinualGatheringPolicy">
+        <item>GATHER_ONCE</item>
+        <item>GATHER_CONTINUALLY</item>
+    </string-array>
+
+
+    <string-array name="nullable_boolean">
+        <item>null</item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+    <string-array name="nullable_boolean_values">
+        <item>null</item>
+        <item>true</item>
+        <item>false</item>
+    </string-array>
+
+
+    <string-array name="AdapterType">
+        <item>UNKNOWN</item>
+        <item>ETHERNET</item>
+        <item>WIFI</item>
+        <item>CELLULAR</item>
+        <item>VPN</item>
+        <item>LOOPBACK</item>
+    </string-array>
+
+    <string-array name="SdpSemantics">
+        <item>PLAN_B</item>
+        <item>UNIFIED_PLAN</item>
+    </string-array>
+
+
+</resources>

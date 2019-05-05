@@ -1,9 +1,11 @@
 package com.webrtc.boyj.data.source.remote;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserDataSource;
+import com.webrtc.boyj.data.source.remote.request.UserRequest;
 import com.webrtc.boyj.data.source.remote.response.StatusCode;
 import com.webrtc.boyj.utils.Logger;
 
@@ -74,8 +76,9 @@ public class UserRemoteDataSource implements UserDataSource {
 
     @NonNull
     @Override
-    public Completable registerUser(@NonNull User user) {
-        return boyjApi.registerUser(user)
+    public Completable registerUser(@NonNull User user, @Nullable final String deviceToken) {
+        final UserRequest request = new UserRequest(user.getId(), user.getName(), deviceToken);
+        return boyjApi.registerUser(request)
                 .subscribeOn(Schedulers.io());
     }
 

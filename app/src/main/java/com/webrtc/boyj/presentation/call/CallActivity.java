@@ -59,7 +59,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     public void showCallMenuDialog(View view) {
         final List<String> ids = adapter.getUserListInRoomIncludingMe(id);
         final CallMenuDialog dialog = CallMenuDialog.newInstance(ids);
-        dialog.setOnInviteListener(user -> binding.getVm().invite(user.getId()));
+        dialog.setOnInviteListener(user -> {
+            showToast(user.getName() + " 에게 통화를 요청하였습니다.");
+            binding.getVm().invite(user.getId());
+            dialog.dismiss();
+        });
         dialog.show(getSupportFragmentManager(), "CallMenuDialog");
     }
 

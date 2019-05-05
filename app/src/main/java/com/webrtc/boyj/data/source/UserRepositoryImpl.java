@@ -115,6 +115,6 @@ public class UserRepositoryImpl implements UserRepository {
     public Completable updateUserName(@NonNull final String id,
                                       @NonNull final String name) {
         return localDataSource.updateUserName(id, name)
-                .concatWith(remoteDataSource.updateDeviceToken(id, name));
+                .concatWith(remoteDataSource.updateUserName(id, name));
     }
 }

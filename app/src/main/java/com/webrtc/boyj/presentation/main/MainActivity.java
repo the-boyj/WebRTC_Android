@@ -1,17 +1,18 @@
 package com.webrtc.boyj.presentation.main;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
@@ -24,8 +25,8 @@ import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
-import com.webrtc.boyj.presentation.settings.SettingsActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.presentation.settings.SettingsActivity;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private String id;
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void initToolbar() {
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar(binding.layoutToolbar.toolbar);
         final ActionBar toolbar = getSupportActionBar();
         if (toolbar != null) {
             toolbar.setDisplayShowTitleEnabled(false);
@@ -68,6 +69,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private void initRecyclerView() {
         final MainAdapter adapter = new MainAdapter();
         adapter.setOnDialListener(this::startCallActivity);
+
+        final SwipeRefreshLayout layout = findViewById(R.id.swipe_refresh_layout);
+        layout.setOnRefreshListener(() -> {
+            binding.getVm().loadNewUserList(id);
+            layout.setRefreshing(false);
+        });
         binding.rvUser.setAdapter(adapter);
     }
 

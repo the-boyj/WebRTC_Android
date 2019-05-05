@@ -20,10 +20,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         getPreferenceManager().setSharedPreferencesName("RtcConfiguration");
-        setPreferencesFromResource(R.xml.rtc_config,rootKey);
+        setPreferencesFromResource(R.xml.rtc_config, rootKey);
 
     }
-
 
 
     @Override

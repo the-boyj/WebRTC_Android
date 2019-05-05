@@ -2,14 +2,12 @@ package com.webrtc.boyj.api.boyjrtc.peer.manager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.webrtc.boyj.App;
 import com.webrtc.boyj.api.boyjrtc.peer.IceServers;
 
 import org.webrtc.PeerConnection;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class RtcConfigurationManager {

@@ -1,26 +1,24 @@
 package com.webrtc.boyj.api.boyjrtc.peer.manager;
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
+import com.webrtc.boyj.App;
 
 import org.webrtc.DefaultVideoDecoderFactory;
 import org.webrtc.DefaultVideoEncoderFactory;
 import org.webrtc.PeerConnectionFactory;
 
 public final class PeerConnectionFactoryManager {
-    private static boolean isFactoryInitialized = false;
+    private static boolean isInitialized = false;
 
     private PeerConnectionFactoryManager() {
 
     }
 
-    public static void initialize(@NonNull final Context context) {
-        if (!isFactoryInitialized) {
-            isFactoryInitialized = true;
+    public static void initialize() {
+        if (!isInitialized) {
+            isInitialized = true;
             PeerConnectionFactory.initialize(
                     PeerConnectionFactory.InitializationOptions
-                            .builder(context)
+                            .builder(App.getContext())
                             .createInitializationOptions()
             );
         }

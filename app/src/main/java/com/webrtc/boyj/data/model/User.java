@@ -11,11 +11,11 @@ import java.util.Objects;
 public class User {
     @SerializedName("userId")
     @Expose
-    private final String id;
+    private String id;
 
     @Expose
     @SerializedName("name")
-    private final String name;
+    private String name;
 
     public User(String id, String name) {
         this.id = id;
@@ -28,6 +28,14 @@ public class User {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public static User createFromId(@NonNull final String id) {

@@ -1,9 +1,10 @@
 package com.webrtc.boyj.presentation.call;
 
-import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
@@ -19,12 +20,28 @@ import java.util.List;
 public class CallAdapter extends SplitLayout.Adapter {
     private List<BoyjMediaStream> mediaStreamList = new ArrayList<>();
 
-    public void submitMediaStreams(@NonNull final List<BoyjMediaStream> mediaStreams) {
-        if (!mediaStreams.isEmpty()) {
-            mediaStreamList = new ArrayList<>();
-            mediaStreamList.addAll(mediaStreams);
-            notifyDataSetChanged();
+    public void addMediaStream(@NonNull final BoyjMediaStream mediaStream) {
+        mediaStreamList.add(mediaStream);
+        notifyDataSetChanged();
+    }
+
+    public void removeStreamById(@NonNull final String id) {
+        for (int i = 0; i < mediaStreamList.size(); i++) {
+            final BoyjMediaStream stream = mediaStreamList.get(i);
+            if (id.equals(stream.getId())) {
+                mediaStreamList.remove(i);
+                break;
+            }
         }
+    }
+
+    public List<String> getUserListInRoomIncludingMe(@NonNull final String id) {
+        final List<String> userList = new ArrayList<>();
+        for (final BoyjMediaStream mediaStream : mediaStreamList) {
+            userList.add(mediaStream.getId());
+        }
+        userList.add(id);
+        return userList;
     }
 
     @Override

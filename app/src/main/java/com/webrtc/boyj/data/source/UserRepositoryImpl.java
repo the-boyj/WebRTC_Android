@@ -56,7 +56,8 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     private Single<User> getAndSaveRemoteProfile(@NonNull final String id) {
         return remoteDataSource.getProfile(id)
-                .flatMap(user -> localDataSource.registerUser(user).toSingleDefault(user));
+                .flatMap(user -> localDataSource.registerUser(user, null)
+                        .toSingleDefault(user));
     }
 
     @NonNull
@@ -92,8 +93,10 @@ public class UserRepositoryImpl implements UserRepository {
     @NonNull
     @Override
     public Completable registerUser(@NonNull final User user) {
-        return localDataSource.registerUser(user)
-                .concatWith(remoteDataSource.registerUser(user));
+        final String token = tokenDataSource.getToken();
+        tokenDataSource.unsetNewToken();
+        return localDataSource.registerUser(user, null)
+                .concatWith(remoteDataSource.registerUser(user, token));
     }
 
     @NonNull

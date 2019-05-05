@@ -26,7 +26,9 @@ public class Logger {
     }
 
     public static void ii(String event, String msg) {
-        i(String.format("%s\n%s", event, msg));
+        if (BuildConfig.DEBUG) {
+            Log.i(tag(), String.format("%s\n%s", event, msg));
+        }
     }
 
     public static void w(String msg) {

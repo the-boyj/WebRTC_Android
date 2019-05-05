@@ -4,6 +4,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
+import com.webrtc.boyj.App;
+
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.Camera1Enumerator;
@@ -25,29 +27,29 @@ public final class UserMediaManager {
     @NonNull
     private final VideoCapturer capturer;
 
-    public UserMediaManager(@NonNull final Context context,
-                            @NonNull final PeerConnectionFactory peerConnectionFactory) {
+    public UserMediaManager(@NonNull final PeerConnectionFactory peerConnectionFactory) {
         this.peerConnectionFactory = peerConnectionFactory;
-        mediaStream = peerConnectionFactory.createLocalMediaStream("LocalMediaStream");
-        mediaStream.addTrack(createVideoTrack(context));
-        mediaStream.addTrack(createAudioTrack());
 
-        capturer = createVideoCapturer(context);
+        mediaStream = peerConnectionFactory.createLocalMediaStream("LocalMediaStream");
+        capturer = createVideoCapturer(App.getContext());
+
+        mediaStream.addTrack(createVideoTrack());
+        mediaStream.addTrack(createAudioTrack());
     }
 
-    public MediaStream getLocalMediaStream() {
+    public MediaStream mediaStream() {
         return mediaStream;
     }
 
     @NonNull
-    private VideoTrack createVideoTrack(@NonNull final Context context) {
+    private VideoTrack createVideoTrack() {
         final SurfaceTextureHelper helper = SurfaceTextureHelper.create(
                 "SurfaceTexture",
                 EglBaseManager.getEglBase().getEglBaseContext()
         );
         final VideoSource videoSource = peerConnectionFactory.createVideoSource(true);
         final VideoTrack videoTrack = peerConnectionFactory.createVideoTrack("VideoTrack", videoSource);
-        capturer.initialize(helper, context, videoSource.getCapturerObserver());
+        capturer.initialize(helper, App.getContext(), videoSource.getCapturerObserver());
 
         return videoTrack;
     }

@@ -1,10 +1,11 @@
 package com.webrtc.boyj.presentation.main;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.ListAdapter;
-import androidx.recyclerview.widget.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;

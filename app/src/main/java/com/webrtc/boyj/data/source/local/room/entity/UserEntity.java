@@ -1,9 +1,9 @@
 package com.webrtc.boyj.data.source.local.room.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
 
 @Entity(tableName = "users")
 public class UserEntity {

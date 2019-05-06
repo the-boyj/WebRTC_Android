@@ -1,8 +1,8 @@
 package com.webrtc.boyj.presentation.main;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.source.UserRepository;
 

@@ -14,8 +14,8 @@ import com.webrtc.boyj.R;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
-import com.webrtc.boyj.presentation.common.view.SplitLayout;
 import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.common.view.SplitLayout;
 import com.webrtc.boyj.utils.SpeakerLoader;
 
 import java.util.List;

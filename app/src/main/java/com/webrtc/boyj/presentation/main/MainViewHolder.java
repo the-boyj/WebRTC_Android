@@ -1,9 +1,10 @@
 package com.webrtc.boyj.presentation.main;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.databinding.ItemUserBinding;

@@ -41,13 +41,13 @@ public class RtcConfigurationManager {
         rtcConfiguration.rtcpMuxPolicy = PeerConnection.RtcpMuxPolicy.valueOf(pref.getString("RtcpMuxPolicy", "REQUIRE"));
         rtcConfiguration.tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.valueOf(pref.getString("TcpCandidatePolicy", "ENABLED"));
         rtcConfiguration.candidateNetworkPolicy = PeerConnection.CandidateNetworkPolicy.valueOf(pref.getString("CandidateNetworkPolicy", "ALL"));
-        rtcConfiguration.audioJitterBufferMaxPackets = pref.getInt("AudioJitterBufferMaxPackets", 50);
+        rtcConfiguration.audioJitterBufferMaxPackets = Integer.parseInt(pref.getString("AudioJitterBufferMaxPackets", "50"));
         rtcConfiguration.audioJitterBufferFastAccelerate = pref.getBoolean("AudioJitterBufferFastAccelerate", false);
-        rtcConfiguration.iceConnectionReceivingTimeout = pref.getInt("IceConnectionReceivingTimeout", -1);
-        rtcConfiguration.iceBackupCandidatePairPingInterval = pref.getInt("IceBackupCandidatePairPingInterval", -1);
+        rtcConfiguration.iceConnectionReceivingTimeout = Integer.parseInt(pref.getString("IceConnectionReceivingTimeout", "-1"));
+        rtcConfiguration.iceBackupCandidatePairPingInterval = Integer.parseInt(pref.getString("IceBackupCandidatePairPingInterval", "-1"));
         rtcConfiguration.keyType = PeerConnection.KeyType.valueOf(pref.getString("KeyType", "ECDSA"));
         rtcConfiguration.continualGatheringPolicy = PeerConnection.ContinualGatheringPolicy.valueOf(pref.getString("ContinualGatheringPolicy", "GATHER_ONCE"));
-        rtcConfiguration.iceCandidatePoolSize = pref.getInt("IceCandidatePoolSize", 0);
+        rtcConfiguration.iceCandidatePoolSize = Integer.parseInt(pref.getString("IceCandidatePoolSize", "0"));
         rtcConfiguration.pruneTurnPorts = pref.getBoolean("PruneTurnPorts", false);
         rtcConfiguration.presumeWritableWhenFullyRelayed = pref.getBoolean("PresumeWritableWhenFullyRelayed", false);
         rtcConfiguration.iceCheckIntervalStrongConnectivityMs = convertIntegerOrNull(pref.getString("IceCheckIntervalStrongConnectivityMs", "null"));
@@ -57,7 +57,7 @@ public class RtcConfigurationManager {
         rtcConfiguration.iceUnwritableMinChecks = convertIntegerOrNull(pref.getString("IceUnwritableMinChecks", "null"));
         rtcConfiguration.stunCandidateKeepaliveIntervalMs = convertIntegerOrNull(pref.getString("StunCandidateKeepaliveIntervalMs", "null"));
         rtcConfiguration.disableIPv6OnWifi = pref.getBoolean("DisableIPv6OnWifi", false);
-        rtcConfiguration.maxIPv6Networks = pref.getInt("MaxIPv6Networks", 5);
+        rtcConfiguration.maxIPv6Networks = Integer.parseInt(pref.getString("MaxIPv6Networks", "5"));
         rtcConfiguration.disableIPv6OnWifi = pref.getBoolean("DisableIpv6", false);
         rtcConfiguration.enableDscp = pref.getBoolean("EnableDscp", false);
         rtcConfiguration.enableCpuOveruseDetection = pref.getBoolean("EnableCpuOveruseDetection", true);

@@ -47,6 +47,7 @@
             android:name=".presentation.call.CallActivity"
             android:launchMode="singleTop" />
         <activity android:name=".presentation.ringing.RingingActivity" />
+
         <service
             android:name=".api.firebase.MyFirebaseMessagingService"
             tools:ignore="ExportedService">

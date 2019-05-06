@@ -11,7 +11,6 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class PeerConnectionClient {
@@ -89,8 +88,7 @@ public class PeerConnectionClient {
         return boyjPeerConnection.answer();
     }
 
-    @NonNull
-    public Completable callFinish() {
-        return boyjPeerConnection.callFinish();
+    public int getConnectionCount() {
+        return boyjPeerConnection.getConnectionCount();
     }
 }

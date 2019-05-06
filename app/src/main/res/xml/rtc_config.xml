@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
 
     <ListPreference
@@ -40,7 +39,6 @@
     <EditTextPreference
         android:defaultValue="50"
         android:key="AudioJitterBufferMaxPackets"
-        android:numeric="integer"
         android:summary="integer only"
         android:title="AudioJitterBufferMaxPackets" />
 
@@ -54,14 +52,12 @@
     <EditTextPreference
         android:defaultValue="-1"
         android:key="IceConnectionReceivingTimeout"
-        android:numeric="integer"
         android:summary="integer only"
         android:title="IceConnectionReceivingTimeout" />
 
     <EditTextPreference
         android:defaultValue="-1"
         android:key="IceBackupCandidatePairPingInterval"
-        android:numeric="integer"
         android:summary="integer only"
         android:title="IceBackupCandidatePairPingInterval" />
 
@@ -83,7 +79,6 @@
     <EditTextPreference
         android:defaultValue="0"
         android:key="IceCandidatePoolSize"
-        android:numeric="integer"
         android:summary="integer only"
         android:title="IceCandidatePoolSize" />
 
@@ -117,7 +112,6 @@
     <EditTextPreference
         android:defaultValue="5"
         android:key="MaxIPv6Networks"
-        android:numeric="integer"
         android:summary="integer only"
         android:title="MaxIPv6Networks" />
 
@@ -130,7 +124,7 @@
         android:title="AdapterType" />
 
     <ListPreference
-        android:defaultValue="0"
+        android:defaultValue="PLAN_B"
         android:entries="@array/SdpSemantics"
         android:entryValues="@array/SdpSemantics"
         android:key="SdpSemantics"
@@ -188,14 +182,12 @@
     <EditTextPreference
         android:defaultValue="null"
         android:key="IceCheckIntervalStrongConnectivityMs"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="IceCheckIntervalStrongConnectivityMs" />
 
     <EditTextPreference
         android:defaultValue="null"
         android:key="IceCheckIntervalWeakConnectivityMs"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="IceCheckIntervalWeakConnectivityMs" />
 
@@ -203,32 +195,27 @@
     <EditTextPreference
         android:defaultValue="null"
         android:key="IceCheckMinInterval"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="IceCheckMinInterval" />
 
     <EditTextPreference
         android:defaultValue="null"
         android:key="IceUnwritableTimeMs"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="IceUnwritableTimeMs" />
     <EditTextPreference
         android:defaultValue="null"
         android:key="IceUnwritableMinChecks"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="IceUnwritableMinChecks" />
     <EditTextPreference
         android:defaultValue="null"
         android:key="StunCandidateKeepaliveIntervalMs"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="StunCandidateKeepaliveIntervalMs" />
     <EditTextPreference
         android:defaultValue="null"
         android:key="ScreencastMinBitrate"
-        android:numeric="integer"
         android:summary="null or integer"
         android:title="ScreencastMinBitrate" />
 

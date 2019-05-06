@@ -56,7 +56,28 @@ public final class UserMediaManager {
 
     @NonNull
     private AudioTrack createAudioTrack() {
-        final AudioSource audioSource = peerConnectionFactory.createAudioSource(new MediaConstraints());
+
+        //https://www.programcreek.com/java-api-examples/index.php?api=org.webrtc.MediaConstraints
+
+        MediaConstraints audioConstraints = new MediaConstraints();
+
+        // add all existing audio filters to avoid having echos
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googEchoCancellation", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googEchoCancellation2", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googDAEchoCancellation", "true"));
+
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googTypingNoiseDetection", "true"));
+
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googAutoGainControl", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googAutoGainControl2", "true"));
+
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googNoiseSuppression", "true"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googNoiseSuppression2", "true"));
+
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googAudioMirroring", "false"));
+        audioConstraints.mandatory.add(new MediaConstraints.KeyValuePair("googHighpassFilter", "true"));
+
+        final AudioSource audioSource = peerConnectionFactory.createAudioSource(audioConstraints);
         return peerConnectionFactory.createAudioTrack("AudioTrack", audioSource);
     }
 

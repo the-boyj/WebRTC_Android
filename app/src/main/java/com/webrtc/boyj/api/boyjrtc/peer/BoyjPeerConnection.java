@@ -19,9 +19,7 @@ import org.webrtc.SessionDescription;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 class BoyjPeerConnection {
@@ -37,8 +35,6 @@ class BoyjPeerConnection {
     private final PublishSubject<IceCandidatePayload> iceCandidateSubject = PublishSubject.create();
     @NonNull
     private final PublishSubject<BoyjMediaStream> remoteMediaStreamSubject = PublishSubject.create();
-    @NonNull
-    private final CompletableSubject onCallFinishSubject = CompletableSubject.create();
 
     BoyjPeerConnection() {
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
@@ -86,22 +82,18 @@ class BoyjPeerConnection {
     }
 
     void dispose(@NonNull final String id) {
-        getConnectionById(id).dispose();
+        //getConnectionById(id).dispose();
         connections.remove(id);
-
-        if (connections.isEmpty()) {
-            onCallFinishSubject.onComplete();
-        }
-    }
-
-    @NonNull
-    Completable callFinish() {
-        return onCallFinishSubject.hide();
     }
 
     void disposeAll() {
         for (PeerConnection pc : connections.values()) {
-            pc.dispose();
+            try {
+                pc.dispose();
+            } catch (Exception e) {
+
+            }
+
         }
     }
 
@@ -167,5 +159,10 @@ class BoyjPeerConnection {
     @NonNull
     Observable<SdpPayload> answer() {
         return answerSubject.hide();
+    }
+
+    @NonNull
+    public int getConnectionCount() {
+        return connections.size();
     }
 }

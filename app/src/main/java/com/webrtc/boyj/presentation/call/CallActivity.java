@@ -34,16 +34,9 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
         initViews();
         initViewModel();
-        initRTC();
-
+        initCamera();
+        initCall(calleeId);
         SpeakerLoader.turnOn(this);
-
-        if (calleeId != null) {
-            initCaller(id, calleeId);
-        } else {
-            initCallee();
-        }
-
     }
 
     private void initViews() {
@@ -96,8 +89,16 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         });
     }
 
-    private void initRTC() {
+    private void initCamera() {
         binding.getVm().initLocalStream();
+    }
+
+    private void initCall(@Nullable final String calleeId) {
+        if (calleeId != null) {
+            initCaller(id, calleeId);
+        } else {
+            initCallee();
+        }
     }
 
     private void initCaller(@NonNull final String callerId,

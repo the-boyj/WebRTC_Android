@@ -1,6 +1,5 @@
 package com.webrtc.boyj.presentation.ringing;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,6 +8,7 @@ import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
@@ -59,7 +59,6 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
     private void startCallActivity() {
         startActivity(CallActivity.getCalleeLaunchIntent(this));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
         finish();
     }
 

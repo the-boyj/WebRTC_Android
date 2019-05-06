@@ -1,13 +1,10 @@
 package com.webrtc.boyj.presentation.sign;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -20,53 +17,40 @@ import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.main.MainActivity;
 
 public class SignActivity extends BaseActivity<ActivitySignBinding> {
+    private String savedId;
+    private SignViewModel viewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        savedId = IDManager.getSavedUserId(this);
         initViewModel();
-        getMyId();
+        viewModel.setIdField(savedId);
     }
 
     private void initViewModel() {
-        final SignViewModel viewModel = ViewModelProviders.of(this).get(SignViewModel.class);
+        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        final TokenDataSource tokenDataSource = TokenLocalDataSource.getInstance(pref);
+        final SignViewModel.Factory factory = new SignViewModel.Factory(tokenDataSource);
+
+        viewModel = ViewModelProviders.of(this, factory).get(SignViewModel.class);
         binding.setVm(viewModel);
         subscribeViewModel();
     }
 
     private void subscribeViewModel() {
-        binding.getVm().getSignIn().observe(this, id -> {
-            if (id != null) {
-                Toast.makeText(this, id + " 님 환영합니다", Toast.LENGTH_SHORT).show();
-                checkOtherUserSignIn(id);
-                IDManager.saveUserId(this, id);
-                startMainActivity();
-            }
+        viewModel.getSignIn().observe(this, id -> {
+            Toast.makeText(this, id + " 님 환영합니다", Toast.LENGTH_SHORT).show();
+            viewModel.checkAndSetNewTokenStatus(savedId);
+            IDManager.saveUserId(this, id);
+            startMainActivity();
         });
-    }
-
-    private void checkOtherUserSignIn(@NonNull final String id) {
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final TokenDataSource tokenDataSource = TokenLocalDataSource.getInstance(pref);
-        final String userId = IDManager.getSavedUserId(this);
-
-        if (userId == null || !userId.equals(id)) {
-            tokenDataSource.setNewToken();
-        }
     }
 
     private void startMainActivity() {
         startActivity(MainActivity.getLaunchIntent(this, MainActivity.class));
         finish();
-    }
-
-    private void getMyId() {
-        binding.getVm().setId(IDManager.getSavedUserId(this));
-    }
-
-    @NonNull
-    public static Intent getLaunchIntent(@NonNull final Context context) {
-        return getLaunchIntent(context, SignActivity.class)
-                .addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
     }
 
     @Override

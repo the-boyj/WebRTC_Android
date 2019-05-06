@@ -8,8 +8,8 @@ import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
-import com.webrtc.boyj.extension.custom.BoyjSurfaceView;
-import com.webrtc.boyj.extension.custom.SplitLayout;
+import com.webrtc.boyj.presentation.common.view.BoyjSurfaceView;
+import com.webrtc.boyj.presentation.common.view.SplitLayout;
 
 import org.webrtc.MediaStream;
 import org.webrtc.VideoTrack;
@@ -30,6 +30,7 @@ public class CallAdapter extends SplitLayout.Adapter {
             final BoyjMediaStream stream = mediaStreamList.get(i);
             if (id.equals(stream.getId())) {
                 mediaStreamList.remove(i);
+                notifyDataSetChanged();
                 break;
             }
         }

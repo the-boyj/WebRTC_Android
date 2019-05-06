@@ -33,6 +33,7 @@
             android:hint="@string/sign_login_hint"
             app:boxStrokeWidth="2dp"
             app:helperText="최초 아이디 등록이 필요합니다"
+            app:validId="@{vm.validId}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/layout_logo">
@@ -44,7 +45,7 @@
                 android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
                 android:inputType="text"
                 android:maxLines="1"
-                android:text="@={vm.id}" />
+                android:text="@={vm.idField}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView

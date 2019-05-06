@@ -3,19 +3,23 @@ package com.webrtc.boyj.presentation.permission;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.util.Linkify;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.text.util.Linkify;
-import android.widget.Toast;
 
+import com.jakewharton.rxbinding3.view.RxView;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivityPermissionBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.sign.SignActivity;
 
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 import static android.Manifest.permission.CALL_PHONE;
 import static android.Manifest.permission.CAMERA;
@@ -26,10 +30,11 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> {
     private static final int PERMISSION_REQUEST_CODE = 100;
 
+    private CompositeDisposable disposables = new CompositeDisposable();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (areAllPermissionsGrantedAlready(RECORD_AUDIO, CAMERA, CALL_PHONE)) {
             startSignActivity();
         } else {
@@ -47,8 +52,7 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     }
 
     private void startSignActivity() {
-        startActivity(SignActivity.getLaunchIntent(this));
-        overridePendingTransition(0, 0);
+        startActivity(SignActivity.getLaunchIntent(this, SignActivity.class));
         finish();
     }
 
@@ -67,7 +71,10 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     }
 
     private void initButton() {
-        binding.btnAccept.setOnClickListener(__ -> requestPermissions());
+        disposables.add(RxView.clicks(binding.btnAccept)
+                .throttleFirst(500, TimeUnit.MILLISECONDS)
+                .subscribe(__ -> requestPermissions()));
+
         binding.btnDeny.setOnClickListener(__ -> finish());
     }
 
@@ -107,5 +114,11 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_permission;
+    }
+
+    @Override
+    protected void onDestroy() {
+        disposables.dispose();
+        super.onDestroy();
     }
 }

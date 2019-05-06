@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 
 import com.webrtc.boyj.data.source.TokenDataSource;
+import com.webrtc.boyj.utils.Logger;
 
 public class TokenLocalDataSource implements TokenDataSource {
     private static final String KEY_DEVICE_TOKEN = "KEY_DEVICE_TOKEN";
@@ -42,6 +43,7 @@ public class TokenLocalDataSource implements TokenDataSource {
      */
     @Override
     public void registerToken(@NonNull String token) {
+        Logger.i("new token is registered. token [" + token + "]");
         pref.edit()
                 .putString(KEY_DEVICE_TOKEN, token)
                 .putBoolean(KEY_IS_NEW_TOKEN, true)
@@ -58,6 +60,7 @@ public class TokenLocalDataSource implements TokenDataSource {
 
     @Override
     public void setNewToken() {
+        Logger.i("setNewToken called. After login updateDeviceToken will call");
         pref.edit()
                 .putBoolean(KEY_IS_NEW_TOKEN, true)
                 .apply();
@@ -68,6 +71,7 @@ public class TokenLocalDataSource implements TokenDataSource {
      */
     @Override
     public void unsetNewToken() {
+        Logger.i("unsetNewToken called.");
         pref.edit()
                 .putBoolean(KEY_IS_NEW_TOKEN, false)
                 .apply();

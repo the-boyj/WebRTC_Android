@@ -80,7 +80,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private void startCallActivity(@NonNull final User user) {
         startActivity(CallActivity.getCallerLaunchIntent(this, user.getId()));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     private void subscribeViewModel() {

@@ -25,11 +25,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
-        <activity
-            android:name=".presentation.settings.SettingsActivity"
-            android:theme="@style/DefaultTheme"></activity>
-        <activity android:name=".presentation.permission.PermissionActivity" />
-        <activity android:name=".presentation.sign.SignActivity" />
         <activity android:name=".presentation.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,10 +32,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.main.MainActivity" />
-        <activity android:name=".presentation.call.CallActivity" />
+        <activity android:name=".presentation.permission.PermissionActivity" />
+        <activity
+            android:name=".presentation.sign.SignActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".presentation.settings.SettingsActivity"
+            android:launchMode="singleTop"
+            android:theme="@style/DefaultTheme" />
+        <activity
+            android:name=".presentation.main.MainActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name=".presentation.call.CallActivity"
+            android:launchMode="singleTop" />
         <activity android:name=".presentation.ringing.RingingActivity" />
-
         <service
             android:name=".api.firebase.MyFirebaseMessagingService"
             tools:ignore="ExportedService">

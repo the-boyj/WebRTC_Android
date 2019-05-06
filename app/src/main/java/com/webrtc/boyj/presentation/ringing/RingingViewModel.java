@@ -20,6 +20,8 @@ public class RingingViewModel extends BaseViewModel {
     @NonNull
     private final MutableLiveData<String> callerName = new MutableLiveData<>();
     @NonNull
+    private final MutableLiveData<Throwable> error = new MutableLiveData<>();
+    @NonNull
     private final UserRepository repository;
     private BoyjRTC boyjRTC;
 
@@ -34,7 +36,7 @@ public class RingingViewModel extends BaseViewModel {
                 .subscribe(user -> {
                     this.callerId.setValue(user.getId());
                     this.callerName.setValue(user.getName());
-                }));
+                }, this.error::setValue));
     }
 
     public void awaken(@NonNull final String room,
@@ -58,6 +60,11 @@ public class RingingViewModel extends BaseViewModel {
     @NonNull
     public MutableLiveData<String> getCallerName() {
         return callerName;
+    }
+
+    @NonNull
+    public LiveData<Throwable> getError() {
+        return error;
     }
 
     public static class Factory implements ViewModelProvider.Factory {

@@ -43,7 +43,7 @@ public class TokenLocalDataSource implements TokenDataSource {
      */
     @Override
     public void registerToken(@NonNull String token) {
-        Logger.i("new token is registered. token : [" + token + "]");
+        Logger.i("new token is registered. token [" + token + "]");
         pref.edit()
                 .putString(KEY_DEVICE_TOKEN, token)
                 .putBoolean(KEY_IS_NEW_TOKEN, true)

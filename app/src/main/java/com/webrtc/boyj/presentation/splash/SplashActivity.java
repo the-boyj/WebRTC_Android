@@ -29,7 +29,6 @@ public class SplashActivity extends BaseActivity<ActivitySplashBinding> {
 
     private void startPermissionActivity() {
         startActivity(PermissionActivity.getLaunchIntent(this));
-        overridePendingTransition(0, 0);
         finish();
     }
 

@@ -1,15 +1,15 @@
-package com.webrtc.boyj.extension.custom;
+package com.webrtc.boyj.presentation.common.view;
 
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 

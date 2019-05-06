@@ -3,12 +3,12 @@ package com.webrtc.boyj.presentation.permission;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.util.Linkify;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import android.text.util.Linkify;
-import android.widget.Toast;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivityPermissionBinding;
@@ -47,8 +47,7 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     }
 
     private void startSignActivity() {
-        startActivity(SignActivity.getLaunchIntent(this));
-        overridePendingTransition(0, 0);
+        startActivity(SignActivity.getLaunchIntent(this, SignActivity.class));
         finish();
     }
 

@@ -94,17 +94,17 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Completable registerUser(@NonNull final User user) {
         final String token = tokenDataSource.getToken();
-        tokenDataSource.unsetNewToken();
-        return localDataSource.registerUser(user, null)
-                .concatWith(remoteDataSource.registerUser(user, token));
+        return remoteDataSource.registerUser(user, token)
+                .concatWith(localDataSource.registerUser(user, null))
+                .concatWith(Completable.fromAction(tokenDataSource::unsetNewToken));
     }
 
     @NonNull
     @Override
     public Completable updateDeviceToken(@NonNull String id) {
         if (tokenDataSource.isNewToken()) {
-            tokenDataSource.unsetNewToken();
-            return remoteDataSource.updateDeviceToken(id, tokenDataSource.getToken());
+            return remoteDataSource.updateDeviceToken(id, tokenDataSource.getToken())
+                    .concatWith(Completable.fromAction(tokenDataSource::unsetNewToken));
         } else {
             return Completable.complete();
         }
@@ -114,7 +114,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Completable updateUserName(@NonNull final String id,
                                       @NonNull final String name) {
-        return localDataSource.updateUserName(id, name)
-                .concatWith(remoteDataSource.updateUserName(id, name));
+        return remoteDataSource.updateUserName(id, name)
+                .concatWith(localDataSource.updateUserName(id, name));
     }
 }

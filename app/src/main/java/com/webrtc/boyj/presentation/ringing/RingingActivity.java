@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,16 +24,22 @@ import com.webrtc.boyj.databinding.ActivityRingingBinding;
 import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
 import com.webrtc.boyj.utils.RingtoneLoader;
+import com.webrtc.boyj.utils.WakeManager;
 
 public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private static final String EXTRA_ROOM = "room";
     private static final String EXTRA_CALLER_ID = "callerId";
+
     private String callerId;
+    private RingingViewModel viewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         RingtoneLoader.ring(this);
+        WakeManager.turnOnScreen(this);
+
         initViews();
         initViewModel();
         awaken();
@@ -41,7 +48,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private void initViews() {
         findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
         findViewById(R.id.fab_reject).setOnClickListener(__ -> {
-            binding.getVm().reject(callerId);
+            viewModel.reject(callerId);
             finish();
         });
     }
@@ -53,8 +60,18 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
                 UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
                 TokenLocalDataSource.getInstance(pref));
         final RingingViewModel.Factory factory = new RingingViewModel.Factory(repository);
-        final RingingViewModel vm = ViewModelProviders.of(this, factory).get(RingingViewModel.class);
-        binding.setVm(vm);
+        viewModel = ViewModelProviders.of(this, factory).get(RingingViewModel.class);
+        binding.setVm(viewModel);
+
+        subscribeViewModel();
+    }
+
+    private void subscribeViewModel() {
+        viewModel.getError().observe(this, error -> {
+            final String errorMessage = getString(R.string.ERROR_DEFAULT);
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+            error.printStackTrace();
+        });
     }
 
     private void startCallActivity() {
@@ -68,8 +85,8 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
         assert calleeId != null;
 
         callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
-        binding.getVm().loadCallerProfile(callerId);
-        binding.getVm().awaken(room, callerId, calleeId);
+        viewModel.loadCallerProfile(callerId);
+        viewModel.awaken(room, callerId, calleeId);
     }
 
     public static Intent getLaunchIntent(@NonNull final Context context,

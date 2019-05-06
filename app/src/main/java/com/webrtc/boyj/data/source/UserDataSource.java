@@ -25,7 +25,8 @@ public interface UserDataSource {
     Single<List<User>> getOtherUserListExceptIds(@NonNull final List<String> ids);
 
     @NonNull
-    Completable registerUser(@NonNull final User user, @Nullable final String deviceToken);
+    Completable
+    registerUser(@NonNull final User user, @Nullable final String deviceToken);
 
     @NonNull
     Completable updateDeviceToken(@NonNull final String id, @NonNull final String token);

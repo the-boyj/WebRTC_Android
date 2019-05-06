@@ -11,7 +11,6 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class PeerConnectionClient {

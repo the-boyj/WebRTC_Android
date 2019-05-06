@@ -19,9 +19,7 @@ import org.webrtc.SessionDescription;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.subjects.CompletableSubject;
 import io.reactivex.subjects.PublishSubject;
 
 class BoyjPeerConnection {
@@ -90,10 +88,9 @@ class BoyjPeerConnection {
 
     void disposeAll() {
         for (PeerConnection pc : connections.values()) {
-            try{
+            try {
                 pc.dispose();
-            }
-            catch (Exception e){
+            } catch (Exception e) {
 
             }
 
@@ -163,8 +160,9 @@ class BoyjPeerConnection {
     Observable<SdpPayload> answer() {
         return answerSubject.hide();
     }
+
     @NonNull
-    public int getConnectionCount(){
+    public int getConnectionCount() {
         return connections.size();
     }
 }

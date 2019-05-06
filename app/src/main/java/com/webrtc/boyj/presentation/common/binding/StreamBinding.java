@@ -5,9 +5,9 @@ import androidx.annotation.Nullable;
 import androidx.databinding.BindingAdapter;
 
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
+import com.webrtc.boyj.presentation.call.CallAdapter;
 import com.webrtc.boyj.presentation.common.view.BoyjSurfaceView;
 import com.webrtc.boyj.presentation.common.view.SplitLayout;
-import com.webrtc.boyj.presentation.call.CallAdapter;
 
 import org.webrtc.MediaStream;
 import org.webrtc.VideoTrack;

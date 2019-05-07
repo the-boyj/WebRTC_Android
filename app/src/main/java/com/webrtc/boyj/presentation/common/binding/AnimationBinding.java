@@ -19,14 +19,15 @@ public class AnimationBinding {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
                     final ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) view.getLayoutParams();
-                    params.width = dp2Px(80);
-                    params.height = dp2Px(120);
+                    params.width = dp2Px(90);
+                    params.height = dp2Px(135);
                     params.endToEnd = ConstraintLayout.LayoutParams.UNSET;
                     params.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
                     params.setMargins(dp2Px(24), dp2Px(24), 0, 0);
                     view.setLayoutParams(params);
                 }
             });
+            view.dragStart();
         }
     }
 

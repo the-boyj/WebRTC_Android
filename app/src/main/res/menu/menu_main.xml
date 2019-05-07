@@ -10,7 +10,6 @@
 
     <item
         android:id="@+id/menu_refresh_user_list"
-        android:icon="@drawable/ic_refresh"
         android:title="@string/menu_refresh_user_list" />
     <item
         android:id="@+id/menu_settings"

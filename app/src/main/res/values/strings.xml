@@ -27,7 +27,10 @@
     <string name="text_call_reject">거절</string>
 
     <!-- Invite -->
-    <string name="text_invite_user">초대</string>
+    <string name="text_invite_user">초대하기</string>
+    <string name="text_invite_empty_list">초대 가능한 유저가 없습니다</string>
+
+    <!-- Permission -->
     <string name="text_notice_description">
         안내사항 \n\n
         모든 소스코드는 이곳에서 확인 가능합니다.

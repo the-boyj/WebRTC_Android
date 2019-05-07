@@ -12,7 +12,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:background="#BB000000"
         android:gravity="center"
         android:orientation="horizontal"
@@ -24,42 +24,43 @@
             android:layout_height="36dp"
             android:layout_margin="@dimen/space_small"
             android:background="@drawable/ic_arrow_down"
-            app:layout_constraintBottom_toBottomOf="@id/fab_invite"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/fab_invite" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_invite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/space_small"
-            android:layout_marginTop="@dimen/space_small"
-            android:src="@drawable/ic_call"
-            app:backgroundTint="@color/colorPrimaryLight"
-            app:fabSize="mini"
-            app:layout_constraintEnd_toStartOf="@id/btn_close"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_invite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_small"
+            android:layout_margin="@dimen/space_small"
             android:text="@string/text_invite_user"
             android:textColor="@color/colorWhite"
-            app:layout_constraintEnd_toEndOf="@id/fab_invite"
-            app:layout_constraintStart_toStartOf="@id/fab_invite"
-            app:layout_constraintTop_toBottomOf="@id/fab_invite" />
+            android:textSize="@dimen/text_x_large"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_invite_user"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_small"
+            app:items="@{inviteViewModel.otherUserList}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_invite" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/text_invite_empty_list"
+            android:textColor="@color/colorPrimaryLight"
+            android:textSize="@dimen/text_large"
+            app:visibleByListSize="@{inviteViewModel.otherUserList}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_close" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

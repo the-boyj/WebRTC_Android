@@ -3,7 +3,6 @@ package com.webrtc.boyj.presentation.call;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +24,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private CallAdapter adapter;
     private String id;
 
+    private CallViewModel callViewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,11 +37,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         initViewModel();
         initCamera();
         initCall(calleeId);
-        SpeakerLoader.turnOn(this);
     }
 
     private void initViews() {
         initSplitLayout();
+        initInviteFab();
     }
 
     private void initSplitLayout() {
@@ -49,25 +50,31 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         splitLayout.setAdapter(adapter);
     }
 
-    public void showCallMenuDialog(View view) {
-        final List<String> ids = adapter.getUserListInRoomIncludingMe(id);
-        final CallMenuDialog dialog = CallMenuDialog.newInstance(ids);
-        dialog.setOnInviteListener(user -> {
-            showToast(user.getName() + " 에게 통화를 요청하였습니다.");
-            binding.getVm().invite(user.getId());
-            dialog.dismiss();
+    private void initInviteFab() {
+        findViewById(R.id.fab_right).setOnClickListener(__ -> {
+            final List<String> ids = adapter.getUserListInRoomIncludingMe(id);
+            final CallMenuDialog dialog = CallMenuDialog.newInstance(ids);
+            dialog.setOnInviteListener(user -> {
+                showToast(user.getName() + " 에게 통화를 요청하였습니다.");
+                callViewModel.invite(user.getId());
+                dialog.dismiss();
+            });
+            dialog.show(getSupportFragmentManager(), "CallMenuDialog");
         });
-        dialog.show(getSupportFragmentManager(), "CallMenuDialog");
     }
 
     private void initViewModel() {
+        initCallViewModel();
+        initSpeakerViewModel();
+    }
+
+    private void initCallViewModel() {
         final BoyjRTC boyjRTC = new BoyjRTC();
         boyjRTC.initRTC();
 
         final CallViewModelFactory factory = new CallViewModelFactory(boyjRTC);
-        final CallViewModel viewModel =
-                ViewModelProviders.of(this, factory).get(CallViewModel.class);
-        binding.setVm(viewModel);
+        callViewModel = ViewModelProviders.of(this, factory).get(CallViewModel.class);
+        binding.setVm(callViewModel);
         subscribeViewModel();
     }
 
@@ -77,20 +84,28 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     private void subscribeRejected() {
-        binding.getVm().getRejectedUserName().observe(this, userName ->
+        callViewModel.getRejectedUserName().observe(this, userName ->
                 showToast(userName + "가 통화를 거절하였습니다."));
     }
 
     private void subscribeEndOfCall() {
-        binding.getVm().getEndOfCall().observe(this, isEnded -> {
+        callViewModel.getEndOfCall().observe(this, isEnded -> {
             if (Boolean.TRUE.equals(isEnded)) {
                 finish();
             }
         });
     }
 
+    private void initSpeakerViewModel() {
+        final SpeakerLoader loader = new SpeakerLoader(this);
+        final CallSpeakerViewModel.Factory factory = new CallSpeakerViewModel.Factory(loader);
+        final CallSpeakerViewModel speakerViewModel =
+                ViewModelProviders.of(this, factory).get(CallSpeakerViewModel.class);
+        binding.setSpeakerViewModel(speakerViewModel);
+    }
+
     private void initCamera() {
-        binding.getVm().initLocalStream();
+        callViewModel.initLocalStream();
     }
 
     private void initCall(@Nullable final String calleeId) {
@@ -103,11 +118,11 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
 
     private void initCaller(@NonNull final String callerId,
                             @NonNull final String calleeId) {
-        binding.getVm().initCaller(callerId, calleeId);
+        callViewModel.initCaller(callerId, calleeId);
     }
 
     private void initCallee() {
-        binding.getVm().initCallee();
+        callViewModel.initCallee();
     }
 
     private void showToast(@Nullable final String msg) {
@@ -136,11 +151,5 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     @Override
     public void onBackPressed() {
         // disabled back press
-    }
-
-    @Override
-    protected void onDestroy() {
-        SpeakerLoader.turnOff(this);
-        super.onDestroy();
     }
 }

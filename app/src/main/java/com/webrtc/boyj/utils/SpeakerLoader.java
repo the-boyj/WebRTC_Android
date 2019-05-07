@@ -8,26 +8,35 @@ import androidx.annotation.NonNull;
 import static android.content.Context.AUDIO_SERVICE;
 
 public class SpeakerLoader {
+    private final Context context;
 
-    public static void turnOn(@NonNull final Context context) {
-        final AudioManager manager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+    public SpeakerLoader(Context context) {
+        this.context = context;
+    }
+
+    public void turnOn() {
+        final AudioManager manager = getAudioManager();
         if (isSpeakerphoneOff(manager)) {
             manager.setSpeakerphoneOn(true);
         }
     }
 
-    public static void turnOff(@NonNull final Context context) {
-        final AudioManager manager = (AudioManager) context.getSystemService(AUDIO_SERVICE);
+    public void turnOff() {
+        final AudioManager manager = getAudioManager();
         if (isSpeakerphoneOn(manager)) {
             manager.setSpeakerphoneOn(false);
         }
     }
 
-    private static boolean isSpeakerphoneOn(@NonNull final AudioManager manager) {
+    private AudioManager getAudioManager() {
+        return (AudioManager) context.getSystemService(AUDIO_SERVICE);
+    }
+
+    private boolean isSpeakerphoneOn(@NonNull final AudioManager manager) {
         return manager.isSpeakerphoneOn();
     }
 
-    private static boolean isSpeakerphoneOff(@NonNull final AudioManager manager) {
+    private boolean isSpeakerphoneOff(@NonNull final AudioManager manager) {
         return !isSpeakerphoneOn(manager);
     }
 }

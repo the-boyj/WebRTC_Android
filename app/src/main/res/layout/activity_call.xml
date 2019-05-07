@@ -9,6 +9,10 @@
         <variable
             name="vm"
             type="com.webrtc.boyj.presentation.call.CallViewModel" />
+
+        <variable
+            name="speakerViewModel"
+            type="com.webrtc.boyj.presentation.call.CallSpeakerViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -20,12 +24,12 @@
             android:id="@+id/splitLayout"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:remoteStream="@{vm.remoteStream}"
-            app:leaveStream="@{vm.leavedUserName}" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:leaveStream="@{vm.leavedUserName}"
+            app:remoteStream="@{vm.remoteStream}" />
 
         <com.webrtc.boyj.presentation.common.view.BoyjSurfaceView
             android:id="@+id/local_boyj_surface_view"
@@ -75,9 +79,9 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_reject"
-            android:onClick="@{() -> vm.hangUp()}"
             style="@style/CallFabDefault"
             android:backgroundTint="@color/colorRed"
+            android:onClick="@{() -> vm.hangUp()}"
             android:src="@drawable/ic_call_end"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -87,13 +91,17 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_left"
             style="@style/CallFabDefault"
+            android:backgroundTint="@color/colorPrimaryLight"
+            android:onClick="@{() -> speakerViewModel.toggleSpeaker()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/fab_reject"
-            app:layout_constraintTop_toBottomOf="@id/guideline2" />
+            app:layout_constraintTop_toBottomOf="@id/guideline2"
+            app:speakerphoneImage="@{speakerViewModel.isSpeakerphone}" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_right"
             style="@style/CallFabDefault"
+            android:backgroundTint="@color/colorPrimaryLight"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/fab_reject"
             app:layout_constraintTop_toBottomOf="@id/guideline2" />
@@ -111,8 +119,8 @@
             android:layout_height="36dp"
             android:layout_marginEnd="@dimen/space_small"
             android:layout_marginBottom="@dimen/space_small"
-            android:src="@drawable/ic_more_vert"
             android:onClick="showCallMenuDialog"
+            android:src="@drawable/ic_more_vert"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

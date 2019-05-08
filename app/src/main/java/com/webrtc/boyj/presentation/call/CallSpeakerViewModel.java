@@ -10,20 +10,29 @@ import com.webrtc.boyj.utils.SpeakerLoader;
 
 public class CallSpeakerViewModel extends BaseViewModel {
     private final SpeakerLoader speakerLoader;
-    private final ObservableBoolean isSpeakerphone = new ObservableBoolean(true);
+    private final ObservableBoolean isSpeakerphone = new ObservableBoolean();
 
     public CallSpeakerViewModel(SpeakerLoader speakerLoader) {
         this.speakerLoader = speakerLoader;
+        turnOnSpeaker();
     }
 
     public void toggleSpeaker() {
         if (isSpeakerphone.get()) {
-            isSpeakerphone.set(false);
-            speakerLoader.turnOff();
+            turnOffSpeaker();
         } else {
-            isSpeakerphone.set(true);
-            speakerLoader.turnOn();
+            turnOnSpeaker();
         }
+    }
+
+    private void turnOnSpeaker() {
+        speakerLoader.turnOn();
+        isSpeakerphone.set(true);
+    }
+
+    private void turnOffSpeaker() {
+        speakerLoader.turnOff();
+        isSpeakerphone.set(false);
     }
 
     public ObservableBoolean getIsSpeakerphone() {

@@ -102,7 +102,7 @@ public final class UserMediaManager {
     }
 
     public void startCapture() {
-        capturer.startCapture(1024, 720, 30);
+        capturer.startCapture(480, 320, 24);
     }
 
     public void stopCapture() {

@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
         applicationId "com.webrtc.boyj"
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 1
-        versionName "2.0-SNAPSHOT"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 2
+        versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -42,68 +42,66 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    //android support
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.browser:browser:1.0.0'
-    implementation 'androidx.vectordrawable:vectordrawable:1.0.1'
-    implementation 'androidx.media:media:1.0.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
-    implementation 'androidx.preference:preference:1.0.0'
+    // Dependencies for androidx support
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "androidx.browser:browser:$browser_version"
+    implementation "androidx.vectordrawable:vectordrawable:$vectordrawable_version"
+    implementation "androidx.media:media:$media_version"
+    implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
+    implementation "androidx.preference:preference:$preference_version"
 
-    // Test
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'androidx.test:runner:1.1.1'
-    testImplementation 'androidx.test:rules:1.1.1'
+    // Dependencies for design support
+    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
+    implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
+    implementation "com.google.android.material:material:$material_version"
+    implementation "com.airbnb.android:lottie:$lottie_version"
 
-    androidTestImplementation 'androidx.test:runner:1.1.1'
-    androidTestImplementation 'androidx.test:rules:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-
-    androidTestImplementation 'androidx.test:core:1.1.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-
-    testImplementation 'org.mockito:mockito-core:2.7.22'
-    testImplementation 'androidx.arch.core:core-testing:2.0.1'
-
-    implementation 'com.google.android.material:material:1.0.0'
-    // RecyclerView
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    // ViewModel and LiveData
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-    // Room
+    // Dependencies for android arch
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
-    // RxJava
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+
+    testImplementation "androidx.arch.core:core-testing:$arch_testing_version"
+
+    // Dependencies for RxJava
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
-    // RxBinding
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
     implementation "com.jakewharton.rxbinding3:rxbinding:$rxbinding_version"
 
-    // Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.google.firebase:firebase-messaging:17.6.0'
+    // Dependencies for Firebase
+    implementation "com.google.firebase:firebase-core:$firebase_core_version"
+    implementation "com.google.firebase:firebase-messaging:$firebase_messaging_version"
 
+    // Dependencies for WebRTC
     implementation("io.socket:socket.io-client:$socket_version") {
         exclude group: 'org.json', module: 'json'
     }
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:$lottie_version"
-    // WebRtc
     implementation "org.webrtc:google-webrtc:$webrtc_version"
-    // Gson
-    implementation "com.google.code.gson:gson:$gson_version"
-    testImplementation "com.google.code.gson:gson:$gson_version"
-    // Retrofit
+
+    // Dependencies for network
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
-    // OkHttp
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_version"
-    // Stetho
+    implementation "com.google.code.gson:gson:$gson_version"
+
+    testImplementation "com.google.code.gson:gson:$gson_version"
+
+    // Dependencies for test
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "androidx.test:rules:$test_rules_version"
+    testImplementation "androidx.test:runner:$test_runner_version"
+    testImplementation "org.mockito:mockito-core:$mockito_core_version"
+
+    androidTestImplementation "androidx.test:core:$test_core_version"
+    androidTestImplementation "androidx.test.ext:junit:$test_ext_junit_version"
+    androidTestImplementation "androidx.test:rules:$test_rules_version"
+    androidTestImplementation "androidx.test:runner:$test_runner_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$test_espresso_version"
+
+    // Dependencies for debug
     implementation "com.facebook.stetho:stetho:$stetho_version"
     implementation "com.facebook.stetho:stetho-okhttp3:$stetho_version"
 }

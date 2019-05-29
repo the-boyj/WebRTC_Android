@@ -12,6 +12,7 @@ import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
+import com.webrtc.boyj.presentation.common.Event;
 import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import org.webrtc.MediaStream;
@@ -35,7 +36,7 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     private final MutableLiveData<String> leavedUserName = new MutableLiveData<>();
     @NonNull
-    private final MutableLiveData<Boolean> endOfCall = new MutableLiveData<>();
+    private final MutableLiveData<Event<Boolean>> endOfCallEvent = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<Throwable> error = new MutableLiveData<>();
     @NonNull
@@ -97,7 +98,8 @@ public class CallViewModel extends BaseViewModel {
     private void subscribeOnCallFinish() {
         addDisposable(boyjRTC.onCallFinish()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> this.endOfCall.setValue(true), this::notifyError));
+                .subscribe(() ->
+                        this.endOfCallEvent.setValue(new Event<>(Boolean.TRUE)), this::notifyError));
     }
 
     public void initCaller(@NonNull final String callerId,
@@ -165,8 +167,8 @@ public class CallViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public LiveData<Boolean> getEndOfCall() {
-        return endOfCall;
+    public LiveData<Event<Boolean>> getEndOfCallEvent() {
+        return endOfCallEvent;
     }
 
     @NonNull

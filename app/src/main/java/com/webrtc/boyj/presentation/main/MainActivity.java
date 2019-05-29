@@ -24,7 +24,6 @@ import com.webrtc.boyj.presentation.settings.SettingsActivity;
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private String id;
 
-
     @Override
     protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         init();
@@ -90,12 +89,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_update_profile) {
-            showDialog();
-        } else if (item.getItemId() == R.id.menu_refresh_user_list) {
-            binding.getVm().loadNewUserList(id);
-        } else if (item.getItemId() == R.id.menu_settings) {
-            startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+        switch (item.getItemId()) {
+            case R.id.menu_update_profile:
+                showDialog();
+                break;
+            case R.id.menu_refresh_user_list:
+                binding.getVm().loadNewUserList(id);
+                break;
+            case R.id.menu_settings:
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

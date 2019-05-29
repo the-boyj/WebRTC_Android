@@ -78,8 +78,8 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
         callViewModel.getRejectedUserName().observe(this, userName ->
                 showToast(userName + "가 통화를 거절하였습니다."));
 
-        callViewModel.getEndOfCall().observe(this, isEnded -> {
-            if (Boolean.TRUE.equals(isEnded)) {
+        callViewModel.getEndOfCallEvent().observe(this, event -> {
+            if (event.getContentIfNotHandled() != null) {
                 finish();
             }
         });

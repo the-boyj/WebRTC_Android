@@ -12,7 +12,7 @@ import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.CreateRoomPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import org.webrtc.MediaStream;
 

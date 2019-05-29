@@ -10,7 +10,7 @@ import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
 import com.webrtc.boyj.data.source.UserRepository;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
@@ -58,7 +58,7 @@ public class RingingViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public MutableLiveData<String> getCallerName() {
+    public LiveData<String> getCallerName() {
         return callerName;
     }
 

@@ -24,16 +24,16 @@ import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
 import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
 import com.webrtc.boyj.presentation.settings.SettingsActivity;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private String id;
 
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         init();
     }
 

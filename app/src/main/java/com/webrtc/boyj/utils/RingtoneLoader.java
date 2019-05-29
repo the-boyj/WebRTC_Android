@@ -52,7 +52,7 @@ public class RingtoneLoader {
         }
     }
 
-    public static void unRing() {
+    public static void cancelAndRelease() {
         if (ringtone != null) {
             ringtone.stop();
             ringtone = null;

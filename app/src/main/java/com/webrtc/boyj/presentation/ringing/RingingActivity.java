@@ -21,8 +21,8 @@ import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
 import com.webrtc.boyj.data.source.remote.BoyjApiClient;
 import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.utils.RingtoneLoader;
 import com.webrtc.boyj.utils.WakeManager;
 
@@ -34,9 +34,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private RingingViewModel viewModel;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         RingtoneLoader.ring(this);
         WakeManager.turnOnScreen(this);
 
@@ -46,8 +44,8 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     }
 
     private void initViews() {
-        findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
-        findViewById(R.id.fab_reject).setOnClickListener(__ -> {
+        binding.fabAccept.setOnClickListener(__ -> startCallActivity());
+        binding.fabReject.setOnClickListener(__ -> {
             viewModel.reject(callerId);
             finish();
         });
@@ -68,8 +66,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
     private void subscribeViewModel() {
         viewModel.getError().observe(this, error -> {
-            final String errorMessage = getString(R.string.ERROR_DEFAULT);
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.ERROR_DEFAULT), Toast.LENGTH_SHORT).show();
             error.printStackTrace();
         });
     }
@@ -110,7 +107,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
     @Override
     protected void onDestroy() {
-        RingtoneLoader.unRing();
+        RingtoneLoader.cancelAndRelease();
         super.onDestroy();
     }
 }

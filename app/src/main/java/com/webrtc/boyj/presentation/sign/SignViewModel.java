@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.webrtc.boyj.data.source.TokenDataSource;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 public class SignViewModel extends BaseViewModel {
     @NonNull

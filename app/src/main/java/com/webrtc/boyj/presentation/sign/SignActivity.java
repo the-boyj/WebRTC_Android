@@ -13,7 +13,7 @@ import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.source.TokenDataSource;
 import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
 import com.webrtc.boyj.databinding.ActivitySignBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.presentation.main.MainActivity;
 
 public class SignActivity extends BaseActivity<ActivitySignBinding> {
@@ -21,9 +21,7 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     private SignViewModel viewModel;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         savedId = IDManager.getSavedUserId(this);
         initViewModel();
         viewModel.setIdField(savedId);

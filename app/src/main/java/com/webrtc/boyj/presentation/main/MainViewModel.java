@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepository;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import java.util.List;
 

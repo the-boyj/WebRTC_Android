@@ -5,7 +5,7 @@ import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 import com.webrtc.boyj.utils.SpeakerLoader;
 
 public class CallSpeakerViewModel extends BaseViewModel {

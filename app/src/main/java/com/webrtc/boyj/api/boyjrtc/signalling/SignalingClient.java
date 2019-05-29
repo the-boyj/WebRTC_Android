@@ -34,19 +34,19 @@ import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.SEND_ICE_CANDID
 
 public class SignalingClient {
     @NonNull
-    private static SocketIO socketIO = SocketIO.create();
+    private static final SocketIO socketIO = SocketIO.create();
     @NonNull
-    private PublishSubject<RejectPayload> rejectSubject = PublishSubject.create();
+    private final PublishSubject<RejectPayload> rejectSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<ParticipantsPayload> participantsSubject = PublishSubject.create();
+    private final PublishSubject<ParticipantsPayload> participantsSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<SdpPayload> offerSubject = PublishSubject.create();
+    private final PublishSubject<SdpPayload> offerSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<SdpPayload> answerSubject = PublishSubject.create();
+    private final PublishSubject<SdpPayload> answerSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<IceCandidatePayload> iceCandidateSubject = PublishSubject.create();
+    private final PublishSubject<IceCandidatePayload> iceCandidateSubject = PublishSubject.create();
     @NonNull
-    private PublishSubject<EndOfCallPayload> endOfCallSubject = PublishSubject.create();
+    private final PublishSubject<EndOfCallPayload> endOfCallSubject = PublishSubject.create();
 
     public SignalingClient() {
         socketIO.connect();

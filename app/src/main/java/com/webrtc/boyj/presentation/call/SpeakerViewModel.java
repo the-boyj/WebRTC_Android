@@ -8,11 +8,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 import com.webrtc.boyj.utils.SpeakerLoader;
 
-public class CallSpeakerViewModel extends BaseViewModel {
+public class SpeakerViewModel extends BaseViewModel {
+    @NonNull
     private final SpeakerLoader speakerLoader;
+    @NonNull
     private final ObservableBoolean isSpeakerphone = new ObservableBoolean();
 
-    public CallSpeakerViewModel(SpeakerLoader speakerLoader) {
+    public SpeakerViewModel(@NonNull final SpeakerLoader speakerLoader) {
         this.speakerLoader = speakerLoader;
         turnOnSpeaker();
     }
@@ -56,11 +58,12 @@ public class CallSpeakerViewModel extends BaseViewModel {
         @NonNull
         @Override
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-            if (modelClass.isAssignableFrom(CallSpeakerViewModel.class)) {
-                return (T) new CallSpeakerViewModel(speakerLoader);
+            if (modelClass.isAssignableFrom(SpeakerViewModel.class)) {
+                return (T) new SpeakerViewModel(speakerLoader);
             } else {
                 throw new IllegalArgumentException("ViewModel Not Found");
             }
+
         }
     }
 }

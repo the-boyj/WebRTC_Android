@@ -1,12 +1,12 @@
 package com.webrtc.boyj.presentation.call;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.databinding.ObservableInt;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
@@ -37,10 +37,13 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     private final MutableLiveData<Boolean> endOfCall = new MutableLiveData<>();
     @NonNull
+    private final MutableLiveData<Throwable> error = new MutableLiveData<>();
+    @NonNull
     private final BoyjRTC boyjRTC;
 
     public CallViewModel(@NonNull final BoyjRTC boyjRTC) {
         this.boyjRTC = boyjRTC;
+        this.boyjRTC.initRTC();
         subscribeBoyjRTC();
     }
 
@@ -61,7 +64,7 @@ public class CallViewModel extends BaseViewModel {
         addDisposable(boyjRTC.onRejected()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this.rejectedUserName::setValue,
-                        Throwable::printStackTrace));
+                        this::notifyError));
     }
 
     private void subscribeRemoteStream() {
@@ -70,35 +73,31 @@ public class CallViewModel extends BaseViewModel {
                 .subscribe(stream -> {
                     call();
                     remoteStream.setValue(stream);
-                }, Throwable::printStackTrace));
+                }, this::notifyError));
     }
 
     public void call() {
         if (!isCalling.get()) {
+            localStream.setValue(boyjRTC.localStream());
             isCalling.set(true);
+
             addDisposable(Observable.interval(1, TimeUnit.SECONDS)
                     .map(Long::intValue)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(callTime::set, Throwable::printStackTrace));
+                    .subscribe(callTime::set, this::notifyError));
         }
     }
 
     private void subscribeLeave() {
         addDisposable(boyjRTC.onLeaved()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(name -> {
-                    leavedUserName.setValue(name);
-                    Log.d("BOYJ", name);
-                }, Throwable::printStackTrace));
+                .subscribe(leavedUserName::setValue, this::notifyError));
     }
 
     private void subscribeOnCallFinish() {
         addDisposable(boyjRTC.onCallFinish()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                            this.endOfCall.setValue(true);
-                        },
-                        Throwable::printStackTrace));
+                .subscribe(() -> this.endOfCall.setValue(true), this::notifyError));
     }
 
     public void initCaller(@NonNull final String callerId,
@@ -128,6 +127,11 @@ public class CallViewModel extends BaseViewModel {
 
     public void hangUp() {
         boyjRTC.endOfCall();
+    }
+
+    private void notifyError(Throwable e) {
+        e.printStackTrace();
+        error.setValue(e);
     }
 
     @NonNull
@@ -163,5 +167,30 @@ public class CallViewModel extends BaseViewModel {
     @NonNull
     public LiveData<Boolean> getEndOfCall() {
         return endOfCall;
+    }
+
+    @NonNull
+    public LiveData<Throwable> getError() {
+        return error;
+    }
+
+    public static class Factory implements ViewModelProvider.Factory {
+        @NonNull
+        private final BoyjRTC boyjRTC;
+
+        public Factory(@NonNull BoyjRTC boyjRTC) {
+            this.boyjRTC = boyjRTC;
+        }
+
+        @SuppressWarnings("unchecked")
+        @NonNull
+        @Override
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            if (modelClass.isAssignableFrom(CallViewModel.class)) {
+                return (T) new CallViewModel(boyjRTC);
+            } else {
+                throw new IllegalArgumentException("ViewModel Not Found");
+            }
+        }
     }
 }

@@ -1,8 +1,6 @@
 package com.webrtc.boyj.presentation.sign;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -10,9 +8,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
-import com.webrtc.boyj.data.source.TokenDataSource;
-import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
 import com.webrtc.boyj.databinding.ActivitySignBinding;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.presentation.main.MainActivity;
 
@@ -28,11 +25,8 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     }
 
     private void initViewModel() {
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        final TokenDataSource tokenDataSource = TokenLocalDataSource.getInstance(pref);
-        final SignViewModel.Factory factory = new SignViewModel.Factory(tokenDataSource);
-
-        viewModel = ViewModelProviders.of(this, factory).get(SignViewModel.class);
+        viewModel = ViewModelProviders.of(this,
+                Injection.providerSignViewModelFactory(this)).get(SignViewModel.class);
         binding.setVm(viewModel);
         subscribeViewModel();
     }

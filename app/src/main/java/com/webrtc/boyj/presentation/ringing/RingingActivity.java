@@ -2,9 +2,7 @@ package com.webrtc.boyj.presentation.ringing;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,14 +11,8 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
-import com.webrtc.boyj.data.source.UserRepository;
-import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
-import com.webrtc.boyj.data.source.local.room.AppDatabase;
-import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
-import com.webrtc.boyj.data.source.remote.BoyjApiClient;
-import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.call.CallActivity;
 import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.utils.RingtoneLoader;
@@ -52,15 +44,9 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     }
 
     private void initViewModel() {
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final UserRepository repository = UserRepositoryImpl.getInstance(
-                UserLocalDataSource.getInstance(AppDatabase.getInstance(this).userDao()),
-                UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
-                TokenLocalDataSource.getInstance(pref));
-        final RingingViewModel.Factory factory = new RingingViewModel.Factory(repository);
-        viewModel = ViewModelProviders.of(this, factory).get(RingingViewModel.class);
+        viewModel = ViewModelProviders.of(this,
+                Injection.providerRingingViewModelFactory(this)).get(RingingViewModel.class);
         binding.setVm(viewModel);
-
         subscribeViewModel();
     }
 

@@ -111,7 +111,6 @@ public class RoomTest {
 
         getUserObserver.assertValue(user);
 
-
         TestObserver<User> updateObserver = TestObserver.create();
 
         final User newUser = new User(id, "newUpdate");
@@ -122,5 +121,29 @@ public class RoomTest {
                 .subscribe(updateObserver);
 
         updateObserver.assertValue(newUser);
+    }
+
+    @Test
+    public void deleteTest() {
+        final String exceptId = "tbtzpdlql";
+        final User exceptUser = User.createFromId(exceptId);
+        final List<User> result = new ArrayList<>();
+        result.add(exceptUser);
+        final List<UserEntity> entities = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            entities.add(UserMapper.toEntityFromUser(new User("ID - " + i, "NAME - " + i)));
+        }
+        entities.add(UserMapper.toEntityFromUser(exceptUser));
+
+        TestObserver<List<User>> observer = TestObserver.create();
+
+        userDao.insertAll(entities)
+                .concatWith(userDao.deleteExceptId(exceptId))
+                .andThen(userDao.selectExceptId("NULL"))
+                .map(UserMapper::toUserListFromEntities)
+                .subscribe(observer);
+
+        observer.assertValue(result);
     }
 }

@@ -32,11 +32,14 @@ public class SignActivity extends BaseActivity<ActivitySignBinding> {
     }
 
     private void subscribeViewModel() {
-        viewModel.getSignIn().observe(this, id -> {
-            Toast.makeText(this, id + " 님 환영합니다", Toast.LENGTH_SHORT).show();
-            viewModel.checkAndSetNewTokenStatus(savedId);
-            IDManager.saveUserId(this, id);
-            startMainActivity();
+        viewModel.getSignInEvent().observe(this, event -> {
+            final String content = event.getContentIfNotHandled();
+            if (content != null) {
+                Toast.makeText(this, content + " 님 환영합니다", Toast.LENGTH_SHORT).show();
+                viewModel.checkAndSetNewTokenStatus(savedId);
+                IDManager.saveUserId(this, content);
+                startMainActivity();
+            }
         });
     }
 

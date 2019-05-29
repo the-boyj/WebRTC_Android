@@ -16,22 +16,23 @@ public interface UserDataSource {
     Single<User> getProfile(@NonNull final String id);
 
     @NonNull
-    Completable
-    insertUserList(@NonNull final List<User> userList);
+    Completable insertUserList(@NonNull final List<User> userList);
+
+    @NonNull
+    Completable deleteUserListExceptId(@NonNull final String id);
 
     @NonNull
     Single<List<User>> getOtherUserListExceptId(@NonNull final String id);
 
     @NonNull
-    Single<List<User>> getOtherUserListExceptIds(@NonNull final List<String> ids);
+    Completable registerUser(@NonNull final User user,
+                             @Nullable final String deviceToken);
 
     @NonNull
-    Completable
-    registerUser(@NonNull final User user, @Nullable final String deviceToken);
+    Completable updateDeviceToken(@NonNull final String id,
+                                  @NonNull final String token);
 
     @NonNull
-    Completable updateDeviceToken(@NonNull final String id, @NonNull final String token);
-
-    @NonNull
-    Completable updateUserName(@NonNull final String id, @NonNull final String name);
+    Completable updateUserName(@NonNull final String id,
+                               @NonNull final String name);
 }

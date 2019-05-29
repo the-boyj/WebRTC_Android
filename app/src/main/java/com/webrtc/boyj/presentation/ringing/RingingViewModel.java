@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
+import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepository;
 import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
@@ -16,14 +17,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class RingingViewModel extends BaseViewModel {
     @NonNull
-    private final MutableLiveData<String> callerId = new MutableLiveData<>();
-    @NonNull
-    private final MutableLiveData<String> callerName = new MutableLiveData<>();
+    private final MutableLiveData<User> caller = new MutableLiveData<>();
     @NonNull
     private final MutableLiveData<Throwable> error = new MutableLiveData<>();
     @NonNull
     private final UserRepository repository;
-    private BoyjRTC boyjRTC;
+    @NonNull
+    private final BoyjRTC boyjRTC;
 
     public RingingViewModel(@NonNull final UserRepository repository) {
         this.repository = repository;
@@ -33,17 +33,13 @@ public class RingingViewModel extends BaseViewModel {
     public void loadCallerProfile(@NonNull final String callerId) {
         addDisposable(repository.getProfile(callerId)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(user -> {
-                    this.callerId.setValue(user.getId());
-                    this.callerName.setValue(user.getName());
-                }, this.error::setValue));
+                .subscribe(this.caller::setValue, this.error::setValue));
     }
 
     public void awaken(@NonNull final String room,
                        @NonNull final String callerId,
                        @NonNull final String calleeId) {
-        final AwakenPayload payload = new AwakenPayload(room, callerId, calleeId);
-        boyjRTC.awaken(payload);
+        boyjRTC.awaken(new AwakenPayload(room, callerId, calleeId));
     }
 
     public void reject(@NonNull final String callerId) {
@@ -53,13 +49,8 @@ public class RingingViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public LiveData<String> getCallerId() {
-        return callerId;
-    }
-
-    @NonNull
-    public LiveData<String> getCallerName() {
-        return callerName;
+    public LiveData<User> getCaller() {
+        return caller;
     }
 
     @NonNull

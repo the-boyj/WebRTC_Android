@@ -44,7 +44,9 @@ public class MainViewModel extends BaseViewModel {
                         this.profile.setValue(user);
                         return repository.updateDeviceToken(id);
                     }
-                }).subscribe(() -> { /* doNothing */ }, this.error::setValue));
+                })
+                .doOnError(this.error::setValue)
+                .subscribe());
     }
 
     public void loadNewUserList(@NonNull final String id) {

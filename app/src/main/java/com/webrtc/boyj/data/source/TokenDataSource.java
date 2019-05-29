@@ -13,5 +13,4 @@ public interface TokenDataSource {
     void setNewToken();
 
     void unsetNewToken();
-
 }

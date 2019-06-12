@@ -13,7 +13,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.webrtc.boyj.data.source.TokenDataSource;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.Event;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 public class SignViewModel extends BaseViewModel {
     @NonNull
@@ -21,7 +22,7 @@ public class SignViewModel extends BaseViewModel {
     @NonNull
     private final ObservableBoolean validId = new ObservableBoolean(true);
     @NonNull
-    private final MutableLiveData<String> signIn = new MutableLiveData<>();
+    private final MutableLiveData<Event<String>> signInEvent = new MutableLiveData<>();
     @NonNull
     private final TokenDataSource dataSource;
 
@@ -47,7 +48,7 @@ public class SignViewModel extends BaseViewModel {
     public void signInClicked() {
         final String id = this.idField.get();
         if (isValidId(id)) {
-            signIn.setValue(id);
+            signInEvent.setValue(new Event<>(id));
         } else {
             validId.set(false);
         }
@@ -74,8 +75,8 @@ public class SignViewModel extends BaseViewModel {
     }
 
     @NonNull
-    public LiveData<String> getSignIn() {
-        return signIn;
+    public LiveData<Event<String>> getSignInEvent() {
+        return signInEvent;
     }
 
     public static class Factory implements ViewModelProvider.Factory {

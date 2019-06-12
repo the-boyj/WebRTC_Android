@@ -14,9 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.source.local.room.AppDatabase;
-import com.webrtc.boyj.data.source.local.room.dao.UserDao;
 import com.webrtc.boyj.databinding.DialogCallMenuBinding;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.call.invite.InviteAdapter;
 import com.webrtc.boyj.presentation.call.invite.InviteViewModel;
 
@@ -70,9 +69,8 @@ public class CallMenuDialog extends BottomSheetDialogFragment {
     }
 
     private void initViewModel() {
-        final UserDao userDao = AppDatabase.getInstance(getContext()).userDao();
-        final InviteViewModel.Factory factory = new InviteViewModel.Factory(userDao);
-        viewModel = ViewModelProviders.of(this, factory).get(InviteViewModel.class);
+        viewModel = ViewModelProviders.of(this,
+                Injection.providerInviteViewModelFactory(getContext())).get(InviteViewModel.class);
         binding.setInviteViewModel(viewModel);
     }
 

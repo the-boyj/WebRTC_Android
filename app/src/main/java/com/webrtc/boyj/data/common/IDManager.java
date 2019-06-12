@@ -19,6 +19,8 @@ public class IDManager {
     public static void saveUserId(@NonNull final Context context,
                                   @NonNull final String id) {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-        pref.edit().putString(KEY_USER_ID, id).apply();
+        pref.edit()
+                .putString(KEY_USER_ID, id)
+                .apply();
     }
 }

@@ -7,13 +7,14 @@ import android.text.util.Linkify;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.jakewharton.rxbinding3.view.RxView;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.databinding.ActivityPermissionBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.presentation.sign.SignActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -33,8 +34,7 @@ public class PermissionActivity extends BaseActivity<ActivityPermissionBinding> 
     private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         if (areAllPermissionsGrantedAlready(RECORD_AUDIO, CAMERA, CALL_PHONE)) {
             startSignActivity();
         } else {

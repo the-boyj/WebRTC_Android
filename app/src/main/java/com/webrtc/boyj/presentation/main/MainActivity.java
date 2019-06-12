@@ -1,9 +1,7 @@
 package com.webrtc.boyj.presentation.main;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -17,23 +15,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
-import com.webrtc.boyj.data.source.local.room.AppDatabase;
-import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
-import com.webrtc.boyj.data.source.remote.BoyjApiClient;
-import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.presentation.settings.SettingsActivity;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private String id;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         init();
     }
 
@@ -54,13 +46,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void initViewModel() {
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final MainViewModelFactory factory = new MainViewModelFactory(
-                UserRepositoryImpl.getInstance(
-                        UserLocalDataSource.getInstance(AppDatabase.getInstance(this).userDao()),
-                        UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
-                        TokenLocalDataSource.getInstance(pref)));
-        final MainViewModel vm = ViewModelProviders.of(this, factory).get(MainViewModel.class);
+        final MainViewModel vm = ViewModelProviders.of(this,
+                Injection.providerMainViewModelFactory(this)).get(MainViewModel.class);
         vm.loadProfile(id);
         vm.loadOtherUserList(id);
         binding.setVm(vm);
@@ -102,12 +89,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_update_profile) {
-            showDialog();
-        } else if (item.getItemId() == R.id.menu_refresh_user_list) {
-            binding.getVm().loadNewUserList(id);
-        } else if (item.getItemId() == R.id.menu_settings) {
-            startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+        switch (item.getItemId()) {
+            case R.id.menu_update_profile:
+                showDialog();
+                break;
+            case R.id.menu_refresh_user_list:
+                binding.getVm().loadNewUserList(id);
+                break;
+            case R.id.menu_settings:
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

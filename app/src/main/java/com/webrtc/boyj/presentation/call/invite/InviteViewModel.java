@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.local.room.dao.UserDao;
 import com.webrtc.boyj.data.source.local.room.entity.UserMapper;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import java.util.Collections;
 import java.util.List;

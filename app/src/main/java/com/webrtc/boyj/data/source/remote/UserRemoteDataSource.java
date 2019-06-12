@@ -59,6 +59,12 @@ public class UserRemoteDataSource implements UserDataSource {
 
     @NonNull
     @Override
+    public Completable deleteUserListExceptId(@NonNull String id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @NonNull
+    @Override
     public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
         return boyjApi.getOthers(id)
                 .doOnSuccess(response -> Logger.ii("getOtherUserListExceptId", response.toString()))
@@ -66,12 +72,6 @@ public class UserRemoteDataSource implements UserDataSource {
                         new ArrayList<User>() :
                         response.getItems())
                 .subscribeOn(Schedulers.io());
-    }
-
-    @NonNull
-    @Override
-    public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
-        throw new UnsupportedOperationException();
     }
 
     @NonNull

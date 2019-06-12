@@ -64,7 +64,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Single<List<User>> loadNewUserListExceptId(@NonNull String id) {
         return remoteDataSource.getOtherUserListExceptId(id)
-                .flatMap(users -> localDataSource.insertUserList(users).toSingleDefault(users));
+                .flatMap(users ->
+                        localDataSource.deleteUserListExceptId(id).andThen(
+                                localDataSource.insertUserList(users).toSingleDefault(users)));
     }
 
     @NonNull
@@ -82,12 +84,6 @@ public class UserRepositoryImpl implements UserRepository {
                 .flatMap(users -> !users.isEmpty() ?
                         localDataSource.insertUserList(users).toSingleDefault(users) :
                         Single.just(users));
-    }
-
-    @NonNull
-    @Override
-    public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
-        return localDataSource.getOtherUserListExceptIds(ids);
     }
 
     @NonNull

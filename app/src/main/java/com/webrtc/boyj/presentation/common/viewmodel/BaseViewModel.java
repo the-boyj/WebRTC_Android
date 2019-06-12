@@ -1,4 +1,4 @@
-package com.webrtc.boyj.presentation;
+package com.webrtc.boyj.presentation.common.viewmodel;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
@@ -16,7 +16,7 @@ public class BaseViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        super.onCleared();
         compositeDisposable.dispose();
+        super.onCleared();
     }
 }

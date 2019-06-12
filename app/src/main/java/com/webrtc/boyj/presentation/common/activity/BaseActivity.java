@@ -1,4 +1,4 @@
-package com.webrtc.boyj.presentation;
+package com.webrtc.boyj.presentation.common.activity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -20,10 +20,13 @@ public abstract class BaseActivity<B extends ViewDataBinding> extends AppCompatA
 
         binding = DataBindingUtil.setContentView(this, getLayoutId());
         binding.setLifecycleOwner(this);
+        onActivityCreated(savedInstanceState);
     }
 
     @LayoutRes
     protected abstract int getLayoutId();
+
+    protected abstract void onActivityCreated(@Nullable Bundle savedInstanceState);
 
     public static Intent getLaunchIntent(@NonNull final Context context,
                                          @NonNull final Class<?> cls) {

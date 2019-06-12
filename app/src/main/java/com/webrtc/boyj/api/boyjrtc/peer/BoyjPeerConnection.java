@@ -93,7 +93,6 @@ class BoyjPeerConnection {
             } catch (Exception e) {
 
             }
-
         }
     }
 

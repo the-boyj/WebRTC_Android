@@ -41,6 +41,34 @@ public final class UserMediaManager {
         return mediaStream;
     }
 
+    /**
+     * Local Camera 초기화 및 Capturer 생성
+     *
+     * @throws IllegalStateException Camera 초기화 실패
+     */
+    @NonNull
+    private VideoCapturer createVideoCapturer(@NonNull final Context context) {
+        final CameraEnumerator enumerator;
+
+        enumerator = isCamera2Supported(context) ?
+                new Camera2Enumerator(context) :
+                new Camera1Enumerator(false);
+
+        for (final String deviceName : enumerator.getDeviceNames()) {
+            if (enumerator.isFrontFacing(deviceName)) {
+                return enumerator.createCapturer(deviceName, null);
+            }
+        }
+        throw new IllegalStateException("Camera is not supported");
+    }
+
+    private boolean isCamera2Supported(@NonNull final Context context) {
+        return Camera2Enumerator.isSupported(context);
+    }
+
+    /**
+     * VideoTrack 초기화
+     */
     @NonNull
     private VideoTrack createVideoTrack() {
         final SurfaceTextureHelper helper = SurfaceTextureHelper.create(
@@ -54,6 +82,9 @@ public final class UserMediaManager {
         return videoTrack;
     }
 
+    /**
+     * AudioTrack 초기화
+     */
     @NonNull
     private AudioTrack createAudioTrack() {
 
@@ -79,26 +110,6 @@ public final class UserMediaManager {
 
         final AudioSource audioSource = peerConnectionFactory.createAudioSource(audioConstraints);
         return peerConnectionFactory.createAudioTrack("AudioTrack", audioSource);
-    }
-
-    @NonNull
-    private VideoCapturer createVideoCapturer(@NonNull final Context context) {
-        final CameraEnumerator enumerator;
-
-        enumerator = isCamera2Supported(context) ?
-                new Camera2Enumerator(context) :
-                new Camera1Enumerator(false);
-
-        for (final String deviceName : enumerator.getDeviceNames()) {
-            if (enumerator.isFrontFacing(deviceName)) {
-                return enumerator.createCapturer(deviceName, null);
-            }
-        }
-        throw new IllegalStateException("Camera is not supported");
-    }
-
-    private boolean isCamera2Supported(@NonNull final Context context) {
-        return Camera2Enumerator.isSupported(context);
     }
 
     public void startCapture() {

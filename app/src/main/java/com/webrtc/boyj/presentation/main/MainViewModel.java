@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.databinding.ObservableBoolean;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.webrtc.boyj.data.model.User;
 import com.webrtc.boyj.data.source.UserRepository;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import java.util.List;
 
@@ -42,7 +44,9 @@ public class MainViewModel extends BaseViewModel {
                         this.profile.setValue(user);
                         return repository.updateDeviceToken(id);
                     }
-                }).subscribe(() -> { /* doNothing */ }, this.error::setValue));
+                })
+                .doOnError(this.error::setValue)
+                .subscribe());
     }
 
     public void loadNewUserList(@NonNull final String id) {
@@ -95,5 +99,25 @@ public class MainViewModel extends BaseViewModel {
     @NonNull
     public ObservableBoolean getLoading() {
         return loading;
+    }
+
+    public static class Factory implements ViewModelProvider.Factory {
+        @NonNull
+        private final UserRepository repository;
+
+        public Factory(@NonNull UserRepository repository) {
+            this.repository = repository;
+        }
+
+        @SuppressWarnings("unchecked")
+        @NonNull
+        @Override
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            if (modelClass.isAssignableFrom(MainViewModel.class)) {
+                return (T) new MainViewModel(repository);
+            } else {
+                throw new IllegalArgumentException("ViewModel Not Found");
+            }
+        }
     }
 }

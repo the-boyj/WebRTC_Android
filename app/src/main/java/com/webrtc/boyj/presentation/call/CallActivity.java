@@ -10,26 +10,25 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
 import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityCallBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.di.Injection;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.presentation.common.view.SplitLayout;
-import com.webrtc.boyj.utils.SpeakerLoader;
 
 import java.util.List;
 
 public class CallActivity extends BaseActivity<ActivityCallBinding> {
     private static final String EXTRA_CALLEE_ID = "EXTRA_CALLEE_ID";
+
     private CallAdapter adapter;
+
     private String id;
 
     private CallViewModel callViewModel;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         final String calleeId = getIntent().getStringExtra(EXTRA_CALLEE_ID);
         id = IDManager.getSavedUserId(this);
 
@@ -69,38 +68,32 @@ public class CallActivity extends BaseActivity<ActivityCallBinding> {
     }
 
     private void initCallViewModel() {
-        final BoyjRTC boyjRTC = new BoyjRTC();
-        boyjRTC.initRTC();
-
-        final CallViewModelFactory factory = new CallViewModelFactory(boyjRTC);
-        callViewModel = ViewModelProviders.of(this, factory).get(CallViewModel.class);
+        callViewModel = ViewModelProviders.of(this,
+                Injection.providerCallViewModelFactory()).get(CallViewModel.class);
         binding.setVm(callViewModel);
         subscribeViewModel();
     }
 
     private void subscribeViewModel() {
-        subscribeRejected();
-        subscribeEndOfCall();
-    }
-
-    private void subscribeRejected() {
         callViewModel.getRejectedUserName().observe(this, userName ->
                 showToast(userName + "가 통화를 거절하였습니다."));
-    }
 
-    private void subscribeEndOfCall() {
-        callViewModel.getEndOfCall().observe(this, isEnded -> {
-            if (Boolean.TRUE.equals(isEnded)) {
+        callViewModel.getEndOfCallEvent().observe(this, event -> {
+            if (event.getContentIfNotHandled() != null) {
                 finish();
             }
         });
+
+        callViewModel.getError().observe(this, e ->
+                showToast(getString(R.string.ERROR_DEFAULT)));
     }
 
     private void initSpeakerViewModel() {
-        final SpeakerLoader loader = new SpeakerLoader(this);
-        final CallSpeakerViewModel.Factory factory = new CallSpeakerViewModel.Factory(loader);
-        final CallSpeakerViewModel speakerViewModel =
-                ViewModelProviders.of(this, factory).get(CallSpeakerViewModel.class);
+        final SpeakerViewModel speakerViewModel =
+                ViewModelProviders.of(
+                        this,
+                        Injection.providerSpeakerViewModelFactory(this)
+                ).get(SpeakerViewModel.class);
         binding.setSpeakerViewModel(speakerViewModel);
     }
 

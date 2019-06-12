@@ -2,9 +2,7 @@ package com.webrtc.boyj.presentation.ringing;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,16 +11,10 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.webrtc.boyj.R;
 import com.webrtc.boyj.data.common.IDManager;
-import com.webrtc.boyj.data.source.UserRepository;
-import com.webrtc.boyj.data.source.UserRepositoryImpl;
-import com.webrtc.boyj.data.source.local.preferences.TokenLocalDataSource;
-import com.webrtc.boyj.data.source.local.room.AppDatabase;
-import com.webrtc.boyj.data.source.local.room.UserLocalDataSource;
-import com.webrtc.boyj.data.source.remote.BoyjApiClient;
-import com.webrtc.boyj.data.source.remote.UserRemoteDataSource;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
 import com.webrtc.boyj.utils.RingtoneLoader;
 import com.webrtc.boyj.utils.WakeManager;
 
@@ -34,9 +26,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     private RingingViewModel viewModel;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
         RingtoneLoader.ring(this);
         WakeManager.turnOnScreen(this);
 
@@ -46,30 +36,23 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
     }
 
     private void initViews() {
-        findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
-        findViewById(R.id.fab_reject).setOnClickListener(__ -> {
+        binding.fabAccept.setOnClickListener(__ -> startCallActivity());
+        binding.fabReject.setOnClickListener(__ -> {
             viewModel.reject(callerId);
             finish();
         });
     }
 
     private void initViewModel() {
-        final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        final UserRepository repository = UserRepositoryImpl.getInstance(
-                UserLocalDataSource.getInstance(AppDatabase.getInstance(this).userDao()),
-                UserRemoteDataSource.getInstance(BoyjApiClient.getInstance()),
-                TokenLocalDataSource.getInstance(pref));
-        final RingingViewModel.Factory factory = new RingingViewModel.Factory(repository);
-        viewModel = ViewModelProviders.of(this, factory).get(RingingViewModel.class);
+        viewModel = ViewModelProviders.of(this,
+                Injection.providerRingingViewModelFactory(this)).get(RingingViewModel.class);
         binding.setVm(viewModel);
-
         subscribeViewModel();
     }
 
     private void subscribeViewModel() {
         viewModel.getError().observe(this, error -> {
-            final String errorMessage = getString(R.string.ERROR_DEFAULT);
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.ERROR_DEFAULT), Toast.LENGTH_SHORT).show();
             error.printStackTrace();
         });
     }
@@ -110,7 +93,7 @@ public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
 
     @Override
     protected void onDestroy() {
-        RingtoneLoader.unRing();
+        RingtoneLoader.cancelAndRelease();
         super.onDestroy();
     }
 }

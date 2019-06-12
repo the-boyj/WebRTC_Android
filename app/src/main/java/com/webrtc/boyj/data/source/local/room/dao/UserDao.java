@@ -32,4 +32,7 @@ public interface UserDao {
 
     @Update
     Completable update(final UserEntity entity);
+
+    @Query("DELETE FROM users WHERE id<>:id")
+    Completable deleteExceptId(final String id);
 }

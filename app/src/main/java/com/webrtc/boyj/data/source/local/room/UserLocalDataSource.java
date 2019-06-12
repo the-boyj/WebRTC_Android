@@ -56,18 +56,15 @@ public class UserLocalDataSource implements UserDataSource {
 
     @NonNull
     @Override
-    public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
-        return userDao.selectExceptId(id)
-                .subscribeOn(Schedulers.io())
-                .doOnSuccess(entities -> Logger.i(entities.toString()))
-                .onErrorReturnItem(Collections.emptyList())
-                .map(UserMapper::toUserListFromEntities);
+    public Completable deleteUserListExceptId(@NonNull String id) {
+        return userDao.deleteExceptId(id)
+                .subscribeOn(Schedulers.io());
     }
 
     @NonNull
     @Override
-    public Single<List<User>> getOtherUserListExceptIds(@NonNull List<String> ids) {
-        return userDao.selectExceptIds(ids)
+    public Single<List<User>> getOtherUserListExceptId(@NonNull String id) {
+        return userDao.selectExceptId(id)
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(entities -> Logger.i(entities.toString()))
                 .onErrorReturnItem(Collections.emptyList())

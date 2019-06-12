@@ -23,10 +23,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField "String", "SERVER_URL", "\"http://ec2-15-164-22-189.ap-northeast-2.compute.amazonaws.com:3000\""
+            buildConfigField "String", "SERVER_URL", "\"http://10.20.29.147:3000\""
         }
         release {
-            buildConfigField "String", "SERVER_URL", "\"http://ec2-15-164-22-189.ap-northeast-2.compute.amazonaws.com:3000\""
+            buildConfigField "String", "SERVER_URL", "\"http://10.20.29.147:3000\""
         }
     }
 

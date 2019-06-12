@@ -11,7 +11,10 @@ import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
+import java.util.Set;
+
 import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 public class PeerConnectionClient {
     @NonNull
@@ -78,6 +81,7 @@ public class PeerConnectionClient {
         return boyjPeerConnection.remoteMediaStream();
     }
 
+
     @NonNull
     public Observable<SdpPayload> offer() {
         return boyjPeerConnection.offer();
@@ -90,5 +94,31 @@ public class PeerConnectionClient {
 
     public int getConnectionCount() {
         return boyjPeerConnection.getConnectionCount();
+    }
+
+    @NonNull
+    public PublishSubject<String> connectionStateSubject() {
+        return boyjPeerConnection.connectionStateSubject();
+    }
+
+    @NonNull
+    public boolean isOfferer(String id) {
+        return boyjPeerConnection.isOfferer(id);
+    }
+
+    public void removeConnection(String id) {
+        boyjPeerConnection.removeConnection(id);
+    }
+
+    public boolean isConnected(String id) {
+        return boyjPeerConnection.isConnected(id);
+    }
+
+    public BoyjPeerConnection getConnections() {
+        return boyjPeerConnection;
+    }
+
+    public Set<String> peersId() {
+        return boyjPeerConnection.getPeersId();
     }
 }

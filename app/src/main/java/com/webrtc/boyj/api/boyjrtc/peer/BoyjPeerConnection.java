@@ -2,12 +2,15 @@ package com.webrtc.boyj.api.boyjrtc.peer;
 
 import androidx.annotation.NonNull;
 
+import com.webrtc.boyj.App;
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.peer.manager.RtcConfigurationManager;
 import com.webrtc.boyj.api.boyjrtc.peer.observer.BoyjDefaultSdpObserver;
 import com.webrtc.boyj.api.boyjrtc.peer.observer.BoyjPeerConnectionObserver;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
+import com.webrtc.boyj.data.common.IDManager;
+import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -17,6 +20,7 @@ import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Observable;
@@ -36,13 +40,26 @@ class BoyjPeerConnection {
     @NonNull
     private final PublishSubject<BoyjMediaStream> remoteMediaStreamSubject = PublishSubject.create();
 
+    @NonNull
+    public PublishSubject<String> connectionStateSubject() {
+        return connectionStateSubject;
+    }
+
+    @NonNull
+    private PublishSubject<String> connectionStateSubject = PublishSubject.create();
+
     BoyjPeerConnection() {
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
     }
 
+    public Set<String> getPeersId() {
+        return connections.keySet();
+    }
+
     void createPeerConnection(@NonNull final String id,
                               @NonNull final PeerConnectionFactory factory) {
+        Logger.BOYJ("createPeerConnection");
         final PeerConnection connection = factory.createPeerConnection(
                 RtcConfigurationManager.createRtcConfiguration(),
                 new BoyjPeerObserver(id));
@@ -53,11 +70,21 @@ class BoyjPeerConnection {
         connections.put(id, connection);
     }
 
+    public boolean isOfferer(String id) {
+        if (getConnectionById(id).getLocalDescription().type == SessionDescription.Type.OFFER)
+            return true;
+        else {
+            return false;
+        }
+    }
+
     void createOffer(@NonNull final String id) {
+        Logger.BOYJ("createOffer");
         getConnectionById(id).createOffer(new BoyjSdpObserver(id), constraints);
     }
 
     void createAnswer(@NonNull final String id) {
+        Logger.BOYJ("createAnswer");
         getConnectionById(id).createAnswer(new BoyjSdpObserver(id), constraints);
     }
 
@@ -68,11 +95,13 @@ class BoyjPeerConnection {
 
     void setLocalSdp(@NonNull final String id,
                      @NonNull SessionDescription sdp) {
+        Logger.BOYJ("setLocalSDP");
         getConnectionById(id).setLocalDescription(new BoyjDefaultSdpObserver(id), sdp);
     }
 
     void setRemoteSdp(@NonNull final String id,
                       @NonNull final SessionDescription sdp) {
+        Logger.BOYJ("setRemoteSDP");
         getConnectionById(id).setRemoteDescription(new BoyjDefaultSdpObserver(id), sdp);
     }
 
@@ -100,6 +129,26 @@ class BoyjPeerConnection {
         return connections.get(id);
     }
 
+    public void removeConnection(String id) {
+        connections.remove(id);
+    }
+
+    public boolean isConnected(String id) {
+        if (connections.containsKey(id)) {
+            if (getConnectionById(id).iceConnectionState() == PeerConnection.IceConnectionState.FAILED ||
+                    getConnectionById(id).iceConnectionState() == PeerConnection.IceConnectionState.DISCONNECTED ||
+                    getConnectionById(id).iceConnectionState() == PeerConnection.IceConnectionState.CLOSED
+            ) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+
+        }
+    }
+
     private class BoyjPeerObserver extends BoyjPeerConnectionObserver {
         @NonNull
         private final String id;
@@ -109,14 +158,26 @@ class BoyjPeerConnection {
         }
 
         @Override
+        public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
+            super.onIceConnectionChange(iceConnectionState);
+            if (iceConnectionState == PeerConnection.IceConnectionState.FAILED) {
+                connectionStateSubject.onNext(id);
+            }
+
+        }
+
+        @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
             final IceCandidatePayload payload = new IceCandidatePayload(iceCandidate);
+            Logger.BOYJ("onIceCandidate");
+            payload.setSender(IDManager.getSavedUserId(App.getContext()));
             payload.setReceiver(id);
             iceCandidateSubject.onNext(payload);
         }
 
         @Override
         public void onAddStream(MediaStream mediaStream) {
+            Logger.BOYJ("onAddStream");
             final BoyjMediaStream boyjMediaStream = new BoyjMediaStream(id, mediaStream);
             remoteMediaStreamSubject.onNext(boyjMediaStream);
         }
@@ -141,6 +202,7 @@ class BoyjPeerConnection {
         public void onCreateSuccess(SessionDescription sessionDescription) {
             super.onCreateSuccess(sessionDescription);
             final SdpPayload payload = new SdpPayload(sessionDescription);
+            payload.setSender(IDManager.getSavedUserId(App.getContext()));
             payload.setReceiver(id);
             if (sessionDescription.type == SessionDescription.Type.OFFER) {
                 offerSdpSubject.onNext(payload);

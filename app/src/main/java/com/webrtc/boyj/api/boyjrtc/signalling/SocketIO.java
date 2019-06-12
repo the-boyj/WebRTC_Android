@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import com.webrtc.boyj.BuildConfig;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.Payload;
 import com.webrtc.boyj.utils.JSONUtil;
+import com.webrtc.boyj.utils.Logger;
 
 import java.net.URISyntaxException;
 
@@ -31,21 +32,25 @@ class SocketIO {
     }
 
     void connect() {
+        Logger.BOYJ("connect");
         socket.connect();
     }
 
     void disconnect() {
+        Logger.BOYJ("disconnect");
         socket.off();
         socket.disconnect();
     }
 
     void emit(@NonNull SocketEvent event,
               @NonNull final Payload payload) {
+        Logger.BOYJ("emit "+event);
         socket.emit(event.toString(), JSONUtil.toJSONObject(payload));
     }
 
     void emit(@NonNull SocketEvent event,
               @Nullable final Object... args) {
+        Logger.BOYJ("emit "+event);
         socket.emit(event.toString(), args);
     }
 

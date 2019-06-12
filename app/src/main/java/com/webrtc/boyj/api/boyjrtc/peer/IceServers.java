@@ -15,19 +15,30 @@ public class IceServers {
     @NonNull
     private static final String CREDENTIAL_PWD = "boyj";
 
-    private static final List<String> stunUrlList = new ArrayList<>(
+    private static final String PRIVATE_ID = "aa1f1c54-39c4-11e9-9ab4-8a1138a37ce0";
+    private static final String PRIVATE_CREDENCIAL= "aa1f1ccc-39c4-11e9-9fd9-42348e526b10";
+
+    private static final List<String> private_serverUrlList = new ArrayList<>(
             Arrays.asList(
-                    "stun:13.124.30.187:3478",
-                    "stun:13.209.192.5:3478"
+                    "turn:tk-turn1.xirsys.com:80?transport=udp",
+                    "turn:tk-turn1.xirsys.com:3478?transport=udp",
+                    "turn:tk-turn1.xirsys.com:80?transport=tcp",
+                    "turn:tk-turn1.xirsys.com:3478?transport=tcp",
+                    "turns:tk-turn1.xirsys.com:443?transport=tcp",
+                    "turns:tk-turn1.xirsys.com:5349?transport=tcp"
             )
     );
 
-    private static final List<String> turnUrlList = new ArrayList<>(
+
+    private static final List<String> serverUrlList = new ArrayList<>(
             Arrays.asList(
                     "turn:13.124.30.187:3478",
                     "turn:13.209.192.5:3478"
             )
     );
+
+
+
 
     private IceServers() {
 
@@ -51,6 +62,14 @@ public class IceServers {
             );
         }
 
+        for (final String url : private_serverUrlList) {
+            iceServerList.add(
+                    PeerConnection.IceServer.builder(url)
+                            .setUsername(PRIVATE_ID)
+                            .setPassword(PRIVATE_CREDENCIAL)
+                            .createIceServer()
+            );
+        }
         return iceServerList;
     }
 }

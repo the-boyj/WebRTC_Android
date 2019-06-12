@@ -12,11 +12,13 @@ import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.Participant;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
+import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -24,6 +26,10 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.CompletableSubject;
 
 public class BoyjRTC implements BoyjContract {
+
+    private int connectionCount = 1;
+    private ConcurrentHashMap<String, Integer> renegotiationNeededList = new ConcurrentHashMap<>();
+
     private static final String ERROR_INITIALIZED = "BoyjRTC is not init. call `initRTC()` before use";
 
     @NonNull
@@ -84,12 +90,52 @@ public class BoyjRTC implements BoyjContract {
      * {@link SignalingClient} 로부터 들어오는 정보를 구독한다.
      */
     private void subscribeSignaling() {
+        subscribeConnectFromSig();
         subscribeParticipantsFromSig();
         subscribeOfferFromSig();
         subscribeAnswerFromSig();
         subscribeIceCandidateFromSig();
         subscribeEndOfCallFromSig();
         subscribeRejectFromSig();
+    }
+
+    private void subscribeConnectFromSig() {
+        disposables.add(sigClient.connectionAck().subscribe(s -> {
+            connectionCount++;
+
+            //reconnected
+            if (connectionCount > 1) {
+
+
+
+                for (String id : peerClient.peersId()) {
+                    if (renegotiationNeededList.keySet().contains(id)) {
+                        continue;
+                    }
+                    renegotiationNeededList.put(id, 1);
+                }
+
+                Logger.BOYJ("renegotiationSize : " + renegotiationNeededList.size());
+                Logger.BOYJ("peerClient size : " + peerClient.peersId().size());
+
+                for(String id : peerClient.peersId()){
+                    peerClient.removeConnection(id);
+                }
+
+
+
+
+                for (String id : renegotiationNeededList.keySet()) {
+                    peerClient.createPeerConnection(id);
+                    peerClient.addLocalStream(id, localStream());
+                    peerClient.createOffer(id);
+                }
+                renegotiationNeededList.clear();
+                Logger.BOYJ("after clear renegotiationSize : " + renegotiationNeededList.size());
+            }
+
+
+        }));
     }
 
     /**
@@ -159,10 +205,31 @@ public class BoyjRTC implements BoyjContract {
         disposables.add(sigClient.endOfCall()
                 .subscribe(
                         endOfCallPayload -> {
-                            peerClient.dispose(endOfCallPayload.getSender());
-                            if (peerClient.getConnectionCount() == 0) {
-                                callFinish();
+
+                            if (endOfCallPayload.getTimeout() == true) {
+                                //timeout but connected , reconnected
+                                if (peerClient.isConnected(endOfCallPayload.getSender())) {
+                                    //nothing
+                                }
+                                //other peer network error
+                                else {
+                                    peerClient.dispose(endOfCallPayload.getSender());
+                                    if (peerClient.getConnectionCount() == 0) {
+                                        callFinish();
+                                    }
+                                }
+
+
                             }
+
+                            //normal endofcall
+                            else {
+                                peerClient.dispose(endOfCallPayload.getSender());
+                                if (peerClient.getConnectionCount() == 0) {
+                                    callFinish();
+                                }
+                            }
+
                         }
                 ));
 
@@ -175,7 +242,6 @@ public class BoyjRTC implements BoyjContract {
         disposables.add(sigClient.reject()
                 .subscribe(rejectPayload -> {
                     if (peerClient.getConnectionCount() == 0) {
-                        onCallFinishSubject.onComplete();
                         callFinish();
                     }
                 }));
@@ -188,6 +254,7 @@ public class BoyjRTC implements BoyjContract {
         subscribeOfferSdpFromPeer();
         subscribeAnswerSdpFromPeer();
         subscribeIceCandidateFromPeer();
+        subscribeNetworkStateFromPeer();
     }
 
     /**
@@ -220,7 +287,28 @@ public class BoyjRTC implements BoyjContract {
      */
     private void subscribeIceCandidateFromPeer() {
         disposables.add(peerClient.iceCandidate()
-                .subscribe(payload -> sigClient.emitIceCandidate(payload), Throwable::printStackTrace));
+                .subscribe(payload -> {
+                    sigClient.emitIceCandidate(payload);
+                }, Throwable::printStackTrace));
+    }
+
+    private void subscribeNetworkStateFromPeer() {
+        disposables.add(peerClient.connectionStateSubject().subscribe(
+                id -> {
+
+
+                    if (renegotiationNeededList.keySet().contains(id)) {
+                        //nothing
+                    } else {
+                        renegotiationNeededList.put(id, 1);
+                    }
+                    Logger.BOYJ("after catch peer error renegotiationSize : " + renegotiationNeededList.size());
+
+                    peerClient.removeConnection(id);
+
+
+                }
+        ));
     }
 
 

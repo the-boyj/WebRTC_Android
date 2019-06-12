@@ -32,7 +32,7 @@ import java.util.Objects;
 
 public class Injection {
 
-    public static UserRepository providerUserRepository(@NonNull final Context context) {
+    private static UserRepository providerUserRepository(@NonNull final Context context) {
         return UserRepositoryImpl.getInstance(
                 providerLocalDataSource(context),
                 providerRemoteDataSource(),
@@ -56,7 +56,7 @@ public class Injection {
         return BoyjApiClient.getInstance();
     }
 
-    private static TokenDataSource providerTokenDataSource(@NonNull final Context context) {
+    public static TokenDataSource providerTokenDataSource(@NonNull final Context context) {
         final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         return TokenLocalDataSource.getInstance(pref);
     }

@@ -81,7 +81,6 @@ public class PeerConnectionClient {
         return boyjPeerConnection.remoteMediaStream();
     }
 
-
     @NonNull
     public Observable<SdpPayload> offer() {
         return boyjPeerConnection.offer();
@@ -101,21 +100,12 @@ public class PeerConnectionClient {
         return boyjPeerConnection.connectionStateSubject();
     }
 
-    @NonNull
-    public boolean isOfferer(String id) {
-        return boyjPeerConnection.isOfferer(id);
-    }
-
     public void removeConnection(String id) {
         boyjPeerConnection.removeConnection(id);
     }
 
     public boolean isConnected(String id) {
         return boyjPeerConnection.isConnected(id);
-    }
-
-    public BoyjPeerConnection getConnections() {
-        return boyjPeerConnection;
     }
 
     public Set<String> peersId() {

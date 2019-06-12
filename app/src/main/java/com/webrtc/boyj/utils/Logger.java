@@ -19,11 +19,6 @@ public class Logger {
         }
     }
 
-    public static void BOYJ(String msg){
-        if (BuildConfig.DEBUG) {
-            Log.i("bhw1994_tag", msg);
-        }
-    }
     public static void i(String msg) {
         if (BuildConfig.DEBUG) {
             Log.i(tag(), msg);

@@ -10,7 +10,6 @@ import com.webrtc.boyj.api.boyjrtc.peer.observer.BoyjPeerConnectionObserver;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
 import com.webrtc.boyj.data.common.IDManager;
-import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -59,7 +58,6 @@ class BoyjPeerConnection {
 
     void createPeerConnection(@NonNull final String id,
                               @NonNull final PeerConnectionFactory factory) {
-        Logger.BOYJ("createPeerConnection");
         final PeerConnection connection = factory.createPeerConnection(
                 RtcConfigurationManager.createRtcConfiguration(),
                 new BoyjPeerObserver(id));
@@ -70,21 +68,11 @@ class BoyjPeerConnection {
         connections.put(id, connection);
     }
 
-    public boolean isOfferer(String id) {
-        if (getConnectionById(id).getLocalDescription().type == SessionDescription.Type.OFFER)
-            return true;
-        else {
-            return false;
-        }
-    }
-
     void createOffer(@NonNull final String id) {
-        Logger.BOYJ("createOffer");
         getConnectionById(id).createOffer(new BoyjSdpObserver(id), constraints);
     }
 
     void createAnswer(@NonNull final String id) {
-        Logger.BOYJ("createAnswer");
         getConnectionById(id).createAnswer(new BoyjSdpObserver(id), constraints);
     }
 
@@ -95,13 +83,11 @@ class BoyjPeerConnection {
 
     void setLocalSdp(@NonNull final String id,
                      @NonNull SessionDescription sdp) {
-        Logger.BOYJ("setLocalSDP");
         getConnectionById(id).setLocalDescription(new BoyjDefaultSdpObserver(id), sdp);
     }
 
     void setRemoteSdp(@NonNull final String id,
                       @NonNull final SessionDescription sdp) {
-        Logger.BOYJ("setRemoteSDP");
         getConnectionById(id).setRemoteDescription(new BoyjDefaultSdpObserver(id), sdp);
     }
 
@@ -169,7 +155,6 @@ class BoyjPeerConnection {
         @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
             final IceCandidatePayload payload = new IceCandidatePayload(iceCandidate);
-            Logger.BOYJ("onIceCandidate");
             payload.setSender(IDManager.getSavedUserId(App.getContext()));
             payload.setReceiver(id);
             iceCandidateSubject.onNext(payload);
@@ -177,7 +162,6 @@ class BoyjPeerConnection {
 
         @Override
         public void onAddStream(MediaStream mediaStream) {
-            Logger.BOYJ("onAddStream");
             final BoyjMediaStream boyjMediaStream = new BoyjMediaStream(id, mediaStream);
             remoteMediaStreamSubject.onNext(boyjMediaStream);
         }

@@ -80,7 +80,6 @@ public class SignalingClient {
     private void listenReject() {
         socketIO.on(NOTIFY_REJECT, args -> {
             final RejectPayload payload = JSONUtil.fromJson(args[0], RejectPayload.class);
-            Logger.BOYJ(NOTIFY_REJECT.toString());
             Logger.ii(NOTIFY_REJECT.toString(), payload.toString());
             rejectSubject.onNext(payload);
         });
@@ -94,7 +93,6 @@ public class SignalingClient {
     private void listenParticipants() {
         socketIO.on(PARTICIPANTS, args -> {
             final ParticipantsPayload payload = JSONUtil.fromJson(args[0], ParticipantsPayload.class);
-            Logger.BOYJ(PARTICIPANTS.toString());
             Logger.ii(PARTICIPANTS.toString(), payload.toString());
             participantsSubject.onNext(payload);
         });
@@ -108,7 +106,6 @@ public class SignalingClient {
     private void listenOffer() {
         socketIO.on(RELAY_OFFER, args -> {
             final SdpPayload payload = JSONUtil.fromJson(args[0], SdpPayload.class);
-            Logger.BOYJ(RELAY_OFFER.toString());
             Logger.ii(RELAY_OFFER.toString(), payload.toString());
             offerSubject.onNext(payload);
         });
@@ -122,7 +119,6 @@ public class SignalingClient {
     private void listenAnswer() {
         socketIO.on(RELAY_ANSWER, args -> {
             final SdpPayload payload = JSONUtil.fromJson(args[0], SdpPayload.class);
-            Logger.BOYJ(RELAY_ANSWER.toString());
             Logger.ii(RELAY_ANSWER.toString(), payload.toString());
             answerSubject.onNext(payload);
         });
@@ -136,7 +132,6 @@ public class SignalingClient {
     private void listenIceCandidate() {
         socketIO.on(RELAY_ICE_CANDIDATE, args -> {
             final IceCandidatePayload payload = JSONUtil.fromJson(args[0], IceCandidatePayload.class);
-            Logger.BOYJ(RELAY_ICE_CANDIDATE.toString());
             Logger.ii(RELAY_ICE_CANDIDATE.toString(), payload.toString());
             iceCandidateSubject.onNext(payload);
         });
@@ -150,7 +145,6 @@ public class SignalingClient {
     private void listenEndOfCall() {
         socketIO.on(NOTIFY_END_OF_CALL, args -> {
             final EndOfCallPayload payload = JSONUtil.fromJson(args[0], EndOfCallPayload.class);
-            Logger.BOYJ(NOTIFY_END_OF_CALL.toString());
             Logger.ii(NOTIFY_END_OF_CALL.toString(), payload.toString());
             endOfCallSubject.onNext(payload);
         });

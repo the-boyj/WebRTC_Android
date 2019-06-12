@@ -12,7 +12,6 @@ import com.webrtc.boyj.api.boyjrtc.signalling.payload.DialPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.EndOfCallPayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.Participant;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
-import com.webrtc.boyj.utils.Logger;
 
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
@@ -103,38 +102,24 @@ public class BoyjRTC implements BoyjContract {
         disposables.add(sigClient.connectionAck().subscribe(s -> {
             connectionCount++;
 
-            //reconnected
+            // Reconnected
             if (connectionCount > 1) {
-
-
-
                 for (String id : peerClient.peersId()) {
                     if (renegotiationNeededList.keySet().contains(id)) {
                         continue;
                     }
                     renegotiationNeededList.put(id, 1);
                 }
-
-                Logger.BOYJ("renegotiationSize : " + renegotiationNeededList.size());
-                Logger.BOYJ("peerClient size : " + peerClient.peersId().size());
-
-                for(String id : peerClient.peersId()){
+                for (String id : peerClient.peersId()) {
                     peerClient.removeConnection(id);
                 }
-
-
-
-
                 for (String id : renegotiationNeededList.keySet()) {
                     peerClient.createPeerConnection(id);
                     peerClient.addLocalStream(id, localStream());
                     peerClient.createOffer(id);
                 }
                 renegotiationNeededList.clear();
-                Logger.BOYJ("after clear renegotiationSize : " + renegotiationNeededList.size());
             }
-
-
         }));
     }
 
@@ -206,7 +191,7 @@ public class BoyjRTC implements BoyjContract {
                 .subscribe(
                         endOfCallPayload -> {
 
-                            if (endOfCallPayload.getTimeout() == true) {
+                            if (endOfCallPayload.getTimeout()) {
                                 //timeout but connected , reconnected
                                 if (peerClient.isConnected(endOfCallPayload.getSender())) {
                                     //nothing
@@ -218,21 +203,16 @@ public class BoyjRTC implements BoyjContract {
                                         callFinish();
                                     }
                                 }
-
-
                             }
-
-                            //normal endofcall
+                            // normal end of call
                             else {
                                 peerClient.dispose(endOfCallPayload.getSender());
                                 if (peerClient.getConnectionCount() == 0) {
                                     callFinish();
                                 }
                             }
-
                         }
                 ));
-
     }
 
     /**
@@ -287,26 +267,19 @@ public class BoyjRTC implements BoyjContract {
      */
     private void subscribeIceCandidateFromPeer() {
         disposables.add(peerClient.iceCandidate()
-                .subscribe(payload -> {
-                    sigClient.emitIceCandidate(payload);
-                }, Throwable::printStackTrace));
+                .subscribe(payload ->
+                        sigClient.emitIceCandidate(payload), Throwable::printStackTrace));
     }
 
     private void subscribeNetworkStateFromPeer() {
         disposables.add(peerClient.connectionStateSubject().subscribe(
                 id -> {
-
-
-                    if (renegotiationNeededList.keySet().contains(id)) {
-                        //nothing
-                    } else {
+                    if (!renegotiationNeededList.keySet().contains(id)) {
                         renegotiationNeededList.put(id, 1);
+                    } else {
+                        // Do nothing
                     }
-                    Logger.BOYJ("after catch peer error renegotiationSize : " + renegotiationNeededList.size());
-
                     peerClient.removeConnection(id);
-
-
                 }
         ));
     }

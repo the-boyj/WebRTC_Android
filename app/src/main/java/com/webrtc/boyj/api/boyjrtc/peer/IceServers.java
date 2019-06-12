@@ -11,21 +11,24 @@ import java.util.List;
 public class IceServers {
 
     @NonNull
-    private static final String CREDENTIAL_ID = "boyj";
+    private static final String CREDENTIAL_ID = "MSoK3Kvm1-C2f9k69-CLx3C9l2QierkJ-XVorFNGLQpfEt8akAIoQgYS_fACs9MtAAAAAFz_FdRiaHcxOTk0";
     @NonNull
-    private static final String CREDENTIAL_PWD = "boyj";
+    private static final String CREDENTIAL_PWD = "ffec241c-8bf2-11e9-b318-066b071c7196";
 
+    @NonNull
     private static final List<String> stunUrlList = new ArrayList<>(
-            Arrays.asList(
-                    "stun:13.124.30.187:3478",
-                    "stun:13.209.192.5:3478"
-            )
+            Arrays.asList("stun:tk-turn2.xirsys.com")
     );
 
+    @NonNull
     private static final List<String> turnUrlList = new ArrayList<>(
             Arrays.asList(
-                    "turn:13.124.30.187:3478",
-                    "turn:13.209.192.5:3478"
+                    "turn:tk-turn2.xirsys.com:80?transport=udp",
+                    "turn:tk-turn2.xirsys.com:3478?transport=udp",
+                    "turn:tk-turn2.xirsys.com:80?transport=tcp",
+                    "turn:tk-turn2.xirsys.com:3478?transport=tcp",
+                    "turns:tk-turn2.xirsys.com:443?transport=tcp",
+                    "turns:tk-turn2.xirsys.com:5349?transport=tcp"
             )
     );
 
@@ -41,7 +44,6 @@ public class IceServers {
                     PeerConnection.IceServer.builder(url).createIceServer()
             );
         }
-
         for (final String url : turnUrlList) {
             iceServerList.add(
                     PeerConnection.IceServer.builder(url)
@@ -50,7 +52,6 @@ public class IceServers {
                             .createIceServer()
             );
         }
-
         return iceServerList;
     }
 }

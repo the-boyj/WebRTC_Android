@@ -19,6 +19,7 @@ import io.reactivex.subjects.PublishSubject;
 import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.ACCEPT;
 import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.ANSWER;
 import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.AWAKEN;
+import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.CONNECTION_ACK;
 import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.CREATE_ROOM;
 import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.DIAL;
 import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.END_OF_CALL;
@@ -35,6 +36,10 @@ import static com.webrtc.boyj.api.boyjrtc.signalling.SocketEvent.SEND_ICE_CANDID
 public class SignalingClient {
     @NonNull
     private static final SocketIO socketIO = SocketIO.create();
+
+    @NonNull
+    private PublishSubject<String> connectionAck = PublishSubject.create();
+
     @NonNull
     private final PublishSubject<RejectPayload> rejectSubject = PublishSubject.create();
     @NonNull
@@ -53,12 +58,23 @@ public class SignalingClient {
     }
 
     public void listenSocket() {
+        listenConnectionAck();
         listenReject();
         listenParticipants();
         listenOffer();
         listenAnswer();
         listenIceCandidate();
         listenEndOfCall();
+    }
+
+    public Observable<String> connectionAck() {
+        return connectionAck;
+    }
+
+    private void listenConnectionAck() {
+        socketIO.on(CONNECTION_ACK, args -> {
+            connectionAck.onNext("connect");
+        });
     }
 
     private void listenReject() {
@@ -187,4 +203,6 @@ public class SignalingClient {
     public void disconnect() {
         socketIO.disconnect();
     }
+
+
 }

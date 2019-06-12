@@ -21,6 +21,14 @@ public class CallAdapter extends SplitLayout.Adapter {
     private List<BoyjMediaStream> mediaStreamList = new ArrayList<>();
 
     public void addMediaStream(@NonNull final BoyjMediaStream mediaStream) {
+        for (int i = 0; i < mediaStreamList.size(); i++) {
+            if (mediaStreamList.get(i).getId() == mediaStream.getId()) {
+                mediaStreamList.set(i, mediaStream);
+                notifyDataSetChanged();
+                return;
+            }
+        }
+
         mediaStreamList.add(mediaStream);
         notifyDataSetChanged();
     }

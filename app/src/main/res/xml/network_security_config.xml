@@ -3,5 +3,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">ec2-15-164-22-189.ap-northeast-2.compute.amazonaws.com
         </domain>
+        <domain includeSubdomains="true">10.20.29.147
+        </domain>
+
     </domain-config>
 </network-security-config>

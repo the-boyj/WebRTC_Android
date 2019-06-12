@@ -2,12 +2,14 @@ package com.webrtc.boyj.api.boyjrtc.peer;
 
 import androidx.annotation.NonNull;
 
+import com.webrtc.boyj.App;
 import com.webrtc.boyj.api.boyjrtc.BoyjMediaStream;
 import com.webrtc.boyj.api.boyjrtc.peer.manager.RtcConfigurationManager;
 import com.webrtc.boyj.api.boyjrtc.peer.observer.BoyjDefaultSdpObserver;
 import com.webrtc.boyj.api.boyjrtc.peer.observer.BoyjPeerConnectionObserver;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.IceCandidatePayload;
 import com.webrtc.boyj.api.boyjrtc.signalling.payload.SdpPayload;
+import com.webrtc.boyj.data.common.IDManager;
 
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -17,6 +19,7 @@ import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SessionDescription;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import io.reactivex.Observable;
@@ -36,9 +39,21 @@ class BoyjPeerConnection {
     @NonNull
     private final PublishSubject<BoyjMediaStream> remoteMediaStreamSubject = PublishSubject.create();
 
+    @NonNull
+    public PublishSubject<String> connectionStateSubject() {
+        return connectionStateSubject;
+    }
+
+    @NonNull
+    private PublishSubject<String> connectionStateSubject = PublishSubject.create();
+
     BoyjPeerConnection() {
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
         this.constraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
+    }
+
+    public Set<String> getPeersId() {
+        return connections.keySet();
     }
 
     void createPeerConnection(@NonNull final String id,
@@ -100,6 +115,26 @@ class BoyjPeerConnection {
         return connections.get(id);
     }
 
+    public void removeConnection(String id) {
+        connections.remove(id);
+    }
+
+    public boolean isConnected(String id) {
+        if (connections.containsKey(id)) {
+            if (getConnectionById(id).iceConnectionState() == PeerConnection.IceConnectionState.FAILED ||
+                    getConnectionById(id).iceConnectionState() == PeerConnection.IceConnectionState.DISCONNECTED ||
+                    getConnectionById(id).iceConnectionState() == PeerConnection.IceConnectionState.CLOSED
+            ) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+
+        }
+    }
+
     private class BoyjPeerObserver extends BoyjPeerConnectionObserver {
         @NonNull
         private final String id;
@@ -109,8 +144,18 @@ class BoyjPeerConnection {
         }
 
         @Override
+        public void onIceConnectionChange(PeerConnection.IceConnectionState iceConnectionState) {
+            super.onIceConnectionChange(iceConnectionState);
+            if (iceConnectionState == PeerConnection.IceConnectionState.FAILED) {
+                connectionStateSubject.onNext(id);
+            }
+
+        }
+
+        @Override
         public void onIceCandidate(IceCandidate iceCandidate) {
             final IceCandidatePayload payload = new IceCandidatePayload(iceCandidate);
+            payload.setSender(IDManager.getSavedUserId(App.getContext()));
             payload.setReceiver(id);
             iceCandidateSubject.onNext(payload);
         }
@@ -141,6 +186,7 @@ class BoyjPeerConnection {
         public void onCreateSuccess(SessionDescription sessionDescription) {
             super.onCreateSuccess(sessionDescription);
             final SdpPayload payload = new SdpPayload(sessionDescription);
+            payload.setSender(IDManager.getSavedUserId(App.getContext()));
             payload.setReceiver(id);
             if (sessionDescription.type == SessionDescription.Type.OFFER) {
                 offerSdpSubject.onNext(payload);

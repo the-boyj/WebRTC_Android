@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 public enum SocketEvent {
     /* Caller */
+    CONNECTION_ACK("CONNECTION_ACK"),
     CREATE_ROOM("CREATE_ROOM"),
     DIAL("DIAL"),
     NOTIFY_REJECT("NOTIFY_REJECT"),

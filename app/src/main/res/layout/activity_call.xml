@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -10,25 +9,30 @@
         <variable
             name="vm"
             type="com.webrtc.boyj.presentation.call.CallViewModel" />
+
+        <variable
+            name="speakerViewModel"
+            type="com.webrtc.boyj.presentation.call.SpeakerViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.webrtc.boyj.extension.custom.BoyjSurfaceView
-            android:id="@+id/view_remote"
+        <com.webrtc.boyj.presentation.common.view.SplitLayout
+            android:id="@+id/splitLayout"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:mediaStream="@{vm.remoteMediaStream}" />
+            app:leaveStream="@{vm.leavedUserName}"
+            app:remoteStream="@{vm.remoteStream}" />
 
-        <com.webrtc.boyj.extension.custom.BoyjSurfaceView
-            android:id="@+id/view_local"
+        <com.webrtc.boyj.presentation.common.view.BoyjSurfaceView
+            android:id="@+id/local_boyj_surface_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:callAnimation="@{vm.isCalling}"
@@ -36,7 +40,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:mediaStream="@{vm.localMediaStream}" />
+            app:localStream="@{vm.localStream}" />
 
         <TextView
             android:id="@+id/tv_timer"
@@ -53,7 +57,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,64 +77,44 @@
             app:lottie_fileName="calling.json"
             app:lottie_loop="true" />
 
-        <TextView
-            android:id="@+id/tv_tel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_small"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/text_title_median"
-            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline"
-            app:phoneNumber="@{vm.tel}"
-            tools:text="010-9959-9999" />
-
-        <TextView
-            android:id="@+id/tv_connect_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/space_x_large"
-            android:text="@string/text_connect_message"
-            android:textSize="@dimen/text_xx_large"
-            android:visibility="@{vm.isCalling ? View.GONE : View.VISIBLE}"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_tel" />
-
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_reject"
             style="@style/CallFabDefault"
             android:backgroundTint="@color/colorRed"
+            android:onClick="@{() -> vm.hangUp()}"
             android:src="@drawable/ic_call_end"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guideline2" />
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_left"
             style="@style/CallFabDefault"
+            android:backgroundTint="@color/colorPrimaryLight"
+            android:onClick="@{() -> speakerViewModel.toggleSpeaker()}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/fab_reject"
-            app:layout_constraintTop_toBottomOf="@id/guideline2" />
+            app:layout_constraintTop_toBottomOf="@id/guideline2"
+            app:speakerphoneImage="@{speakerViewModel.isSpeakerphone}" />
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_right"
             style="@style/CallFabDefault"
+            android:backgroundTint="@color/colorPrimaryLight"
+            android:src="@drawable/ic_add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/fab_reject"
             app:layout_constraintTop_toBottomOf="@id/guideline2" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.8" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
 

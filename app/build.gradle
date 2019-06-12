@@ -1,38 +1,38 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion rootProject.compileSdkVersion
+
     defaultConfig {
         applicationId "com.webrtc.boyj"
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 1
-        versionName "1.x"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 2
+        versionName "2.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-        dataBinding {
-            enabled true
-        }
     }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            buildConfigField "String", "SERVER_URL", "\"http://13.124.244.130:3000\""
-
+            buildConfigField "String", "SERVER_URL", "\"http://ec2-15-164-22-189.ap-northeast-2.compute.amazonaws.com:3000\""
+        }
+        release {
+            buildConfigField "String", "SERVER_URL", "\"http://ec2-15-164-22-189.ap-northeast-2.compute.amazonaws.com:3000\""
         }
     }
 
-
     dataBinding {
-        enabled true
+        enabled = true
     }
-
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,63 +42,67 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    //android support
-    implementation "com.android.support:appcompat-v7:$appcompat_version"
-    implementation 'com.android.support:customtabs:28.0.0'
-    implementation 'com.android.support:support-vector-drawable:28.0.0'
-    implementation 'com.android.support:support-media-compat:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    // Dependencies for androidx support
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    implementation "androidx.browser:browser:$browser_version"
+    implementation "androidx.vectordrawable:vectordrawable:$vectordrawable_version"
+    implementation "androidx.media:media:$media_version"
+    implementation "androidx.legacy:legacy-support-v4:$legacy_support_version"
+    implementation "androidx.preference:preference:$preference_version"
 
-    //android test
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'com.android.support.test:runner:1.0.2'
-    testImplementation 'com.android.support.test:rules:1.0.2'
-    //mockito
-    testImplementation 'org.mockito:mockito-core:2.8.0'
+    // Dependencies for design support
+    implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
+    implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
+    implementation "com.google.android.material:material:$material_version"
+    implementation "com.airbnb.android:lottie:$lottie_version"
 
-    //power mockito
-    testImplementation 'org.powermock:powermock-api-mockito2:1.7.0RC2'
-    testImplementation 'org.powermock:powermock-module-junit4:1.7.0'
-    testImplementation 'org.powermock:powermock-core:1.7.0'
-    testImplementation 'org.powermock:powermock-module-junit4-rule:1.7.0'
+    // Dependencies for android arch
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 
+    testImplementation "androidx.arch.core:core-testing:$arch_testing_version"
 
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-
-    // Floating Action Button
-    implementation "com.android.support:design:$design_version"
-    // RecyclerView
-    implementation "com.android.support:recyclerview-v7:$recyclerview_version"
-    // ViewModel and LiveData
-    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
-    // RxJava
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    // Dependencies for RxJava
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    implementation "com.jakewharton.rxbinding3:rxbinding:$rxbinding_version"
 
-    //Firebase
-    implementation 'com.google.firebase:firebase-core:16.0.6'
-    implementation 'com.google.firebase:firebase-messaging:17.3.4'
-    implementation 'com.google.firebase:firebase-firestore:17.1.5'
+    // Dependencies for Firebase
+    implementation "com.google.firebase:firebase-core:$firebase_core_version"
+    implementation "com.google.firebase:firebase-messaging:$firebase_messaging_version"
 
-    implementation 'com.android.support:multidex:1.0.3'
+    // Dependencies for WebRTC
     implementation("io.socket:socket.io-client:$socket_version") {
         exclude group: 'org.json', module: 'json'
     }
-
-    // TedPermission
-    implementation "gun0912.ted:tedpermission:$tedpermission_version"
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:$lottie_version"
-
-    //WebRtc
     implementation "org.webrtc:google-webrtc:$webrtc_version"
 
-    //gson
+    // Dependencies for network
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_logging_version"
     implementation "com.google.code.gson:gson:$gson_version"
+
+    testImplementation "com.google.code.gson:gson:$gson_version"
+
+    // Dependencies for test
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "androidx.test:rules:$test_rules_version"
+    testImplementation "androidx.test:runner:$test_runner_version"
+    testImplementation "org.mockito:mockito-core:$mockito_core_version"
+
+    androidTestImplementation "androidx.test:core:$test_core_version"
+    androidTestImplementation "androidx.test.ext:junit:$test_ext_junit_version"
+    androidTestImplementation "androidx.test:rules:$test_rules_version"
+    androidTestImplementation "androidx.test:runner:$test_runner_version"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$test_espresso_version"
+
+    // Dependencies for debug
+    implementation "com.facebook.stetho:stetho:$stetho_version"
+    implementation "com.facebook.stetho:stetho-okhttp3:$stetho_version"
 }
 apply plugin: 'com.google.gms.google-services'

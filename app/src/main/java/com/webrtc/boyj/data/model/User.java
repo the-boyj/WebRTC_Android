@@ -1,36 +1,53 @@
 package com.webrtc.boyj.data.model;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import java.io.Serializable;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Objects;
 
-public class User implements Serializable {
-    private String tel;
+public class User {
+    @SerializedName("userId")
+    @Expose
+    private String id;
+
+    @Expose
+    @SerializedName("name")
     private String name;
-    private String deviceToken;
 
-    public User() {
-    }
-
-    public User(String tel,
-                String name,
-                String deviceToken) {
-        this.tel = tel;
+    public User(String id, String name) {
+        this.id = id;
         this.name = name;
-        this.deviceToken = deviceToken;
     }
 
-    public String getTel() {
-        return tel;
+    public String getId() {
+        return id;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDeviceToken() {
-        return deviceToken;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public static User createFromId(@NonNull final String id) {
+        return new User(id, id);
+    }
+
+    public boolean isEmpty() {
+        return id == null && name == null;
+    }
+
+    public static User emptyUser() {
+        return new User(null, null);
     }
 
     @Override
@@ -38,15 +55,14 @@ public class User implements Serializable {
         if (this == o) return true;
         if (o instanceof User) {
             User user = (User) o;
-            return Objects.equals(tel, user.tel) &&
-                    Objects.equals(name, user.name) &&
-                    Objects.equals(deviceToken, user.deviceToken);
+            return Objects.equals(id, user.id) &&
+                    Objects.equals(name, user.name);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tel, name, deviceToken);
+        return Objects.hash(id, name);
     }
 }

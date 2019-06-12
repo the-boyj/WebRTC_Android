@@ -10,7 +10,7 @@
             type="com.webrtc.boyj.presentation.ringing.RingingViewModel" />
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,20 +31,32 @@
             app:layout_constraintGuide_percent="0.15" />
 
         <TextView
-            android:id="@+id/tv_caller_tel"
+            android:id="@+id/tv_caller_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/space_x_small"
-            android:clickable="@{vm.isKnockReceived ? true : false, default=false}"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/text_title_median"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/guideline"
-            app:phoneNumber="@{vm.tel}"
+            android:text="@{vm.caller.name}"
+
             tools:text="010-9952-4321" />
 
-        <android.support.design.widget.FloatingActionButton
+        <TextView
+            android:id="@+id/tv_caller_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/space_x_small"
+            android:text="@{vm.caller.id}"
+            android:textSize="@dimen/text_x_large"
+            tools:text="이름"
+            app:layout_constraintEnd_toEndOf="@id/tv_caller_name"
+            app:layout_constraintStart_toStartOf="@id/tv_caller_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_caller_name" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_accept"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -64,7 +76,7 @@
             app:layout_constraintStart_toStartOf="@id/fab_accept"
             app:layout_constraintTop_toBottomOf="@id/fab_accept" />
 
-        <android.support.design.widget.FloatingActionButton
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_reject"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -84,7 +96,7 @@
             app:layout_constraintStart_toStartOf="@id/fab_reject"
             app:layout_constraintTop_toBottomOf="@id/fab_reject" />
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,5 +114,5 @@
             app:lottie_fileName="dial.json"
             app:lottie_loop="true" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

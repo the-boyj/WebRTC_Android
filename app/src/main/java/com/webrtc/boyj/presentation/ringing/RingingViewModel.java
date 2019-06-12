@@ -1,46 +1,80 @@
 package com.webrtc.boyj.presentation.ringing;
 
-import android.databinding.ObservableBoolean;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.webrtc.boyj.api.BoyjRTC;
-import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
-import com.webrtc.boyj.presentation.BaseViewModel;
+import com.webrtc.boyj.api.boyjrtc.BoyjRTC;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.AwakenPayload;
+import com.webrtc.boyj.api.boyjrtc.signalling.payload.RejectPayload;
+import com.webrtc.boyj.data.model.User;
+import com.webrtc.boyj.data.source.UserRepository;
+import com.webrtc.boyj.presentation.common.viewmodel.BaseViewModel;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class RingingViewModel extends BaseViewModel {
     @NonNull
-    private final String tel;
+    private final MutableLiveData<User> caller = new MutableLiveData<>();
+    @NonNull
+    private final MutableLiveData<Throwable> error = new MutableLiveData<>();
+    @NonNull
+    private final UserRepository repository;
     @NonNull
     private final BoyjRTC boyjRTC;
-    @NonNull
-    private final ObservableBoolean isKnockReceived = new ObservableBoolean();
 
-    RingingViewModel(@NonNull final String tel) {
-        this.tel = tel;
+    public RingingViewModel(@NonNull final UserRepository repository) {
+        this.repository = repository;
         this.boyjRTC = new BoyjRTC();
+    }
 
-        addDisposable(boyjRTC.knock()
+    public void loadCallerProfile(@NonNull final String callerId) {
+        addDisposable(repository.getProfile(callerId)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> isKnockReceived.set(true)));
+                .subscribe(this.caller::setValue, this.error::setValue));
     }
 
-    void awaken(@NonNull final AwakenPayload payload) {
-        boyjRTC.awaken(payload);
+    public void awaken(@NonNull final String room,
+                       @NonNull final String callerId,
+                       @NonNull final String calleeId) {
+        boyjRTC.awaken(new AwakenPayload(room, callerId, calleeId));
     }
 
-    void reject() {
-        boyjRTC.reject();
+    public void reject(@NonNull final String callerId) {
+        final RejectPayload payload = new RejectPayload();
+        payload.setReceiver(callerId);
+        boyjRTC.reject(payload);
     }
 
     @NonNull
-    public String getTel() {
-        return tel;
+    public LiveData<User> getCaller() {
+        return caller;
     }
 
     @NonNull
-    public ObservableBoolean getIsKnockReceived() {
-        return isKnockReceived;
+    public LiveData<Throwable> getError() {
+        return error;
+    }
+
+    public static class Factory implements ViewModelProvider.Factory {
+        @NonNull
+        private final UserRepository repository;
+
+        public Factory(@NonNull UserRepository repository) {
+            this.repository = repository;
+        }
+
+        @SuppressWarnings("unchecked")
+        @NonNull
+        @Override
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            if (modelClass.isAssignableFrom(RingingViewModel.class)) {
+                return (T) new RingingViewModel(repository);
+            } else {
+                throw new IllegalArgumentException("ViewModel Not Found");
+            }
+        }
     }
 }

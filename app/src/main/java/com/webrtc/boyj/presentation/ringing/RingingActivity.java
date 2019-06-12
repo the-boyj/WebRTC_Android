@@ -1,64 +1,99 @@
 package com.webrtc.boyj.presentation.ringing;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.api.signalling.payload.AwakenPayload;
-import com.webrtc.boyj.api.signalling.payload.FCMPayload;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.databinding.ActivityRingingBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.call.CallActivity;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
+import com.webrtc.boyj.utils.RingtoneLoader;
+import com.webrtc.boyj.utils.WakeManager;
 
 public class RingingActivity extends BaseActivity<ActivityRingingBinding> {
-    private static final String EXTRA_FCM_PAYLOAD = "EXTRA_FCM_PAYLOAD";
-    private FCMPayload fcmPayload;
+    private static final String EXTRA_ROOM = "room";
+    private static final String EXTRA_CALLER_ID = "callerId";
+
+    private String callerId;
+    private RingingViewModel viewModel;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        fcmPayload = (FCMPayload) getIntent().getSerializableExtra(EXTRA_FCM_PAYLOAD);
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        RingtoneLoader.ring(this);
+        WakeManager.turnOnScreen(this);
 
         initViews();
         initViewModel();
-
-        final AwakenPayload awakenPayload = new AwakenPayload.Builder(fcmPayload.getRoom()).build();
-        binding.getVm().awaken(awakenPayload);
+        awaken();
     }
 
     private void initViews() {
-        findViewById(R.id.fab_accept).setOnClickListener(__ -> startCallActivity());
-        findViewById(R.id.fab_reject).setOnClickListener(__ -> {
-            binding.getVm().reject();
+        binding.fabAccept.setOnClickListener(__ -> startCallActivity());
+        binding.fabReject.setOnClickListener(__ -> {
+            viewModel.reject(callerId);
             finish();
         });
     }
 
     private void initViewModel() {
-        final RingingViewModel vm = ViewModelProviders.of(this,
-                new RingingViewModelFactory(fcmPayload.getTel())).get(RingingViewModel.class);
-        binding.setVm(vm);
+        viewModel = ViewModelProviders.of(this,
+                Injection.providerRingingViewModelFactory(this)).get(RingingViewModel.class);
+        binding.setVm(viewModel);
+        subscribeViewModel();
+    }
+
+    private void subscribeViewModel() {
+        viewModel.getError().observe(this, error -> {
+            Toast.makeText(this, getString(R.string.ERROR_DEFAULT), Toast.LENGTH_SHORT).show();
+            error.printStackTrace();
+        });
     }
 
     private void startCallActivity() {
-        startActivity(CallActivity.getLaunchIntent(this, fcmPayload.getTel(), fcmPayload.getRoom(), false));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
+        startActivity(CallActivity.getCalleeLaunchIntent(this));
         finish();
     }
 
+    private void awaken() {
+        final String room = getIntent().getStringExtra(EXTRA_ROOM);
+        final String calleeId = IDManager.getSavedUserId(this);
+        assert calleeId != null;
+
+        callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
+        viewModel.loadCallerProfile(callerId);
+        viewModel.awaken(room, callerId, calleeId);
+    }
+
     public static Intent getLaunchIntent(@NonNull final Context context,
-                                         @NonNull final FCMPayload payload) {
+                                         @NonNull final String room,
+                                         @NonNull final String callerId) {
         return getLaunchIntent(context, RingingActivity.class)
-                .putExtra(EXTRA_FCM_PAYLOAD, payload);
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(EXTRA_ROOM, room)
+                .putExtra(EXTRA_CALLER_ID, callerId);
     }
 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_ringing;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // disabled back press
+    }
+
+    @Override
+    protected void onDestroy() {
+        RingtoneLoader.cancelAndRelease();
+        super.onDestroy();
     }
 }

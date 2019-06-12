@@ -1,130 +1,84 @@
 package com.webrtc.boyj.presentation.main;
 
-import android.annotation.SuppressLint;
-import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.gun0912.tedpermission.PermissionListener;
-import com.gun0912.tedpermission.TedPermission;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import com.webrtc.boyj.R;
-import com.webrtc.boyj.common.NameDialog;
+import com.webrtc.boyj.data.common.IDManager;
 import com.webrtc.boyj.data.model.User;
-import com.webrtc.boyj.data.repository.UserRepositoryImpl;
 import com.webrtc.boyj.databinding.ActivityMainBinding;
-import com.webrtc.boyj.presentation.BaseActivity;
+import com.webrtc.boyj.di.Injection;
 import com.webrtc.boyj.presentation.call.CallActivity;
-
-import java.util.List;
-
-import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.READ_PHONE_STATE;
-import static android.Manifest.permission.RECORD_AUDIO;
+import com.webrtc.boyj.presentation.common.activity.BaseActivity;
+import com.webrtc.boyj.presentation.settings.SettingsActivity;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
-    @Nullable
-    private String tel;
+    private String id;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        init();
+    }
 
+    private void init() {
+        id = IDManager.getSavedUserId(this);
         initToolbar();
-        checkPermission();
+        initViewModel();
+        initRecyclerView();
+        subscribeViewModel();
     }
 
     private void initToolbar() {
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar(binding.layoutToolbar.toolbar);
         final ActionBar toolbar = getSupportActionBar();
         if (toolbar != null) {
             toolbar.setDisplayShowTitleEnabled(false);
         }
     }
 
-    @SuppressLint({"MissingPermission", "HardwareIds"})
-    private void checkPermission() {
-        TedPermission.with(getApplicationContext())
-                .setPermissions(READ_PHONE_STATE, RECORD_AUDIO, CAMERA)
-                .setPermissionListener(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted() {
-                        final TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
-                        final String number = tm.getLine1Number();
-                        if (TextUtils.isEmpty(number)) {
-                            notExistPhoneNumber();
-                        } else {
-                            tel = number.replace("+82", "0");
-                            init();
-                        }
-                    }
-
-                    @Override
-                    public void onPermissionDenied(List<String> deniedPermissions) {
-                        showToast(getString(R.string.ERROR_PERMISSION_DENIED));
-                    }
-                }).check();
-    }
-
-    private void init() {
-        assert tel != null;
-
-        initViewModel();
-        initRecyclerView();
-        subscribeViewModel();
-        binding.getVm().init(tel);
-    }
-
     private void initViewModel() {
         final MainViewModel vm = ViewModelProviders.of(this,
-                new MainViewModelFactory(UserRepositoryImpl.getInstance(
-                        FirebaseFirestore.getInstance(),
-                        PreferenceManager.getDefaultSharedPreferences(this))))
-                .get(MainViewModel.class);
-
+                Injection.providerMainViewModelFactory(this)).get(MainViewModel.class);
+        vm.loadProfile(id);
+        vm.loadOtherUserList(id);
         binding.setVm(vm);
     }
 
     private void initRecyclerView() {
         final MainAdapter adapter = new MainAdapter();
         adapter.setOnDialListener(this::startCallActivity);
+
+        final SwipeRefreshLayout layout = findViewById(R.id.swipe_refresh_layout);
+        layout.setOnRefreshListener(() -> {
+            binding.getVm().loadNewUserList(id);
+            layout.setRefreshing(false);
+        });
         binding.rvUser.setAdapter(adapter);
+    }
+
+    private void startCallActivity(@NonNull final User user) {
+        startActivity(CallActivity.getCallerLaunchIntent(this, user.getId()));
     }
 
     private void subscribeViewModel() {
         binding.getVm().getError().observe(this,
-                e -> showToast(getString(R.string.ERROR_DEFAULT)));
-    }
-
-    private void notExistPhoneNumber() {
-        showToast(getString(R.string.ERROR_PHONE_NUMBER_NOT_EXIST));
-    }
-
-    private void showDialog() {
-        if (tel == null) {
-            notExistPhoneNumber();
-            return;
-        }
-        final NameDialog dialog = new NameDialog(this);
-        dialog.setPositiveButton(name -> binding.getVm().updateUserName(tel, name));
-        dialog.show();
+                e -> {
+                    showToast(getString(R.string.ERROR_DEFAULT));
+                    e.printStackTrace();
+                });
     }
 
     private void showToast(@NonNull final String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
-
-    private void startCallActivity(@NonNull final User user) {
-        startActivity(CallActivity.getLaunchIntent(this, user.getTel(), user.getDeviceToken(), true));
-        overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left);
     }
 
     @Override
@@ -135,10 +89,24 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_update_profile) {
-            showDialog();
+        switch (item.getItemId()) {
+            case R.id.menu_update_profile:
+                showDialog();
+                break;
+            case R.id.menu_refresh_user_list:
+                binding.getVm().loadNewUserList(id);
+                break;
+            case R.id.menu_settings:
+                startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showDialog() {
+        final NameDialog dialog = new NameDialog(this);
+        dialog.setPositiveButton(name -> binding.getVm().updateUserName(id, name));
+        dialog.show();
     }
 
     @Override
